@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>网页仪器面板</title>
+<style>
+    body {font-family: Arial, sans-serif; margin: 20px;}
+    .panel {display:flex; flex-wrap:wrap;}
+    .section {margin-right:30px;}
+    canvas{border:1px solid #ccc;background:#fafafa;}
+    label{display:inline-block;width:120px;margin-top:8px;}
+    input[type=text],input[type=number]{width:80px;}
+</style>
+</head>
+<body>
+
+<h2>网页仪器面板</h2>
+
+<div class="panel">
+
+    <!-- 配置区 -->
+    <div class="section">
+        <h3>配置参数</h3>
+        <label>采集卡名称：</label><input id="cardName" type="text"><br>
+        <label>通道数（逗号分割）:</label><input id="channels" type="text" value="0"><br>
+        <label>采样率 (Hz):</label><input id="sampleRate" type="number" value="10000"><br>
+        <label>量程 (V):</label><input id="range" type="number" value="10"><br>
+        <label>采集长度:</label><input id="length" type="number" value="2000"><br>
+
+        <button id="acquireBtn">采集</button>
+        <button id="analyzeBtn">分析</button>
+    </div>
+
+    <!-- 波形显示区 -->
+    <div class="section">
+        <h3>波形一（采集）</h3>
+        <canvas id="wave1" width="600" height="200"></canvas><br>
+        <h3>波形二（直方图）</h3>
+        <canvas id="histogram" width="600" height="200"></canvas>
+    </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

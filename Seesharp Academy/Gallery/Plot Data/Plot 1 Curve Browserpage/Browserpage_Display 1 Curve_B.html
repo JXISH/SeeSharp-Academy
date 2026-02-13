@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数组曲线显示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .chart-container {
+            margin-top: 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        
+        canvas {
+            border: 1px solid #ccc;
+            background-color: white;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .error {
+            color: #d32f2f;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .hint {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* 新增样式 */
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: normal;
+            margin-bottom: 0;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 8px;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>数组曲线显示器</h1>
+        
+        <div class="input-section">
+            <label for="arrayInput">输入逗号分隔的一维数组：</label>
+            <input type="text" id="arrayInput" placeholder="例如: 1,2,3,4,5,4,3,2,1">
+            <div class="hint">请输入数字，用逗号分隔</div>
+            
+            <label for="intervalInput">横坐标数据间隔量：</label>
+            <input type="text" id="intervalInput" placeholder="例如: 1" value="1">
+            <div class="hint">设置数据点的横坐标间隔（步长）</div>
+            
+            <div class="control-row">
+                <button onclick="drawCurve()">显示曲线</button>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="hidePointsCheckbox">
+                    隐藏数据点
+                </label>
+            </div>
+            
+            <div id="errorMessage" class="error"></div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="curveCanvas" width="800" height="400"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // 根据范围自动确定刻度间隔
+        function getTickInterval(range) {
+            if (range <= 0) return 1;  // 防止范围为0或负数
+            if (range < 2) return 0.1;  // 范围小于10时使用0.1间隔
+            if (range < 20) return 1;   // 范围10-100时使用1间隔
+            if (range < 200) return 10; // 范围100-1000时使用10间隔
+            return 100; // 更大范围使用100间隔
+        }
+        
+        // 根据值和间隔确定显示的小数位数
+        function getDecimalPlaces(interval) {
+            if (interval < 1) {
+                return interval.toString().split('.')[1].length;
+            }
+            return 0;
+        }
+
+        function drawCurve() {
+            const input = document.getElementById('arrayInput').value.trim();
+            const intervalInput = document.getElementById('intervalInput').value.trim();
+            const hidePoints = document.getElementById('hidePointsCheckbox').checked;
+            const errorDiv = document.getElementById('errorMessage');
+            const canvas = document.getElementById('curveCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 清除错误信息
+            errorDiv.textContent = '';
+            
+            if (!input) {
+                errorDiv.textContent = '请输入数组数据';
+                return;
+            }
+            
+            // 解析间隔输入
+            let interval = 1;
+            if (intervalInput) {
+                try {
+                    interval = parseFloat(intervalInput);
+                    if (isNaN(interval) || interval <= 0) {
+                        throw new Error('间隔必须是大于0的数字');
+                    }
+                } catch (error) {
+                    errorDiv.textContent = '间隔格式错误: ' + error.message;
+                    return;
+                }
+            }
+            
+            // 解析输入数据
+            let data;
+            try {
+                data = input.split(',').map(item => {
+                    const num = parseFloat(item.trim());
+                    if (isNaN(num)) {
+                        throw new Error(`"${item.trim()}" 不是有效数字`);
+                    }
+                    return num;
+                });
+                
+                if (data.length === 0) {
+                    throw new Error('数组不能为空');
+                }
+            } catch (error) {
+                errorDiv.textContent = '数据格式错误: ' + error.message;
+                return;
+            }
+            
+            // 清除画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 设置绘图参数
+            const padding = 50;
+            const chartWidth = canvas.width - 2 * padding;
+            const chartHeight = canvas.height - 2 * padding;
+            
+            // 计算数据范围
+            const minValue = Math.min(...data);
+            const maxValue = Math.max(...data);
+            const valueRange = maxValue - minValue;
+            const minRange = valueRange === 0 ? 1 : valueRange * 0.1; // 如果所有值相同，给一个默认范围
+            const adjustedMin = minValue - (valueRange === 0 ? 0.5 : minRange);
+            const adjustedMax = maxValue + (valueRange === 0 ? 0.5 : minRange);
+            const adjustedRange = adjustedMax - adjustedMin;
+            
+            // 计算Y轴刻度间隔（自动调整）
+            const yInterval = getTickInterval(adjustedRange);
+            // 计算需要多少个刻度
+            const yTickCount = Math.ceil(adjustedRange / yInterval);
+            // 调整最大最小值，确保刻度对齐
+            const alignedMin = Math.floor(adjustedMin / yInterval) * yInterval;
+            const alignedMax = alignedMin + yTickCount * yInterval;
+            const alignedRange = alignedMax - alignedMin;
+            
+            // 计算X轴范围和刻度间隔
+            const xMaxValue = (data.length - 1) * interval;
+            const xRange = xMaxValue;
+            const xInterval = getTickInterval(xRange);
+            const xDecimalPlaces = getDecimalPlaces(xInterval);
+            const yDecimalPlaces = getDecimalPlaces(yInterval);
+            
+            // 绘制坐标轴
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            // Y轴
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, canvas.height - padding);
+            // X轴
+            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.stroke();
+            
+            // 绘制网格线
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            
+            // 垂直网格线（根据X轴间隔绘制）
+            const xGridCount = Math.min(10, Math.ceil(xRange / xInterval));
+            for (let i = 0; i <= xGridCount; i++) {
+                const xValue = i * xInterval;
+                const x = padding + (xValue / xRange) * chartWidth;
+                ctx.beginPath();
+                ctx.moveTo(x, padding);
+                ctx.lineTo(x, canvas.height - padding);
+                ctx.stroke();
+            }
+            
+            // 水平网格线（根据Y轴间隔绘制）
+            for (let i = 0; i <= yTickCount; i++) {
+                const y = canvas.height - padding - (i / yTickCount) * chartHeight;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(canvas.width - padding, y);
+                ctx.stroke();
+            }
+            
+            // 绘制曲线
+            ctx.strokeStyle = '#2196F3';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            for (let i = 0; i < data.length; i++) {
+                const x = padding + (i / (data.length - 1)) * chartWidth;
+                const y = canvas.height - padding - ((data[i] - alignedMin) / alignedRange) * chartHeight;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+            
+            // 绘制数据点（如果未勾选隐藏）
+            if (!hidePoints) {
+                ctx.fillStyle = '#F44336';
+                for (let i = 0; i < data.length; i++) {
+                    const x = padding + (i / (data.length - 1)) * chartWidth;
+                    const y = canvas.height - padding - ((data[i] - alignedMin) / alignedRange) * chartHeight;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+            
+            // 绘制Y轴标签
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= yTickCount; i++) {
+                const value = alignedMin + (i * yInterval);
+                const y = canvas.height - padding - (i / yTickCount) * chartHeight;
+                ctx.fillText(value.toFixed(yDecimalPlaces), padding - 10, y + 4);
+            }
+            
+            // 绘制X轴标签
+            ctx.textAlign = 'center';
+            for (let i = 0; i <= xGridCount; i++) {
+                const xValue = i * xInterval;
+                const x = padding + (xValue / xRange) * chartWidth;
+                ctx.fillText(xValue.toFixed(xDecimalPlaces), x, canvas.height - padding + 20);
+            }
+            
+            // 绘制标题
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('数组数据曲线图', canvas.width / 2, 30);
+        }
+        
+        // 添加回车键支持
+        document.getElementById('arrayInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                drawCurve();
+            }
+        });
+        
+        // 页面加载时显示示例
+        window.onload = function() {
+            document.getElementById('arrayInput').value = '1,4,2,8,5,7,3,9,6';
+            drawCurve();
+        };
+    </script>
+</body>
+</html>

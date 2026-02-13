@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仪器面板 - 采集与分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .control-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-panel h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-acquire {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-acquire:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+        }
+
+        .btn-analyze {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-analyze:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .waveform-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 20px;
+        }
+
+        .waveform-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .waveform-card h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .waveform-card h3::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #667eea;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            background: #fafafa;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .status-bar {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border-left: 4px solid #c62828;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .waveform-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 仪器面板 - 数据采集与分析</h1>
+            <p>Instrument Panel - Data Acquisition & Analysis</p>
+        </div>
+
+        <div class="main-content">
+            <!-- 控制面板 -->
+            <div class="control-panel">
+                <h2>⚙️ 配置参数</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="cardName">采集卡名称</label>
+                        <input type="text" id="cardName" value="JYUSB-1601" placeholder="输入采集卡名称">
+                    </div>
+                    <div class="input-group">
+                        <label for="channels">采集通道</label>
+                        <input type="text" id="channels" value="0" placeholder="逗号分隔，如：0,1,2">
+                    </div>
+                    <div class="input-group">
+                        <label for="sampleRate">采样率 (Hz)</label>
+                        <input type="number" id="sampleRate" value="10000" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="range">量程</label>
+                        <input type="text" id="range" value="10V" placeholder="如：10V, 5V">
+                    </div>
+                    <div class="input-group">
+                        <label for="sampleLength">采集长度</label>
+                        <input type="number" id="sampleLength" value="2000" min="100">
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-acquire" onclick="acquireData()">
+                        📊 采集
+                    </button>
+                    <button class="btn btn-analyze" onclick="analyzeData()">
+                        📈 分析
+                    </button>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+
+            <!-- 波形显示区域 -->
+            <div class="waveform-section">
+                <div class="waveform-card">
+                    <h3>📉 采集波形</h3>
+                    <div class="chart-container">
+                        <canvas id="waveformChart"></canvas>
+                    </div>
+                </div>
+                <div class="waveform-card">
+                    <h3>📊 直方图分析</h3>
+                    <div class="chart-container">
+                        <canvas id="histogramChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-indicator"></div>
+                <span>系统就绪</span>
+            </div>
+            <div class="status-item" id="statusInfo">
+                等待操作...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let waveformChart = null;
+        let histogramChart = null;
+        let acquiredData = null;
+        let config = {};
+
+        // 颜色数组用于多通道显示
+        const channelColors = [
+            'rgba(102, 126, 234, 0.8)',
+            'rgba(237, 100, 166, 0.8)',
+            'rgba(56, 239, 125, 0.8)',
+            'rgba(255, 193, 7, 0.8)',
+            'rgba(255, 87, 34, 0.8)',
+            'rgba(63, 81, 181, 0.8)',
+            'rgba(0, 188, 212, 0.8)',
+            'rgba(139, 195, 74, 0.8)'
+        ];
+
+        // 初始化图表
+        function initCharts() {
+            // 波形图
+            const waveformCtx = document.getElementById('waveformChart').getContext('2d');
+            waveformChart = new Chart(waveformCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 800
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: '实时采集波形'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: '时间'
+                            },
+                            min: 0
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '幅值 (V)'
+                            }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.1
+                        },
+                        point: {
+                            radius: 0
+                        }
+                    }
+                }
+            });
+
+            // 直方图
+            const histogramCtx = document.getElementById('histogramChart').getContext('2d');
+            histogramChart = new Chart(histogramCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 800
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: '直方图分析'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '幅值范围'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '频次'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // 获取配置参数
+        function getConfig() {
+            const cardName = document.getElementById('cardName').value.trim();
+            const channelsStr = document.getElementById('channels').value.trim();
+            const sampleRate = parseInt(document.getElementById('sampleRate').value);
+            const range = document.getElementById('range').value.trim();
+            const sampleLength = parseInt(document.getElementById('sampleLength').value);
+
+            // 解析通道
+            const channels = channelsStr.split(',')
+                .map(ch => parseInt(ch.trim()))
+                .filter(ch => !isNaN(ch));
+
+            return {
+                cardName,
+                channels,
+                sampleRate,
+                range,
+                sampleLength
+            };
+        }
+
+        // 显示错误消息
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 更新状态栏
+        function updateStatus(message) {
+            document.getElementById('statusInfo').textContent = message;
+        }
+
+        // 采集数据
+        function acquireData() {
+            try {
+                config = getConfig();
+
+                // 验证参数
+                if (config.channels.length === 0) {
+                    showError('请输入有效的采集通道！');
+                    return;
+                }
+
+                if (config.sampleLength < 100) {
+                    showError('采集长度不能小于100！');
+                    return;
+                }
+
+                // 生成模拟正弦波数据
+                acquiredData = {};
+                const datasets = [];
+
+                config.channels.forEach((channel, index) => {
+                    const data = generateSineWave(config.sampleLength, index);
+                    acquiredData[channel] = data;
+
+                    datasets.push({
+                        label: `通道 ${channel}`,
+                        data: data.map((val, i) => ({ x: i, y: val })),
+                        borderColor: channelColors[index % channelColors.length],
+                        backgroundColor: channelColors[index % channelColors.length].replace('0.8', '0.1'),
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0
+                    });
+                });
+
+                // 更新波形图
+                waveformChart.data.datasets = datasets;
+                waveformChart.options.scales.x.max = config.sampleLength;
+                waveformChart.update();
+
+                updateStatus(`采集完成 - 设备: ${config.cardName}, 通道: ${config.channels.join(', ')}, 采样率: ${config.sampleRate}Hz`);
+
+            } catch (error) {
+                showError('采集失败: ' + error.message);
+            }
+        }
+
+        // 生成正弦波数据
+        function generateSineWave(length, channelIndex) {
+            const data = [];
+            const frequency = 1 + channelIndex * 0.5; // 每个通道不同频率
+            const amplitude = 5; // 幅值
+            const phase = channelIndex * Math.PI / 4; // 相位偏移
+            const noiseLevel = 0.2; // 噪声水平
+
+            for (let i = 0; i < length; i++) {
+                const t = i / 100; // 时间
+                const signal = amplitude * Math.sin(2 * Math.PI * frequency * t + phase);
+                const noise = (Math.random() - 0.5) * 2 * noiseLevel * amplitude;
+                data.push(signal + noise);
+            }
+
+            return data;
+        }
+
+        // 分析数据 - 直方图
+        function analyzeData() {
+            if (!acquiredData || Object.keys(acquiredData).length === 0) {
+                showError('请先采集数据！');
+                return;
+            }
+
+            try {
+                const datasets = [];
+                let allLabels = new Set();
+                const binCount = 50; // 直方图柱数
+
+                // 计算所有数据的全局范围
+                let allValues = [];
+                Object.values(acquiredData).forEach(channelData => {
+                    allValues = allValues.concat(channelData);
+                });
+                const minVal = Math.min(...allValues);
+                const maxVal = Math.max(...allValues);
+                const binWidth = (maxVal - minVal) / binCount;
+
+                // 为每个通道生成直方图
+                config.channels.forEach((channel, index) => {
+                    const channelData = acquiredData[channel];
+                    const histogram = new Array(binCount).fill(0);
+
+                    // 统计每个区间的频次
+                    channelData.forEach(value => {
+                        const binIndex = Math.min(
+                            Math.floor((value - minVal) / binWidth),
+                            binCount - 1
+                        );
+                        histogram[binIndex]++;
+                    });
+
+                    // 生成标签
+                    const labels = [];
+                    for (let i = 0; i < binCount; i++) {
+                        const binStart = (minVal + i * binWidth).toFixed(2);
+                        const binEnd = (minVal + (i + 1) * binWidth).toFixed(2);
+                        labels.push(`${binStart}~${binEnd}`);
+                        allLabels.add(`${binStart}~${binEnd}`);
+                    }
+
+                    datasets.push({
+                        label: `通道 ${channel}`,
+                        data: histogram,
+                        backgroundColor: channelColors[index % channelColors.length],
+                        borderColor: channelColors[index % channelColors.length].replace('0.8', '1'),
+                        borderWidth: 1
+                    });
+                });
+
+                // 更新直方图
+                histogramChart.data.labels = Array.from(allLabels);
+                histogramChart.data.datasets = datasets;
+                histogramChart.options.scales.x.ticks = {
+                    maxRotation: 45,
+                    minRotation: 45,
+                    autoSkip: true,
+                    maxTicksLimit: 20
+                };
+                histogramChart.update();
+
+                updateStatus(`分析完成 - 直方图柱数: ${binCount}, 数据范围: ${minVal.toFixed(2)}V ~ ${maxVal.toFixed(2)}V`);
+
+            } catch (error) {
+                showError('分析失败: ' + error.message);
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            updateStatus('系统初始化完成，准备就绪');
+        });
+    </script>
+</body>
+</html>
