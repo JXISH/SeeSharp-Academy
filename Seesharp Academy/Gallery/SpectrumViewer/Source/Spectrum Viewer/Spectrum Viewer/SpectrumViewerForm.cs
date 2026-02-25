@@ -1,3 +1,8 @@
+using CSV_Loader;
+using MathNet.Numerics;
+using MathNet.Numerics.IntegralTransforms;
+using SeeSharpTools.JXI.SignalProcessing.JTFA;
+using SeeSharpTools.JY.DSP.Fundamental;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,25 +12,49 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CSV_Loader;
-using SeeSharpTools.JY.DSP.Fundamental;
-using MathNet.Numerics;
-using MathNet.Numerics.IntegralTransforms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Spectrum_Viewer
 {
     public partial class SpectrumViewerForm : Form
     {
-        //Data
+        /// <summary>
+        /// Global waveform Data
+        /// </summary>
         double[] waveform;
         double sampleRate;
+        /// <summary>
+        /// 频谱分析截断波形
+        /// </summary>
         double[] waveformSection;
+        /// <summary>
+        /// 截断波形的频谱
+        /// </summary>
         double[] waveformSectionSpectrum;
+        /// <summary>
+        /// 频谱的频率步进
+        /// </summary>
         double spectrumDeltaF;
-
+        /// <summary>
+        /// 联合时频分析类对象
+        /// </summary>
+        GeneralJTFATask _task;
+        /// <summary>
+        /// 时频图谱数据(dB)
+        /// </summary>
+        double[,] tfDistributionDB;
         public SpectrumViewerForm()
         {
             InitializeComponent();
+            //初始化JTFA控件
+            var windowTypes = Enum.GetNames(typeof(SeeSharpTools.JXI.SignalProcessing.Window.WindowType));
+            foreach (var item in windowTypes)
+            {
+                WindowTypes.Items.Add(item);//Add window type
+            }
+            WindowTypes.SelectedIndex = 3;// window
+            comboBoxColorType.SelectedIndex = 2; //Rainbow color
+            _task = new GeneralJTFATask();
         }
         //从csv导入数据
         private void buttonLoad_Click(object sender, EventArgs e)
@@ -46,6 +75,9 @@ namespace Spectrum_Viewer
             numericUpDownSampleRate.Value = (decimal)sampleRate;
             //更新控件显示波形
             DisplayWaveform();
+
+            //文件名显示到窗体Title
+            this.Text = "Spectrum Viewer: " + csvLoader.LoadedFileName;
         }
         //光标移动，切割数据
         private void easyChartXTimeWaveform_TabCursorChanged(object sender, SeeSharpTools.JY.GUI.TabCursorEventArgs e)
@@ -148,13 +180,69 @@ namespace Spectrum_Viewer
             SectionAnalysis();
         }
         /// <summary>
-        /// 跳转到JTFA界面
+        /// 实施JTFA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void buttonJTFA_Click(object sender, EventArgs e)
         {
+            JTFA();
+            PlotJTFA();
+        }
+        /// <summary>
+        /// 当色板选择变化，绘制JTFA
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void comboBoxColorType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            PlotJTFA();
+        }
+        private void JTFA()
+        {
+            //根据startTime和DurationSec从Waveform提取波形
+            int startIndex= (int)((double)numericUpDownStartTime.Value * sampleRate);
+            int length = (int)((double)numericUpDownDurationSec.Value * sampleRate);
+            int windowLength = (int)numericUpDownJTFAWinLength.Value;
+            if((waveform.Length< startIndex + length)||(length<windowLength))
+            {
+                MessageBox.Show("波形数据不足");
+                return;
+            }
+            double[] analysisWaveform = new double[length];
+            Array.Copy(waveform, startIndex, analysisWaveform, 0, length);
+            _task.SampleRate = sampleRate;//Sampling rate
+            _task.FrequencyBins = windowLength;//Window size, is each FFT point
+            _task.WindowType = (SeeSharpTools.JXI.SignalProcessing.Window.WindowType)Enum.Parse(
+                typeof(SeeSharpTools.JXI.SignalProcessing.Window.WindowType), WindowTypes.Text);//Window type 
+            _task.ColorTable = (GeneralJTFATask.ColorTableType)comboBoxColorType.SelectedIndex;
+            //运算
+            double[,] spec = null;
+            _task.GetJTFA(analysisWaveform, ref spec);//Get JTFA
+            //Convert to DB
+            int freqSize = (int)(spec.GetLength(1)*0.8);
+            tfDistributionDB = new double[spec.GetLength(0), freqSize];
+            for (int i = 0; i < spec.GetLength(0); i++)
+            {
+                for (int j = 0; j < freqSize; j++)
+                {
+                    tfDistributionDB[i, j] = 10 * Math.Log10(spec[i, j]);
+                }
+            }
+        }
+        private void PlotJTFA()
+        {
+            if (tfDistributionDB != null && tfDistributionDB.Length > 0)
+            {
+                //Get the intensity map
+                _task.ColorTable = (GeneralJTFATask.ColorTableType)comboBoxColorType.SelectedIndex;
+                Bitmap myImage = new Bitmap(tfDistributionDB.GetLength(1), tfDistributionDB.GetLength(0));
+                _task.GetImage(tfDistributionDB, ref myImage);
+                pictureBox_frequency_time.Image = myImage;
+            }
 
         }
+
+
     }
 }

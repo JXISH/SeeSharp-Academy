@@ -17,6 +17,7 @@ namespace CSV_Loader
         // 公共属性 - 用于存储加载的数据和采样率
         public double[] LoadedSeries { get; private set; }
         public double SampleRate { get; private set; }
+        public string LoadedFileName { get; private set; }
 
         // 私有字段
         private string selectedFilePath;
@@ -93,6 +94,9 @@ namespace CSV_Loader
 
                 // 计算并显示采样率
                 CalculateAndDisplaySampleRate();
+
+                //提取文件名给属性
+                LoadedFileName = Path.GetFileName(filePath);
             }
             catch (Exception ex)
             {

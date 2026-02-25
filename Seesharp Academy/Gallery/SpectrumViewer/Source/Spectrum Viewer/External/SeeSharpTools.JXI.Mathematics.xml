@@ -1,0 +1,1624 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SeeSharpTools.JXI.Mathematics</name>
+    </assembly>
+    <members>
+        <member name="T:SeeSharpTools.JXI.Exception.JXIInnerException">
+            <summary>
+            JXI DSP Inner Exception
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Exception.JXIInnerException.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="msg"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Exception.JXIInnerException.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Exception.JXIUserBufferException">
+            <summary>
+            JXI DSP User Buffer Exception
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Exception.JXIUserBufferException.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="msg"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Exception.JXIUserBufferException.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Exception.JXIParamException">
+            <summary>
+            JXI DSP Param Exception
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Exception.JXIParamException.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="msg"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Exception.JXIParamException.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:SeeSharpTools.JXI.MKL.CBLASNative">
+            CBLAS native declarations 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.CBLASNative.cblas_dcopy(System.Int32,System.Double[],System.Int32,System.Double[],System.Int32)">
+            CBLAS native LAPACKE_zgesv declaration 
+        </member>
+        <member name="T:SeeSharpTools.JXI.MKL.DftiConfigValue">
+            <summary>
+            Values of the descriptor configuration parameters
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_COMMITTED">
+            <summary>
+            DFTI_COMMIT_STATUS
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_UNCOMMITTED">
+            <summary>
+            DFTI_COMMIT_STATUS
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_COMPLEX">
+            <summary>
+            DFTI_FORWARD_DOMAIN
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_REAL">
+            <summary>
+            DFTI_FORWARD_DOMAIN
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_SINGLE">
+            <summary>
+            DFTI_PRECISION
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_DOUBLE">
+            <summary>
+            DFTI_PRECISION
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_COMPLEX_COMPLEX">
+            <summary>
+            DFTI_COMPLEX_STORAGE and DFTI_CONJUGATE_EVEN_STORAGE
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_COMPLEX_REAL">
+            <summary>
+            DFTI_COMPLEX_STORAGE and DFTI_CONJUGATE_EVEN_STORAGE
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_REAL_COMPLEX">
+            <summary>
+            DFTI_REAL_STORAGE
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_REAL_REAL">
+            <summary>
+            DFTI_REAL_STORAGE
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_INPLACE">
+            <summary>
+            DFTI_PLACEMENT
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_NOT_INPLACE">
+            <summary>
+            DFTI_PLACEMENT
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_ORDERED">
+            <summary>
+            DFTI_ORDERING
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_BACKWARD_SCRAMBLED">
+            <summary>
+            DFTI_ORDERING
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_ALLOW">
+            <summary>
+            Allow/avoid certain usages
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_AVOID">
+            <summary>
+            Allow/avoid certain usages
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_NONE">
+            <summary>
+            Allow/avoid certain usages
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigValue.DFTI_CCS_FORMAT">
+            <summary>
+            DFTI_PACKED_FORMAT (for storing congugate-even finite sequence in real array)
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_FORWARD_DOMAIN">
+            <summary>
+            Domain for forward transform. No default value
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_DIMENSION">
+            <summary>
+            Dimensionality, or rank. No default value
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_LENGTHS">
+            <summary>
+            Length(_status) of transform. No default value
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_FORWARD_SCALE">
+            <summary>
+            Length(_status) of transform. No default value
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_BACKWARD_SCALE">
+            <summary>
+            Scale factor for backward transform [1.0]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_NUMBER_OF_TRANSFORMS">
+            <summary>
+            Number of data sets to be transformed [1]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_COMPLEX_STORAGE">
+            <summary>
+            Storage of finite complex-valued sequences in complex domain [DFTI_COMPLEX_COMPLEX]        
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_REAL_STORAGE">
+            <summary>
+            Storage of finite real-valued sequences in real domain [DFTI_REAL_REAL]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_CONJUGATE_EVEN_STORAGE">
+            <summary>
+             Storage of finite complex-valued sequences in conjugate-even domain [DFTI_COMPLEX_REAL]        
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_PLACEMENT">
+            <summary>
+            Placement of result [DFTI_INPLACE]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_INPUT_STRIDES">
+            <summary>
+             Generalized strides for input data layout [tigth, row-major for C]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_OUTPUT_STRIDES">
+            <summary>
+            Generalized strides for output data layout [tight, row-major for C]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_INPUT_DISTANCE">
+            <summary>
+            Distance between first input elements for multiple transforms [0]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_OUTPUT_DISTANCE">
+            <summary>
+             Distance between first output elements for multiple transforms [0]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_WORKSPACE">
+            <summary>
+            Use of workspace during computation [DFTI_ALLOW]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_ORDERING">
+            <summary>
+            Ordering of the result [DFTI_ORDERED]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_TRANSPOSE">
+            <summary>
+            Possible transposition of result [DFTI_NONE] 
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_DESCRIPTOR_NAME">
+            <summary>
+            User-settable descriptor name [""] 
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_PACKED_FORMAT">
+            <summary>
+            Packing format for DFTI_COMPLEX_REAL storage of finite conjugate-even sequences [DFTI_CCS_FORMAT]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_COMMIT_STATUS">
+            <summary>
+            Commit status of the descriptor - R/O parameter
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_VERSION">
+            <summary>
+            Version string for this DFTI implementation - R/O parameter
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_NUMBER_OF_USER_THREADS">
+            <summary>
+            Number of user threads that share the descriptor [1]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_THREAD_LIMIT">
+            <summary>
+            Limit the number of threads used by this descriptor [0 = don't care]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DftiConfigPARAM.DFTI_DESTROY_INPUT">
+            <summary>
+            Possible input data destruction [DFTI_AVOID = prevent input data]
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DFTI.PRECISION">
+            Constants for DFTI, file "mkl_dfti.h" 
+            DFTI configuration parameters 
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DFTI.SINGLE">
+            DFTI configuration values 
+        </member>
+        <member name="F:SeeSharpTools.JXI.MKL.DFTI.NO_ERROR">
+            DFTI predefined error classes 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiCreateDescriptor(System.IntPtr@,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            DFTI DftiCreateDescriptor wrapper
+            </summary>
+            <param name="desc">return desc handle</param>
+            <param name="precision">precision</param>
+            <param name="domain">domain</param>
+            <param name="dimention">dimention</param>
+            <param name="length">length</param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiFreeDescriptor(System.IntPtr@)">
+            <summary>
+            DFTI DftiFreeDescriptor wrapper
+            </summary>
+            <param name="desc">desc handle</param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiSetValue(System.IntPtr,System.Int32,System.Int32)">
+            <summary>
+            DFTI DftiSetValue wrapper
+            </summary>
+            <param name="desc">desc handle</param>
+            <param name="configParam">config_param</param>
+            <param name="configVal">config_val</param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiSetValue(System.IntPtr,System.Int32,System.Double)">
+            <summary>
+            DFTI DftiSetValue wrapper
+            </summary>
+            <param name="desc">desc handle</param>
+            <param name="configParam">config_param</param>
+            <param name="configVal">config_val</param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiGetValue(System.IntPtr,System.Int32,System.Double@)">
+            <summary>
+            DFTI DftiGetValue wrapper 
+            </summary>
+            <param name="desc">desc handle</param>
+            <param name="configParam">config_param</param>
+            <param name="configVal">config_val</param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiCommitDescriptor(System.IntPtr)">
+            <summary>
+            DFTI DftiCommitDescriptor wrapper
+            </summary>
+            <param name="desc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiComputeForward(System.IntPtr,System.Double[],System.Double[])">
+            <summary>
+            DFTI DftiComputeForward wrapper
+            </summary>
+            <param name="desc"></param>
+            <param name="x_in"></param>
+            <param name="x_out"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiComputeForward(System.IntPtr,System.IntPtr,System.IntPtr)">
+            <summary>
+            DFTI DftiComputeForward wrapper
+            </summary>
+            <param name="desc"></param>
+            <param name="x_in"></param>
+            <param name="x_out"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiComputeForward(System.IntPtr,System.Double[],System.IntPtr)">
+            <summary>
+            DFTI DftiComputeForward wrapper
+            </summary>
+            <param name="desc"></param>
+            <param name="x_in"></param>
+            <param name="x_out"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiComputeForward(System.IntPtr,System.IntPtr,System.Double[])">
+            <summary>
+            DFTI DftiComputeForward wrapper
+            </summary>
+            <param name="desc"></param>
+            <param name="x_in"></param>
+            <param name="x_out"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiComputeBackward(System.IntPtr,System.Double[],System.Double[])">
+            <summary>
+            DFTI DftiComputeBackward wrapper
+            </summary>
+            <param name="desc"></param>
+            <param name="x_in"></param>
+            <param name="x_out"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiComputeBackward(System.IntPtr,System.IntPtr,System.IntPtr)">
+            <summary>
+            DFTI DftiComputeBackward wrapper
+            </summary>
+            <param name="desc"></param>
+            <param name="x_in"></param>
+            <param name="x_out"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiComputeBackward(System.IntPtr,System.Double[],System.IntPtr)">
+            <summary>
+            DFTI DftiComputeBackward wrapper
+            </summary>
+            <param name="desc"></param>
+            <param name="x_in"></param>
+            <param name="x_out"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTI.DftiComputeBackward(System.IntPtr,System.IntPtr,System.Double[])">
+            <summary>
+            DFTI DftiComputeBackward wrapper
+            </summary>
+            <param name="desc"></param>
+            <param name="x_in"></param>
+            <param name="x_out"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SeeSharpTools.JXI.MKL.DFTINative">
+            <summary>
+            DFTI native declarations
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiCreateDescriptor(System.IntPtr@,System.Int32,System.Int32,System.Int32,System.Int32)">
+            DFTI native DftiCreateDescriptor declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiCommitDescriptor(System.IntPtr)">
+            DFTI native DftiCommitDescriptor declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiFreeDescriptor(System.IntPtr@)">
+            DFTI native DftiFreeDescriptor declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiSetValue(System.IntPtr,System.Int32,System.Int32)">
+            DFTI native DftiSetValue declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiSetValue(System.IntPtr,System.Int32,System.Double)">
+            DFTI native DftiSetValue declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiGetValue(System.IntPtr,System.Int32,System.Double@)">
+            DFTI native DftiGetValue declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiComputeForward(System.IntPtr,System.Double[],System.Double[])">
+            DFTI native DftiComputeForward declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiComputeForward(System.IntPtr,System.IntPtr,System.IntPtr)">
+            DFTI native DftiComputeForward declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiComputeForward(System.IntPtr,System.Double[],System.IntPtr)">
+            DFTI native DftiComputeForward declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiComputeForward(System.IntPtr,System.IntPtr,System.Double[])">
+            DFTI native DftiComputeForward declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiComputeBackward(System.IntPtr,System.Double[],System.Double[])">
+            DFTI native DftiComputeBackward declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiComputeBackward(System.IntPtr,System.IntPtr,System.IntPtr)">
+            DFTI native DftiComputeBackward declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiComputeBackward(System.IntPtr,System.Double[],System.IntPtr)">
+            DFTI native DftiComputeBackward declaration 
+        </member>
+        <member name="M:SeeSharpTools.JXI.MKL.DFTINative.DftiComputeBackward(System.IntPtr,System.IntPtr,System.Double[])">
+            DFTI native DftiComputeBackward declaration 
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.FittingCommon">
+            <summary>
+            公共函数类
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.FittingCommon.SumOfArray(System.Double[],System.Int32,System.Double@)">
+            <summary>
+            求数组所有元素之和
+            </summary>
+            <param name="data">数组</param>
+            <param name="length">求和的长度</param>
+            <param name="sum">和</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.FittingCommon.Equilong(System.Double[]@,System.Double[]@,System.Double[]@)">
+            <summary>
+            对比x，y，按照最短一个限制两数组等长
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.FittingCommon.Equilong(System.Double[]@,System.Double[]@)">
+            <summary>
+            对比x，y，按照最短一个限制两数组等长
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.FittingCommon.ZeroValidate(System.Double[])">
+            <summary>
+            进行数据非零矫正，所有0幅度将通过计算机替换成无限接近0的非零数
+            </summary>
+            <param name="y"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.FittingCommon.GeneratedMatrix(System.Double[],System.Double[],System.Int32,System.Double[],System.Double[])">
+            <summary>
+            构造线性方程组的矩阵
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="order">阶数</param>
+            <param name="a">构造后的左边矩阵</param>
+            <param name="b">构造后的右边矩阵</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.FittingCommon.CalculateY(System.Double,System.Double[])">
+            <summary>
+            计算某x[i]对应的指数拟合值
+            </summary>
+            <param name="independentVariablea">自变量</param>
+            <param name="coefficient">多项式系数</param>
+            <returns></returns>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.EasyCurveFitting">
+            <summary>
+            CurveFitting Class
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.LinearFit(System.Double[],System.Double[],System.Double,System.Double@)">
+            <summary>
+            Calculate the linear fit of a pair (intersetX, fittedY) based on known data sequence (x,y) using the Least Square method.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="interestX">x of interest.</param>
+            <param name="fittedY">Fitted y value. </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.LinearFit(System.Double[],System.Double[],System.Double,System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Calculate the linear fit of a pair (intersetX, fittedY) based on known data sequence (x,y) using the Least Square method.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="interestX">x of interest.</param>
+            <param name="fittedY">Fitted y value. </param>
+            <param name="slope"> Slope of the fitted model.</param>
+            <param name="intercept"> Intercept of the fitted model.</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.LinearFit(System.Double[],System.Double[],System.Double[],System.Double[]@)">
+            <summary>
+            Calculate the linear fit of a data set (intersetX, fittedY) based on known data sequence (x,y) using the Least Square method.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="interestX">x sequence of interest.</param>
+            <param name="fittedY">Fitted y sequence corresponding to the intersetX seqeuence. </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.LinearFit(System.Double[],System.Double[],System.Double[],System.Double[]@,System.Double@,System.Double@)">
+            <summary>
+            Calculate the linear fit of a data set (intersetX, fittedY) based on known data sequence (x,y) using the Least Square method.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="interestX">x sequence of interest.</param>
+            <param name="fittedY">Fitted y sequence corresponding to the intersetX sequence. </param>
+            <param name="slope"> Slope of the fitted model.</param>
+            <param name="intercept"> Intercept of the fitted model.</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.ExponentialFit(System.Double[],System.Double[],System.Double,System.Double@)">
+            <summary>
+            Calculate the exponential fit of a pair (intersetX, fittedY) based on known data sequence (x,y) using the Least Square method.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="interestX">x of interest.</param>
+            <param name="fittedY">Fitted y value. </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.ExponentialFit(System.Double[],System.Double[],System.Double,System.Double@,System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Calculate the exponential fit of a pair (intersetX, fittedY) based on known data sequence (x,y) using the Least Square method.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="interestX">x of interest.</param>
+            <param name="fittedY">Fitted y value. </param>
+            <param name="amplitude"> Amplitude of the fitted model.</param>
+            <param name="damping"> Damping of the fitted model.</param>
+            <param name="offset">> Offset of the fitted model.</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.ExponentialFit(System.Double[],System.Double[],System.Double[],System.Double[]@)">
+            <summary>
+            Calculate the exponential fit of a data set (intersetX, fittedY) based on known data sequence (x,y) using the Least Square method.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="interestX">x sequence of interest.</param>
+            <param name="fittedY">Fitted y sequence corresponding to the intersetX seqeuence. </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.ExponentialFit(System.Double[],System.Double[],System.Double[],System.Double[]@,System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Calculate the exponential fit of a data set (intersetX, fittedY) based on known data sequence (x,y) using the Least Square method.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="interestX">x sequence of interest.</param>
+            <param name="fittedY">Fitted y sequence corresponding to the intersetX sequence. </param>
+            <param name="amplitude"> Amplitude of the fitted model.</param>
+            <param name="damping"> Damping of the fitted model.</param>
+            <param name="offset">> Offset of the fitted model.</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.PolynomialFit(System.Double[],System.Double[],System.Int32,System.Double,System.Double@)">
+            <summary>
+            Calculate the polynomial fit of a pair (intersetX, fittedY) based on known data sequence (x,y),
+            using the Least Square method and Singular Value Decomposition (SVD) algorithm.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="order">Order of the polynomial that fits to the data sequence.</param>
+            <param name="interestX">x of interest.</param>
+            <param name="fittedY">Fitted y value. </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.PolynomialFit(System.Double[],System.Double[],System.Int32,System.Double,System.Double@,System.Double[]@)">
+            <summary>
+            Calculate the polynomial fit of a pair (intersetX, fittedY) based on known data sequence (x,y),
+            using the Least Square method and Singular Value Decomposition (SVD) algorithm.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="order">Order of the polynomial that fits to the data sequence.</param>
+            <param name="interestX">x of interest.</param>
+            <param name="fittedY">Fitted y value. </param>
+            <param name="coefficients">Coefficients of the fitted model in ascending order of power, its length must be "order + 1".</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.PolynomialFit(System.Double[],System.Double[],System.Int32,System.Double[],System.Double[]@)">
+            <summary>
+            Calculate the polynomial fit of a data set (intersetX, fittedY) based on known data sequence (x,y),
+            using the Least Square method and Singular Value Decomposition (SVD) algorithm.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="order">Order of the polynomial that fits to the data sequence.</param>
+            <param name="interestX">x sequence of interest.</param>
+            <param name="fittedY">Fitted y sequence corresponding to the intersetX sequence. </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.EasyCurveFitting.PolynomialFit(System.Double[],System.Double[],System.Int32,System.Double[],System.Double[]@,System.Double[]@)">
+            <summary>
+            Calculate the polynomial fit of a data set (intersetX, fittedY) based on known data sequence (x,y),
+            using the Least Square method and Singular Value Decomposition (SVD) algorithm.
+            </summary>
+            <param name="x"> x sequence of the known data set (x,y).</param>
+            <param name="y"> y sequence of the known data set (x,y).</param>
+            <param name="order">Order of the polynomial that fits to the data sequence.</param>
+            <param name="interestX">x sequence of interest.</param>
+            <param name="fittedY">Fitted y sequence corresponding to the intersetX sequence. </param>
+            <param name="coefficients">Coefficients of the fitted model in ascending order of power, its length must be "order + 1".</param>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian">
+            <summary>
+            笛卡尔坐标系，坐标和运算
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.x">
+            <summary>
+            坐标x
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.y">
+            <summary>
+            坐标y
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.z">
+            <summary>
+            坐标z
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.Orgin">
+            <summary>
+            创建0,0,0原点坐标
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.#ctor(System.Double,System.Double,System.Double)">
+            <summary>
+            创建坐标，缺省为0,0,0
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.op_Addition(SeeSharpTools.JXI.Mathematics.Geometry.Cartesian,SeeSharpTools.JXI.Mathematics.Geometry.Cartesian)">
+            <summary>
+            坐标加法
+            </summary>
+            <param name="b"></param>
+            <param name="c"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.op_Subtraction(SeeSharpTools.JXI.Mathematics.Geometry.Cartesian,SeeSharpTools.JXI.Mathematics.Geometry.Cartesian)">
+            <summary>
+            坐标减法
+            </summary>
+            <param name="b"></param>
+            <param name="c"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.op_Multiply(SeeSharpTools.JXI.Mathematics.Geometry.Cartesian,SeeSharpTools.JXI.Mathematics.Geometry.Cartesian)">
+            <summary>
+            三维矢量内积(分量积之和)
+            </summary>
+            <param name="b"></param>
+            <param name="c"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.op_Multiply(SeeSharpTools.JXI.Mathematics.Geometry.Cartesian,System.Double)">
+            <summary>
+            三维矢量标量缩放
+            </summary>
+            <param name="b">矢量</param>
+            <param name="scale">标量</param>
+            <returns>缩放后的矢量</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.CrossProduct(SeeSharpTools.JXI.Mathematics.Geometry.Cartesian,SeeSharpTools.JXI.Mathematics.Geometry.Cartesian)">
+            <summary>
+            三维向量积，也称叉积、外积 return = b ^ c in vector
+            向量积与两个求积向量所在平面垂直，遵守右手法则
+            </summary>
+            <param name="b"></param>
+            <param name="c"></param>
+            <returns>b^c</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.DotProduct(SeeSharpTools.JXI.Mathematics.Geometry.Cartesian,SeeSharpTools.JXI.Mathematics.Geometry.Cartesian)">
+            <summary>
+            点积，也称内积
+            </summary>
+            <param name="b"></param>
+            <param name="c"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.ConverterToSpherical(SeeSharpTools.JXI.Mathematics.Geometry.Cartesian)">
+            <summary>
+            输入笛卡尔坐标转换输出球坐标
+            </summary>
+            <param name="p"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Cartesian.ConverterToSpherical">
+            <summary>
+            本实例的球坐标
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.Geometry.Spherical">
+            <summary>
+            球坐标，按照数学界常用标记习惯，与ISO 31-11不同
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.Geometry.Spherical.r">
+            <summary>
+            径向距离
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.Geometry.Spherical.theta">
+            <summary>
+            方位角 逆时针为正, x+轴0, y+轴pi/2
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.Geometry.Spherical.fai">
+            <summary>
+            俯仰角 -pi/2 ~ pi/2, z+轴pi/2
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.Geometry.Spherical.Orgin">
+            <summary>
+            返回原点
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Spherical.#ctor(System.Double,System.Double,System.Double)">
+            <summary>
+            创建球坐标，缺省为原点
+            </summary>
+            <param name="R">径向距离</param>
+            <param name="Theta">方位角 逆时针为正, x+轴0, y+轴pi/2</param>
+            <param name="Fai">俯仰角 -pi/2 ~ pi/2, z+轴pi/2</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Spherical.ConvertToCartesian(SeeSharpTools.JXI.Mathematics.Geometry.Spherical)">
+            <summary>
+            将输入球坐标转换到笛卡尔坐标
+            </summary>
+            <param name="point"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Spherical.ConvertToCartesian">
+            <summary>
+            将本实例坐标转换到笛卡尔坐标
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.Geometry.Scaling">
+            <summary>
+            简单的Utilities
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.ClockwiseExchange(System.Double)">
+            <summary>
+            求余角
+            顺时针逆时针转换
+            顺时针0度为正北(y轴正方向)
+            逆时针0度为正东(x轴正方向)
+            单位弧度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.ClockwiseExchange(System.Double[])">
+            <summary>
+            求余角，原位
+            顺时针逆时针转换
+            单位弧度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.GetClockwiseExchange(System.Double[])">
+            <summary>
+            求余角
+            顺时针逆时针转换
+            单位弧度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.ClockwiseExchangeDegree(System.Double)">
+            <summary>
+            求余角
+            顺时针逆时针转换
+            顺时针0度为正北(y轴正方向)
+            逆时针0度为正东(x轴正方向)
+            单位角度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.ClockwiseExchangeDegree(System.Double[])">
+            <summary>
+            求余角，原位
+            顺时针逆时针转换
+            单位角度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.GetClockwiseExchangeDegree(System.Double[])">
+            <summary>
+            求余角
+            顺时针逆时针转换
+            单位角度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.Rad2Degree(System.Double)">
+            <summary>
+            弧度转角度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.Rad2Degree(System.Double[])">
+            <summary>
+            弧度转角度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.GetDegree(System.Double[])">
+            <summary>
+            弧度转角度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.Degree2Rad(System.Double)">
+            <summary>
+            角度转弧度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.Degree2Rad(System.Double[])">
+            <summary>
+            角度转弧度
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Geometry.Scaling.GetRad(System.Double[])">
+            <summary>
+            角度转弧度
+            </summary>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.Interpolation.Interpolation">
+            <summary>
+            内插方法，包括线性
+            可扩展多项式内插
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.Interpolation.Interpolation.LinearInterpolate(System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            计算在点[xStart, yStart]与点[xEnd, yEnd]所连成的直线上给定的x所对应的y值。
+            </summary>
+            <param name="xStart"></param>
+            <param name="yStart"></param>
+            <param name="xEnd"></param>
+            <param name="yEnd"></param>
+            <param name="x"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.LUFactorizationInplace``1(System.IntPtr,System.Int32,System.Int32,System.Int32[])">
+            <summary>
+            对矩阵进行LU分解
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="matrixA"> 行排列 </param>
+            <param name="rowA"></param>
+            <param name="columA"></param>
+            <param name="ipiv"></param>
+            <param name="info"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Eigenvalues``1">
+            <summary>
+            计算特征值
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Eigenvalues``1(``0[][]@)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Eigenvalues``1(``0[],``0[][])">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesSymmetric``1">
+            <summary>
+            计算特征值
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesSymmetric``1(`0[][]@)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesSymmetric``1(``0[],`0[][])">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Eigenvalues(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{System.Single},SeeSharpTools.JXI.Numerics.Complex32[],SeeSharpTools.JXI.Numerics.Complex32[][],System.Boolean)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Eigenvalues(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{System.Double},System.Numerics.Complex[],System.Numerics.Complex[][],System.Boolean)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Eigenvalues(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{SeeSharpTools.JXI.Numerics.Complex32},SeeSharpTools.JXI.Numerics.Complex32[],SeeSharpTools.JXI.Numerics.Complex32[][],System.Boolean)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Eigenvalues(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{System.Numerics.Complex},System.Numerics.Complex[],System.Numerics.Complex[][],System.Boolean)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesSymmetric(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{System.Single},System.Single[],System.Single[][],System.Boolean)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesSymmetric(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{System.Double},System.Double[],System.Double[][],System.Boolean)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesSymmetric(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{SeeSharpTools.JXI.Numerics.Complex32},System.Single[],SeeSharpTools.JXI.Numerics.Complex32[][],System.Boolean)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesSymmetric(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{System.Numerics.Complex},System.Double[],System.Numerics.Complex[][],System.Boolean)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Eigenvalues``2(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{``0},``1[],``1[][],System.Boolean)">
+            <summary>
+            计算特征值和特征向量
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="U"> 复数 </typeparam>
+            <param name="matix"></param>
+            <param name="eigenValues"> 特征值, 数据类型为复数 </param>
+            <param name="eigenVectors"> 特征向量, 数据类型为复数 </param>
+            <param name="eigenvectorsOut"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesSymmetric``2(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{``0},``1[],``0[][],System.Boolean)">
+            <summary>
+            计算对称阵特征值和特征向量
+            </summary>
+            <typeparam name="T"> </typeparam>
+            <typeparam name="U"> 实数 float/double </typeparam>
+            <param name="matix"></param>
+            <param name="eigenValues"> 特征值, 数据类型为实数 </param>
+            <param name="eigenVectors"> 特征向量, 数据类型和矩阵数据类型相同 </param>
+            <param name="eigenvectorsOut"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesGeneral``1(System.IntPtr,System.Int32,System.IntPtr,System.IntPtr)">
+            <summary>
+            计算一般阵特征值和特征向量. 特征向量为列向量, 即右乘特征向量
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为N </param>
+            <param name="N">matrixA行数 / matrixA列数 </param>
+            <param name="eigenValues">特征值, 复数数组, 长度N</param>
+            <param name="eigenVectors">特征向量, 二维复数数组, 长度N*N. 每一列代表一个特征向量</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesSymmetricG``1(System.IntPtr,System.Int32,System.IntPtr,System.IntPtr)">
+            <summary>
+            计算对称阵特征值和特征向量. 特征向量为列向量, 即右乘特征向量
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为N </param>
+            <param name="N">matrixA行数 / matrixA列数 </param>
+            <param name="eigenValues">特征值, 复数数组, 长度N</param>
+            <param name="eigenVectors">特征向量, 二维复数数组, 长度N*N. 每一列代表一个特征向量</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.EigenvaluesSymmetric``1(System.IntPtr,System.Int32,System.IntPtr,System.IntPtr)">
+            <summary>
+            计算对称阵特征值和特征向量. 特征向量为列向量, 即右乘特征向量
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为N </param>
+            <param name="N">matrixA行数 / matrixA列数 </param>
+            <param name="eigenValues">特征值, 实数类型数组, 长度N</param>
+            <param name="eigenVectors">特征向量, 二维T类型数组, 长度N*N. 每一列代表一个特征向量 </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.GetEigenValues(System.Int32,System.Single[],System.Single[])">
+            <summary>
+            复数特值
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.GetEigenValues(System.Int32,System.Double[],System.Double[])">
+            <summary>
+            复数特值
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.GetEigenVectors(System.Int32,System.Single[],System.Single[0:,0:])">
+            <summary>
+            复数特征向量
+            </summary>
+            <returns>注： 特征向量是按列排列，对应特征值</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.GetEigenVectors(System.Int32,System.Double[],System.Double[0:,0:])">
+            <summary>
+            复数特征向量
+            </summary>
+            <returns>注： 特征向量是按列排列，对应特征值</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.GetEigenValues``1(``0[],``0[],System.IntPtr)">
+            <summary>
+            复数特值
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.GetEigenVectors(System.Single[],System.Single[0:,0:],System.IntPtr)">
+            <summary>
+            复数特征向量
+            </summary>
+            <returns>注： 特征向量是按列排列，对应特征值</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.GetEigenVectors(System.Double[],System.Double[0:,0:],System.IntPtr)">
+            <summary>
+            复数特征向量
+            </summary>
+            <returns>注： 特征向量是按列排列，对应特征值</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Inverse">
+            <summary>
+            方阵求逆
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Inverse(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            方阵求逆
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquations(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},`0[])">
+            <summary>
+            求解线性方程
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquations(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},`0[],`0[])">
+            <summary>
+            求解线性方程
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquations(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            求解线性方程
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquations(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            求解线性方程
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquations``1(System.IntPtr,System.IntPtr,System.IntPtr,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Solve Equations: matrixInput  * dataSolution = dataKnown
+            </summary>
+            <param name="matrixInput">Row = matrixOrder, Colum = matrixOrder</param>
+            <param name="dataKnown">Row = matrixOrder, Colum = dataSize</param>
+            <param name="dataSolution">Row = matrixOrder, Colum = dataSize</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquationsGeneral``1(System.IntPtr,System.IntPtr,System.Int32,System.Int32)">
+            <summary>
+            求解线性方程, matrixA为一般方阵
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为m </param>
+            <param name="matrixB"> 行排列, 行首元素存储间隔为n </param>
+            <param name="m"> matrixA行数 / matrixA列数 / matrixB行数 </param>
+            <param name="n"> matrixB列数 </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquationsSymmetric``1(System.IntPtr,System.IntPtr,System.Int32,System.Int32)">
+            <summary>
+            求解线性方程, matrixA为对称矩阵
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为m </param>
+            <param name="matrixB"> 行排列, 行首元素存储间隔为n </param>
+            <param name="m"> matrixA行数 / matrixA列数 / matrixB行数 </param>
+            <param name="n"> matrixB列数 </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquationsLMS(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},`0[],`0[])">
+            <summary>
+            求解线性方程
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquationsLMS(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            求解线性方程
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquationsLMS``1(System.IntPtr,System.IntPtr,System.IntPtr,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            matrixInput * dataSolution = dataKnown
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="matrixInput">Row = M, Colum = N </param>
+            <param name="dataKnown">Row = M, Colum = L</param>
+            <param name="dataSolution">Row = N, Colum = L</param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquationsQR``1(System.IntPtr,System.IntPtr,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            求解线性方程, matrixA为一般方阵
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为n </param>
+            <param name="matrixKnownSolution"> 行排列, 行首元素存储间隔为k, 行数为 MAX(m,n) </param>
+            <param name="m"> matrixA行数 / matrixKnow行数 </param>
+            <param name="n"> matrixA列数 / matrixSolution行数 </param>
+            <param name="k"> matrixB列数 </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SolveLinearEquationsSVD``1(System.IntPtr,System.IntPtr,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            求解线性方程, matrixA为一般方阵
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为n </param>
+            <param name="matrixKnownSolution"> 行排列, 行首元素存储间隔为k, 行数为 MAX(m,n) </param>
+            <param name="m"> matrixA行数 / matrixKnow行数 </param>
+            <param name="n"> matrixA列数 / matrixSolution行数 </param>
+            <param name="k"> matrixB列数 </param>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1._dataRef">
+            <summary>
+            矩阵占用内存
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.RefSize">
+            <summary>
+            矩阵占用内存大小 (元素个数)
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.MatrixArray">
+            <summary>
+            矩阵数据
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Row">
+            <summary>
+            行数
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Colum">
+            <summary>
+            列数
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.IsSymmetric">
+            <summary>
+            是否是(共轭)对称阵
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.IsSquare">
+            <summary>
+            是否是方阵
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.IsValid">
+            <summary>
+            是否非空
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Finalize">
+            <summary>
+            析构函数
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Dispose">
+            <summary>
+            释放内存
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.#ctor(System.Int32,System.Int32)">
+            <summary>
+            构造
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.#ctor(`0[0:,0:],System.Boolean)">
+            <summary>
+            构造
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.#ctor(`0[][],System.Boolean)">
+            <summary>
+            构造, 一组列向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.#ctor(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            构造
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.#ctor(`0[])">
+            <summary>
+            构造对角阵
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.CopyFrom(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            复制矩阵
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.GetRow(System.Int32)">
+            <summary>
+            获取矩阵特定阵行
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.GetColum(System.Int32)">
+            <summary>
+            获取矩阵特定列行
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SetRow(System.Int32,`0[])">
+            <summary>
+            设置矩阵特定阵行
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.SetColum(System.Int32,`0[])">
+            <summary>
+            设置矩阵特定列行
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Identity(System.Int32)">
+            <summary>
+            单位阵
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.op_Multiply(`0,SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            矩阵乘以常数
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.op_Multiply(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},`0)">
+            <summary>
+            矩阵乘以常数
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Multiply(`0,SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            矩阵乘以常数
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Multiply(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},`0)">
+            <summary>
+            矩阵乘以常数
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Multiply2(`0[],`0[])">
+            <summary>
+            向量点乘向量
+            ouput = left * right
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Multiply(`0[],`0[])">
+            <summary>
+            向量点乘向量
+            ouput = conj (left) * right
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.op_Multiply(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            矩阵乘以矩阵
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Multiply(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            矩阵乘以矩阵
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.MultiplyGeneral(System.IntPtr,System.IntPtr,System.IntPtr,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            矩阵乘以矩阵
+            </summary>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为k </param>
+            <param name="matrixB"> 行排列, 行首元素存储间隔为n </param>
+            <param name="matrixC"> 行排列, 行首元素存储间隔为n </param>
+            <param name="m"> matrixC行数 / matrixA行数 </param>
+            <param name="n"> matrixC列数 / matrixB列数 </param>
+            <param name="k"> matrixB行数 / matrixA列数 </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.MultiplySymmetric(System.IntPtr,System.IntPtr,System.IntPtr,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            矩阵乘以矩阵, matrixA是对称矩阵
+            </summary>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为 aLeft ? m : n </param>
+            <param name="matrixB"> 行排列, 行首元素存储间隔为n </param>
+            <param name="matrixC"> 行排列, 行首元素存储间隔为n </param>
+            <param name="m"> matrixC行数 / aLeft ? matrixA行数 : matrixB行数 </param>
+            <param name="n"> matrixC列数 / aLeft ? matrixB列数 : matrixA列数 </param>
+            <param name="aLeft"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.op_Multiply(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},`0[])">
+            <summary>
+            矩阵右乘向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Multiply(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},`0[],`0[])">
+            <summary>
+            矩阵右乘向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Multiply(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0},`0[],`0[],System.Boolean)">
+            <summary>
+            矩阵乘向量
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.MultiplyGeneral(System.IntPtr,System.IntPtr,System.IntPtr,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            矩阵乘向量
+            </summary>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为n </param>
+            <param name="vectorB"></param>
+            <param name="vectorC"></param>
+            <param name="m"> matrixA行数 </param>
+            <param name="n"> matrixA列数 </param>
+            <param name="rightVector"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.MultiplySymmetric(System.IntPtr,System.IntPtr,System.IntPtr,System.Int32,System.Boolean)">
+            <summary>
+            矩阵乘向量, matrixA是对称矩阵
+            </summary>
+            <param name="matrixA"> 行排列, 行首元素存储间隔为n </param>
+            <param name="vectorB"></param>
+            <param name="vectorC"></param>
+            <param name="n"> matrixA行数 / matrixA列数 </param>
+            <param name="rightVector"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.PseudoInverse">
+            <summary>
+            方阵伪逆
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.PseudoInverse(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            方阵伪逆
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="input">伪逆运算的目标矩阵</param>
+            <returns>伪逆矩阵</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Transpose">
+            <summary>
+            矩阵转置
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.GetTranspose(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            矩阵转置
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Transpose(`0[0:,0:])">
+            <summary>
+            矩阵转置
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Transpose(SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix{`0})">
+            <summary>
+            矩阵转置
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Transpose``1(System.IntPtr,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            矩阵转置
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="data"></param>
+            <param name="row"></param>
+            <param name="colum"></param>
+            <param name="result"></param>
+            <param name="transOnly">false 表示对于复数是共轭转置 </param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.LinearAlgebra.Matrix.Matrix`1.Transpose``1(System.IntPtr,System.Int32,System.Int32,System.IntPtr,System.Boolean)">
+            <summary>
+            矩阵转置
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="data"></param>
+            <param name="row"></param>
+            <param name="colum"></param>
+            <param name="result"></param>
+            <param name="transOnly">false 表示对于复数是共轭转置 </param>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics">
+            <summary>
+            point-by-point计算最大最小值、平均数
+            将来如果要增加stdev, histogram等功能，可以设立属性flag打开或关闭某些统计，以优化CPU占用
+            2022-02-01 来自VST\Digital Signal Processing\Math Utility
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.Value">
+            <summary>
+            当前数值。
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.Count">
+            <summary>
+            已更新的测量值次数。
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.HistoryLength">
+            <summary>
+            历史数据长度。
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.HistoryValues">
+            <summary>
+            历史数据列表。
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.MaxValue">
+            <summary>
+            自实例化或Reset()以来的最大值，注：并非滑动的历史数据最大值。
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.MinValue">
+            <summary>
+            自实例化或Reset()以来的最小值，注：并非滑动的历史数据最小值。
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.MeanValue">
+            <summary>
+            历史数据的平均值（滑动）。
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.MedianValue">
+            <summary>
+            历史数据的中值（滑动）。
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.#ctor">
+            <summary>
+            构造函数。
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.#ctor(System.Int32)">
+            <summary>
+            构造函数。
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.Enqueue(System.Double)">
+            <summary>
+            将新的数值添加到历史队列中，若队列已满，则移除最早的数据点。
+            </summary>
+            <param name="newValue"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.CopyFrom(SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics)">
+            <summary>
+            复制对象的数据（深复制）。
+            </summary>
+            <param name="source"></param>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.PointByPointStatistics.Reset">
+            <summary>
+            清空历史数据。
+            </summary>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics">
+            <summary>
+            <para>Calculate the Mean, Median, Mode, StandardDeviation, Variance, MeanSquareError, RootMeanSquare and Creat the Histgram of the 1D array</para>
+            <para>计算一维数组均值、中值、众数、标准差、方差、均方差、均方根,一维数组直方图统计</para>
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.Mean(System.Double[])">
+            <summary>
+            计算算术平均值,（x1+x2+...+xn）/n
+            </summary>
+            <param name="nums">待计算数组</param>
+            <returns>算术平均值</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.GeometricMean(System.Double[])">
+            <summary>
+            计算几何平均数：(x1*x2*...*xn)^(1/n)
+            </summary>
+            <param name="nums">待计算数组</param>
+            <returns>几何平均值</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.HarmonicMean(System.Double[])">
+            <summary>
+            计算调和平均数：n/((1/x1)+(1/x2)+...+(1/xn))
+            </summary>
+            <param name="nums">待计算数组</param>
+            <returns>调和平均数</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.TrimmedMean(System.Double[],System.Double)">
+            <summary>
+            计算切尾平均数
+            </summary>
+            <param name="nums">待计算数组</param>
+            <param name="trimmedPercent">切尾百分比（0-100）</param>
+            <returns>切尾平均数</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.Mode(System.Double[])">
+            <summary>
+            计算数组的众数
+            </summary>
+            <param name="nums">数组</param>        
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.Median(System.Double[])">
+            <summary>
+            对一维数组求中值
+            </summary>
+            <param name="nums">输入一维数组</param>
+            <returns>返回输入序列的中值</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.MeanSquaredError(System.Double[],System.Double[])">
+            <summary>
+            计算均方差
+            </summary>
+            <param name="x">序列X值</param>
+            <param name="y">序列Y值</param>
+            <returns>均方差值</returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.RootMeanSquare(System.Double[])">
+            <summary>
+            计算均方根
+            </summary>
+            <param name="nums"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.Variance(System.Double[])">
+            <summary>
+            计算方差
+            </summary>
+            <param name="nums">计算方差的数组</param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.StandardDeviation(System.Double[])">
+            <summary>
+            计算标准差
+            </summary>
+            <param name="nums">计算标准差的数组</param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.ProbabilityStatistics.Histogram(System.Double[],System.Int32[]@,System.Double[]@,SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.IntervalType)">
+            <summary>
+            直方图统计分析(统计输入数据在指定区间中出现次数)
+            </summary>
+            <param name="nums">输入数据(输入数组长度至少包含一个元素)</param>
+            <param name="histogram">nums的离散直方图</param>
+            <param name="intervals">区间中间值,区间数有数组长度决定</param>
+            <param name="intervalType">指定区间开闭方式</param>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.IntervalType">
+            <summary>
+            <para>直方图区间开闭形式</para>
+            <para>选择左闭区间则除最右一个区间为闭区间，其他所有区间为左闭右开形式；</para>
+            <para>选择右闭区间则除最左一个区间为闭区间，其他所有区间为左开右闭区间；</para>
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.IntervalType.LeftClosed">
+            <summary>
+            除最右一个区间为闭区间，其他所有区间为左闭右开形式
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.IntervalType.RightClosed">
+            <summary>
+            除最左一个区间为闭区间，其他所有区间为左开右闭区间
+            </summary>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.MeanType">
+            <summary>
+            均值计算类型枚举
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.MeanType.ArithmeticMean">
+            <summary>
+            算数平均值
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.MeanType.GeometricMean">
+            <summary>
+            几何平均值
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.MeanType.HarmonicMean">
+            <summary>
+            调和平均数
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JXI.Mathematics.ProbabilityStatistics.MeanType.TrimmedMean">
+            <summary>
+            切尾平均数
+            </summary>
+        </member>
+        <member name="T:SeeSharpTools.JXI.Mathematics.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JXI.Mathematics.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+    </members>
+</doc>

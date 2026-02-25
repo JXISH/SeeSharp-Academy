@@ -36,6 +36,9 @@
     <Reference Include="MathNet.Numerics">
       <HintPath>..\External\MathNet.Numerics.dll</HintPath>
     </Reference>
+    <Reference Include="SeeSharpTools.JXI.SignalProcessing">
+      <HintPath>..\External\SeeSharpTools.JXI.SignalProcessing.dll</HintPath>
+    </Reference>
     <Reference Include="SeeSharpTools.JY.DSP.Fundamental">
       <HintPath>..\External\SeeSharpTools.JY.DSP.Fundamental.dll</HintPath>
     </Reference>
@@ -44,6 +47,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />

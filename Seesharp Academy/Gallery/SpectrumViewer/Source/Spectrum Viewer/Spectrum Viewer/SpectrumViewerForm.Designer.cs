@@ -28,8 +28,8 @@ namespace Spectrum_Viewer
         /// </summary>
         private void InitializeComponent()
         {
-            SeeSharpTools.JY.GUI.TabCursor tabCursor9 = new SeeSharpTools.JY.GUI.TabCursor();
-            SeeSharpTools.JY.GUI.TabCursor tabCursor10 = new SeeSharpTools.JY.GUI.TabCursor();
+            SeeSharpTools.JY.GUI.TabCursor tabCursor7 = new SeeSharpTools.JY.GUI.TabCursor();
+            SeeSharpTools.JY.GUI.TabCursor tabCursor8 = new SeeSharpTools.JY.GUI.TabCursor();
             this.easyChartXTimeWaveform = new SeeSharpTools.JY.GUI.EasyChartX();
             this.easyChartXWaveformSection = new SeeSharpTools.JY.GUI.EasyChartX();
             this.easyChartXSectionSpectrum = new SeeSharpTools.JY.GUI.EasyChartX();
@@ -43,22 +43,25 @@ namespace Spectrum_Viewer
             this.checkBoxCepstrum = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.numericUpDownJTFAWinLength = new System.Windows.Forms.NumericUpDown();
-            this.numericUpDownJTFAStep = new System.Windows.Forms.NumericUpDown();
             this.numericUpDownStartTime = new System.Windows.Forms.NumericUpDown();
             this.numericUpDownDurationSec = new System.Windows.Forms.NumericUpDown();
             this.groupBoxSpectrumSettings = new System.Windows.Forms.GroupBox();
             this.groupBoxJTFASettgins = new System.Windows.Forms.GroupBox();
+            this.WindowTypes = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.comboBoxColorType = new System.Windows.Forms.ComboBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.pictureBox_frequency_time = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSampleRate)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWindowLength)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownJTFAWinLength)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownJTFAStep)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStartTime)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDurationSec)).BeginInit();
             this.groupBoxSpectrumSettings.SuspendLayout();
             this.groupBoxJTFASettgins.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_frequency_time)).BeginInit();
             this.SuspendLayout();
             // 
             // easyChartXTimeWaveform
@@ -163,24 +166,24 @@ namespace Spectrum_Viewer
             this.easyChartXTimeWaveform.Series.Count = 0;
             this.easyChartXTimeWaveform.Size = new System.Drawing.Size(531, 200);
             this.easyChartXTimeWaveform.SplitView = false;
-            tabCursor9.Color = System.Drawing.Color.Cyan;
-            tabCursor9.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
-            tabCursor9.Enabled = true;
-            tabCursor9.Name = "TabCursor1";
-            tabCursor9.SeriesIndex = -1;
-            tabCursor9.Value = 0D;
-            tabCursor9.XValue = 0D;
-            tabCursor9.YValue = double.NaN;
-            tabCursor10.Color = System.Drawing.Color.Orange;
-            tabCursor10.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
-            tabCursor10.Enabled = true;
-            tabCursor10.Name = "TabCursor2";
-            tabCursor10.SeriesIndex = -1;
-            tabCursor10.Value = 0D;
-            tabCursor10.XValue = 0D;
-            tabCursor10.YValue = double.NaN;
-            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor9);
-            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor10);
+            tabCursor7.Color = System.Drawing.Color.Cyan;
+            tabCursor7.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
+            tabCursor7.Enabled = true;
+            tabCursor7.Name = "TabCursor1";
+            tabCursor7.SeriesIndex = -1;
+            tabCursor7.Value = 0D;
+            tabCursor7.XValue = 0D;
+            tabCursor7.YValue = double.NaN;
+            tabCursor8.Color = System.Drawing.Color.Orange;
+            tabCursor8.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
+            tabCursor8.Enabled = true;
+            tabCursor8.Name = "TabCursor2";
+            tabCursor8.SeriesIndex = -1;
+            tabCursor8.Value = 0D;
+            tabCursor8.XValue = 0D;
+            tabCursor8.YValue = double.NaN;
+            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor7);
+            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor8);
             this.easyChartXTimeWaveform.TabIndex = 0;
             this.easyChartXTimeWaveform.XCursor.AutoInterval = true;
             this.easyChartXTimeWaveform.XCursor.Color = System.Drawing.Color.DeepSkyBlue;
@@ -428,7 +431,7 @@ namespace Spectrum_Viewer
             // 
             // buttonLoad
             // 
-            this.buttonLoad.Location = new System.Drawing.Point(892, 12);
+            this.buttonLoad.Location = new System.Drawing.Point(12, 438);
             this.buttonLoad.Name = "buttonLoad";
             this.buttonLoad.Size = new System.Drawing.Size(75, 23);
             this.buttonLoad.TabIndex = 1;
@@ -438,7 +441,7 @@ namespace Spectrum_Viewer
             // 
             // buttonJTFA
             // 
-            this.buttonJTFA.Location = new System.Drawing.Point(892, 362);
+            this.buttonJTFA.Location = new System.Drawing.Point(1454, 448);
             this.buttonJTFA.Name = "buttonJTFA";
             this.buttonJTFA.Size = new System.Drawing.Size(75, 23);
             this.buttonJTFA.TabIndex = 1;
@@ -472,7 +475,7 @@ namespace Spectrum_Viewer
             // 
             // numericUpDownWindowLength
             // 
-            this.numericUpDownWindowLength.Location = new System.Drawing.Point(119, 42);
+            this.numericUpDownWindowLength.Location = new System.Drawing.Point(289, 15);
             this.numericUpDownWindowLength.Maximum = new decimal(new int[] {
             100000,
             0,
@@ -501,7 +504,7 @@ namespace Spectrum_Viewer
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 44);
+            this.label2.Location = new System.Drawing.Point(200, 17);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(83, 12);
             this.label2.TabIndex = 3;
@@ -512,7 +515,7 @@ namespace Spectrum_Viewer
             this.checkBoxSpectrumDB.AutoSize = true;
             this.checkBoxSpectrumDB.Checked = true;
             this.checkBoxSpectrumDB.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxSpectrumDB.Location = new System.Drawing.Point(8, 69);
+            this.checkBoxSpectrumDB.Location = new System.Drawing.Point(393, 17);
             this.checkBoxSpectrumDB.Name = "checkBoxSpectrumDB";
             this.checkBoxSpectrumDB.Size = new System.Drawing.Size(90, 16);
             this.checkBoxSpectrumDB.TabIndex = 4;
@@ -523,7 +526,7 @@ namespace Spectrum_Viewer
             // checkBoxCepstrum
             // 
             this.checkBoxCepstrum.AutoSize = true;
-            this.checkBoxCepstrum.Location = new System.Drawing.Point(119, 69);
+            this.checkBoxCepstrum.Location = new System.Drawing.Point(502, 16);
             this.checkBoxCepstrum.Name = "checkBoxCepstrum";
             this.checkBoxCepstrum.Size = new System.Drawing.Size(72, 16);
             this.checkBoxCepstrum.TabIndex = 4;
@@ -543,20 +546,11 @@ namespace Spectrum_Viewer
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 76);
+            this.label4.Location = new System.Drawing.Point(182, 22);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(83, 12);
             this.label4.TabIndex = 3;
             this.label4.Text = "Window Length";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 103);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(71, 12);
-            this.label5.TabIndex = 3;
-            this.label5.Text = "Window Step";
             // 
             // label6
             // 
@@ -569,7 +563,7 @@ namespace Spectrum_Viewer
             // 
             // numericUpDownJTFAWinLength
             // 
-            this.numericUpDownJTFAWinLength.Location = new System.Drawing.Point(119, 74);
+            this.numericUpDownJTFAWinLength.Location = new System.Drawing.Point(271, 20);
             this.numericUpDownJTFAWinLength.Maximum = new decimal(new int[] {
             100000,
             0,
@@ -586,29 +580,10 @@ namespace Spectrum_Viewer
             0});
             this.numericUpDownJTFAWinLength.ValueChanged += new System.EventHandler(this.numericUpDownWindowLength_ValueChanged);
             // 
-            // numericUpDownJTFAStep
-            // 
-            this.numericUpDownJTFAStep.Location = new System.Drawing.Point(119, 101);
-            this.numericUpDownJTFAStep.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.numericUpDownJTFAStep.Name = "numericUpDownJTFAStep";
-            this.numericUpDownJTFAStep.Size = new System.Drawing.Size(75, 21);
-            this.numericUpDownJTFAStep.TabIndex = 2;
-            this.numericUpDownJTFAStep.ThousandsSeparator = true;
-            this.numericUpDownJTFAStep.Value = new decimal(new int[] {
-            256,
-            0,
-            0,
-            0});
-            this.numericUpDownJTFAStep.ValueChanged += new System.EventHandler(this.numericUpDownWindowLength_ValueChanged);
-            // 
             // numericUpDownStartTime
             // 
             this.numericUpDownStartTime.DecimalPlaces = 3;
-            this.numericUpDownStartTime.Location = new System.Drawing.Point(119, 20);
+            this.numericUpDownStartTime.Location = new System.Drawing.Point(101, 20);
             this.numericUpDownStartTime.Maximum = new decimal(new int[] {
             100000,
             0,
@@ -623,7 +598,7 @@ namespace Spectrum_Viewer
             // numericUpDownDurationSec
             // 
             this.numericUpDownDurationSec.DecimalPlaces = 3;
-            this.numericUpDownDurationSec.Location = new System.Drawing.Point(119, 47);
+            this.numericUpDownDurationSec.Location = new System.Drawing.Point(101, 47);
             this.numericUpDownDurationSec.Maximum = new decimal(new int[] {
             100000,
             0,
@@ -648,35 +623,93 @@ namespace Spectrum_Viewer
             this.groupBoxSpectrumSettings.Controls.Add(this.label2);
             this.groupBoxSpectrumSettings.Controls.Add(this.checkBoxSpectrumDB);
             this.groupBoxSpectrumSettings.Controls.Add(this.numericUpDownWindowLength);
-            this.groupBoxSpectrumSettings.Location = new System.Drawing.Point(824, 53);
+            this.groupBoxSpectrumSettings.Location = new System.Drawing.Point(218, 432);
             this.groupBoxSpectrumSettings.Name = "groupBoxSpectrumSettings";
-            this.groupBoxSpectrumSettings.Size = new System.Drawing.Size(203, 97);
+            this.groupBoxSpectrumSettings.Size = new System.Drawing.Size(600, 76);
             this.groupBoxSpectrumSettings.TabIndex = 5;
             this.groupBoxSpectrumSettings.TabStop = false;
             this.groupBoxSpectrumSettings.Text = "Spectrum Settings";
             // 
             // groupBoxJTFASettgins
             // 
+            this.groupBoxJTFASettgins.Controls.Add(this.comboBoxColorType);
+            this.groupBoxJTFASettgins.Controls.Add(this.WindowTypes);
+            this.groupBoxJTFASettgins.Controls.Add(this.label7);
+            this.groupBoxJTFASettgins.Controls.Add(this.label5);
             this.groupBoxJTFASettgins.Controls.Add(this.numericUpDownStartTime);
             this.groupBoxJTFASettgins.Controls.Add(this.label3);
-            this.groupBoxJTFASettgins.Controls.Add(this.label5);
             this.groupBoxJTFASettgins.Controls.Add(this.label6);
             this.groupBoxJTFASettgins.Controls.Add(this.label4);
             this.groupBoxJTFASettgins.Controls.Add(this.numericUpDownDurationSec);
-            this.groupBoxJTFASettgins.Controls.Add(this.numericUpDownJTFAStep);
             this.groupBoxJTFASettgins.Controls.Add(this.numericUpDownJTFAWinLength);
-            this.groupBoxJTFASettgins.Location = new System.Drawing.Point(824, 226);
+            this.groupBoxJTFASettgins.Location = new System.Drawing.Point(834, 432);
             this.groupBoxJTFASettgins.Name = "groupBoxJTFASettgins";
-            this.groupBoxJTFASettgins.Size = new System.Drawing.Size(203, 130);
+            this.groupBoxJTFASettgins.Size = new System.Drawing.Size(600, 76);
             this.groupBoxJTFASettgins.TabIndex = 5;
             this.groupBoxJTFASettgins.TabStop = false;
             this.groupBoxJTFASettgins.Text = "JTFA Settings";
+            // 
+            // WindowTypes
+            // 
+            this.WindowTypes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.WindowTypes.FormattingEnabled = true;
+            this.WindowTypes.Location = new System.Drawing.Point(399, 19);
+            this.WindowTypes.Name = "WindowTypes";
+            this.WindowTypes.Size = new System.Drawing.Size(188, 20);
+            this.WindowTypes.TabIndex = 6;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(352, 22);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(41, 12);
+            this.label5.TabIndex = 5;
+            this.label5.Text = "Window";
+            // 
+            // comboBoxColorType
+            // 
+            this.comboBoxColorType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxColorType.FormattingEnabled = true;
+            this.comboBoxColorType.Items.AddRange(new object[] {
+            "BlackWrite",
+            "BlueGreenRed",
+            "Rainbow",
+            "BalancedRainbow",
+            "Fire",
+            "BlueSpirit",
+            "BlueFairy",
+            "BlueOrange30-Hue"});
+            this.comboBoxColorType.Location = new System.Drawing.Point(435, 47);
+            this.comboBoxColorType.Name = "comboBoxColorType";
+            this.comboBoxColorType.Size = new System.Drawing.Size(152, 20);
+            this.comboBoxColorType.TabIndex = 6;
+            this.comboBoxColorType.SelectedIndexChanged += new System.EventHandler(this.comboBoxColorType_SelectedIndexChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(352, 50);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(47, 12);
+            this.label7.TabIndex = 5;
+            this.label7.Text = "Pallete";
+            // 
+            // pictureBox_frequency_time
+            // 
+            this.pictureBox_frequency_time.Location = new System.Drawing.Point(834, 12);
+            this.pictureBox_frequency_time.Name = "pictureBox_frequency_time";
+            this.pictureBox_frequency_time.Size = new System.Drawing.Size(695, 414);
+            this.pictureBox_frequency_time.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox_frequency_time.TabIndex = 80;
+            this.pictureBox_frequency_time.TabStop = false;
             // 
             // SpectrumViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1038, 440);
+            this.ClientSize = new System.Drawing.Size(1544, 521);
+            this.Controls.Add(this.pictureBox_frequency_time);
             this.Controls.Add(this.groupBoxJTFASettgins);
             this.Controls.Add(this.groupBoxSpectrumSettings);
             this.Controls.Add(this.buttonJTFA);
@@ -689,13 +722,13 @@ namespace Spectrum_Viewer
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSampleRate)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWindowLength)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownJTFAWinLength)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownJTFAStep)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStartTime)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDurationSec)).EndInit();
             this.groupBoxSpectrumSettings.ResumeLayout(false);
             this.groupBoxSpectrumSettings.PerformLayout();
             this.groupBoxJTFASettgins.ResumeLayout(false);
             this.groupBoxJTFASettgins.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_frequency_time)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -715,14 +748,17 @@ namespace Spectrum_Viewer
         private System.Windows.Forms.CheckBox checkBoxCepstrum;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown numericUpDownJTFAWinLength;
-        private System.Windows.Forms.NumericUpDown numericUpDownJTFAStep;
         private System.Windows.Forms.NumericUpDown numericUpDownStartTime;
         private System.Windows.Forms.NumericUpDown numericUpDownDurationSec;
         private System.Windows.Forms.GroupBox groupBoxSpectrumSettings;
         private System.Windows.Forms.GroupBox groupBoxJTFASettgins;
+        private System.Windows.Forms.ComboBox WindowTypes;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.ComboBox comboBoxColorType;
+        private System.Windows.Forms.PictureBox pictureBox_frequency_time;
     }
 }
 
