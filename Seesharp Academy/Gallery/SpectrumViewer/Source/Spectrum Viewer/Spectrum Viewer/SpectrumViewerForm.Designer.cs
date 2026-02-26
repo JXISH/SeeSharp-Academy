@@ -28,8 +28,8 @@ namespace Spectrum_Viewer
         /// </summary>
         private void InitializeComponent()
         {
-            SeeSharpTools.JY.GUI.TabCursor tabCursor7 = new SeeSharpTools.JY.GUI.TabCursor();
-            SeeSharpTools.JY.GUI.TabCursor tabCursor8 = new SeeSharpTools.JY.GUI.TabCursor();
+            SeeSharpTools.JY.GUI.TabCursor tabCursor1 = new SeeSharpTools.JY.GUI.TabCursor();
+            SeeSharpTools.JY.GUI.TabCursor tabCursor2 = new SeeSharpTools.JY.GUI.TabCursor();
             this.easyChartXTimeWaveform = new SeeSharpTools.JY.GUI.EasyChartX();
             this.easyChartXWaveformSection = new SeeSharpTools.JY.GUI.EasyChartX();
             this.easyChartXSectionSpectrum = new SeeSharpTools.JY.GUI.EasyChartX();
@@ -49,11 +49,11 @@ namespace Spectrum_Viewer
             this.numericUpDownDurationSec = new System.Windows.Forms.NumericUpDown();
             this.groupBoxSpectrumSettings = new System.Windows.Forms.GroupBox();
             this.groupBoxJTFASettgins = new System.Windows.Forms.GroupBox();
-            this.WindowTypes = new System.Windows.Forms.ComboBox();
-            this.label5 = new System.Windows.Forms.Label();
             this.comboBoxColorType = new System.Windows.Forms.ComboBox();
+            this.WindowTypes = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.pictureBox_frequency_time = new System.Windows.Forms.PictureBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.formsScottPlot = new ScottPlot.FormsPlot();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSampleRate)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWindowLength)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownJTFAWinLength)).BeginInit();
@@ -61,7 +61,6 @@ namespace Spectrum_Viewer
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownDurationSec)).BeginInit();
             this.groupBoxSpectrumSettings.SuspendLayout();
             this.groupBoxJTFASettgins.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_frequency_time)).BeginInit();
             this.SuspendLayout();
             // 
             // easyChartXTimeWaveform
@@ -166,24 +165,24 @@ namespace Spectrum_Viewer
             this.easyChartXTimeWaveform.Series.Count = 0;
             this.easyChartXTimeWaveform.Size = new System.Drawing.Size(531, 200);
             this.easyChartXTimeWaveform.SplitView = false;
-            tabCursor7.Color = System.Drawing.Color.Cyan;
-            tabCursor7.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
-            tabCursor7.Enabled = true;
-            tabCursor7.Name = "TabCursor1";
-            tabCursor7.SeriesIndex = -1;
-            tabCursor7.Value = 0D;
-            tabCursor7.XValue = 0D;
-            tabCursor7.YValue = double.NaN;
-            tabCursor8.Color = System.Drawing.Color.Orange;
-            tabCursor8.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
-            tabCursor8.Enabled = true;
-            tabCursor8.Name = "TabCursor2";
-            tabCursor8.SeriesIndex = -1;
-            tabCursor8.Value = 0D;
-            tabCursor8.XValue = 0D;
-            tabCursor8.YValue = double.NaN;
-            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor7);
-            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor8);
+            tabCursor1.Color = System.Drawing.Color.Cyan;
+            tabCursor1.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
+            tabCursor1.Enabled = true;
+            tabCursor1.Name = "TabCursor1";
+            tabCursor1.SeriesIndex = -1;
+            tabCursor1.Value = 0D;
+            tabCursor1.XValue = 0D;
+            tabCursor1.YValue = double.NaN;
+            tabCursor2.Color = System.Drawing.Color.Orange;
+            tabCursor2.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
+            tabCursor2.Enabled = true;
+            tabCursor2.Name = "TabCursor2";
+            tabCursor2.SeriesIndex = -1;
+            tabCursor2.Value = 0D;
+            tabCursor2.XValue = 0D;
+            tabCursor2.YValue = double.NaN;
+            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor1);
+            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor2);
             this.easyChartXTimeWaveform.TabIndex = 0;
             this.easyChartXTimeWaveform.XCursor.AutoInterval = true;
             this.easyChartXTimeWaveform.XCursor.Color = System.Drawing.Color.DeepSkyBlue;
@@ -649,24 +648,6 @@ namespace Spectrum_Viewer
             this.groupBoxJTFASettgins.TabStop = false;
             this.groupBoxJTFASettgins.Text = "JTFA Settings";
             // 
-            // WindowTypes
-            // 
-            this.WindowTypes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.WindowTypes.FormattingEnabled = true;
-            this.WindowTypes.Location = new System.Drawing.Point(399, 19);
-            this.WindowTypes.Name = "WindowTypes";
-            this.WindowTypes.Size = new System.Drawing.Size(188, 20);
-            this.WindowTypes.TabIndex = 6;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(352, 22);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(41, 12);
-            this.label5.TabIndex = 5;
-            this.label5.Text = "Window";
-            // 
             // comboBoxColorType
             // 
             this.comboBoxColorType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -686,6 +667,15 @@ namespace Spectrum_Viewer
             this.comboBoxColorType.TabIndex = 6;
             this.comboBoxColorType.SelectedIndexChanged += new System.EventHandler(this.comboBoxColorType_SelectedIndexChanged);
             // 
+            // WindowTypes
+            // 
+            this.WindowTypes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.WindowTypes.FormattingEnabled = true;
+            this.WindowTypes.Location = new System.Drawing.Point(399, 19);
+            this.WindowTypes.Name = "WindowTypes";
+            this.WindowTypes.Size = new System.Drawing.Size(188, 20);
+            this.WindowTypes.TabIndex = 6;
+            // 
             // label7
             // 
             this.label7.AutoSize = true;
@@ -695,21 +685,29 @@ namespace Spectrum_Viewer
             this.label7.TabIndex = 5;
             this.label7.Text = "Pallete";
             // 
-            // pictureBox_frequency_time
+            // label5
             // 
-            this.pictureBox_frequency_time.Location = new System.Drawing.Point(834, 12);
-            this.pictureBox_frequency_time.Name = "pictureBox_frequency_time";
-            this.pictureBox_frequency_time.Size = new System.Drawing.Size(695, 414);
-            this.pictureBox_frequency_time.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox_frequency_time.TabIndex = 80;
-            this.pictureBox_frequency_time.TabStop = false;
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(352, 22);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(41, 12);
+            this.label5.TabIndex = 5;
+            this.label5.Text = "Window";
+            // 
+            // formsScottPlot
+            // 
+            this.formsScottPlot.Location = new System.Drawing.Point(815, -1);
+            this.formsScottPlot.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.formsScottPlot.Name = "formsScottPlot";
+            this.formsScottPlot.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.formsScottPlot.Size = new System.Drawing.Size(728, 444);
+            this.formsScottPlot.TabIndex = 110;
             // 
             // SpectrumViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1544, 521);
-            this.Controls.Add(this.pictureBox_frequency_time);
             this.Controls.Add(this.groupBoxJTFASettgins);
             this.Controls.Add(this.groupBoxSpectrumSettings);
             this.Controls.Add(this.buttonJTFA);
@@ -717,6 +715,7 @@ namespace Spectrum_Viewer
             this.Controls.Add(this.easyChartXSectionSpectrum);
             this.Controls.Add(this.easyChartXWaveformSection);
             this.Controls.Add(this.easyChartXTimeWaveform);
+            this.Controls.Add(this.formsScottPlot);
             this.Name = "SpectrumViewerForm";
             this.Text = "Spectrum Viewer";
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSampleRate)).EndInit();
@@ -728,7 +727,6 @@ namespace Spectrum_Viewer
             this.groupBoxSpectrumSettings.PerformLayout();
             this.groupBoxJTFASettgins.ResumeLayout(false);
             this.groupBoxJTFASettgins.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_frequency_time)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -758,7 +756,7 @@ namespace Spectrum_Viewer
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox comboBoxColorType;
-        private System.Windows.Forms.PictureBox pictureBox_frequency_time;
+        private ScottPlot.FormsPlot formsScottPlot;
     }
 }
 

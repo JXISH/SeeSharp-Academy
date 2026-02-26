@@ -1,6 +1,7 @@
 using CSV_Loader;
 using MathNet.Numerics;
 using MathNet.Numerics.IntegralTransforms;
+using ScottPlot;
 using SeeSharpTools.JXI.SignalProcessing.JTFA;
 using SeeSharpTools.JY.DSP.Fundamental;
 using System;
@@ -53,7 +54,14 @@ namespace Spectrum_Viewer
                 WindowTypes.Items.Add(item);//Add window type
             }
             WindowTypes.SelectedIndex = 3;// window
-            comboBoxColorType.SelectedIndex = 2; //Rainbow color
+            //清除comboBoxColorType
+            comboBoxColorType.Items.Clear();
+            var colorTypes = Enum.GetNames(typeof(ScottHeatMapColor));
+            foreach (var item in colorTypes)
+            {
+                comboBoxColorType.Items.Add(item);//Add color type
+            }
+            comboBoxColorType.SelectedIndex = 29; //Turbo color
             _task = new GeneralJTFATask();
         }
         //从csv导入数据
@@ -204,7 +212,7 @@ namespace Spectrum_Viewer
             int startIndex= (int)((double)numericUpDownStartTime.Value * sampleRate);
             int length = (int)((double)numericUpDownDurationSec.Value * sampleRate);
             int windowLength = (int)numericUpDownJTFAWinLength.Value;
-            if((waveform.Length< startIndex + length)||(length<windowLength))
+            if ((waveform == null || waveform.Length < startIndex + length) || (length < windowLength))
             {
                 MessageBox.Show("波形数据不足");
                 return;
@@ -226,7 +234,7 @@ namespace Spectrum_Viewer
             {
                 for (int j = 0; j < freqSize; j++)
                 {
-                    tfDistributionDB[i, j] = 10 * Math.Log10(spec[i, j]);
+                    tfDistributionDB[i, j] = 10 * Math.Log10(spec[spec.GetLength(0)-1-i, j]);
                 }
             }
         }
@@ -235,14 +243,144 @@ namespace Spectrum_Viewer
             if (tfDistributionDB != null && tfDistributionDB.Length > 0)
             {
                 //Get the intensity map
-                _task.ColorTable = (GeneralJTFATask.ColorTableType)comboBoxColorType.SelectedIndex;
-                Bitmap myImage = new Bitmap(tfDistributionDB.GetLength(1), tfDistributionDB.GetLength(0));
-                _task.GetImage(tfDistributionDB, ref myImage);
-                pictureBox_frequency_time.Image = myImage;
+                //_task.ColorTable = (GeneralJTFATask.ColorTableType)comboBoxColorType.SelectedIndex;
+                //Bitmap myImage = new Bitmap(tfDistributionDB.GetLength(1), tfDistributionDB.GetLength(0));
+                //_task.GetImage(tfDistributionDB, ref myImage);
+                //pictureBox_frequency_time.Image = myImage;
+
+                formsScottPlot.Name = "Time-Frequency Chart";
+                //清除formsScottPlot.
+                formsScottPlot.Plot.Clear();
+                //添加热力图
+                //从comboBoxColorType中获取颜色
+                ScottHeatMapColor selectedColor = (ScottHeatMapColor)comboBoxColorType.SelectedIndex;
+                var hm = formsScottPlot.Plot.AddHeatmap(tfDistributionDB, GetScottColorMap(selectedColor), false);
+                var cb = formsScottPlot.Plot.AddColorbar(hm);
+                //调节X轴量化
+                //formsScottPlot.Plot.AxisScale(_task.JTFAInfomation.df,_task.JTFAInfomation.dt);
+                formsScottPlot.Plot.XLabel("Frequency (Hz)");
+                formsScottPlot.Plot.YLabel("Time (s)");
+                formsScottPlot.Plot.SetAxisLimitsX(0, _task.JTFAInfomation.df * tfDistributionDB.GetLength(1));
+                formsScottPlot.Plot.SetAxisLimitsY(0, _task.JTFAInfomation.dt * tfDistributionDB.GetLength(0));
+                // apply width and height to the heatmap
+                hm.Interpolation =  System.Drawing.Drawing2D.InterpolationMode.Bilinear;
+                hm.XMin=0;
+                hm.XMax=_task.JTFAInfomation.df * tfDistributionDB.GetLength(1);
+                hm.YMin=0;
+                hm.YMax=_task.JTFAInfomation.dt * tfDistributionDB.GetLength(0);
+                formsScottPlot.Plot.AxisAuto(0, 0);
+                formsScottPlot.Plot.Margins(0, 0);
+                formsScottPlot.Refresh();
+            }
+        }
+        public ScottPlot.Drawing.Colormap GetScottColorMap(ScottHeatMapColor color)
+        {
+            ScottPlot.Drawing.Colormap _scottColormap;
+            switch (color) {
+                case ScottHeatMapColor.Algae:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Algae;
+                    break;
+                    case ScottHeatMapColor.Amp:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Amp;
+                    break;
+                    case ScottHeatMapColor.Balance:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Balance;
+                    break;
+                    case ScottHeatMapColor.Blues:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Blues;
+                    break;
+                    case ScottHeatMapColor.Curl:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Curl;
+                    break;
+                    case ScottHeatMapColor.Deep:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Deep;
+                    break;
+                    case ScottHeatMapColor.Delta:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Delta;
+                    break;
+                    case ScottHeatMapColor.Dense:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Dense;
+                    break;
+                    case ScottHeatMapColor.Diff:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Diff;
+                    break;
+                    case ScottHeatMapColor.Grayscale:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Grayscale;
+                    break;
+                    case ScottHeatMapColor.Greens:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Greens;
+                    break;
+                    case ScottHeatMapColor.Haline:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Haline;
+                    break;
+                    case ScottHeatMapColor.Ice:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Ice;
+                    break;
+                    case ScottHeatMapColor.Inferno:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Inferno;
+                    break;
+                    case ScottHeatMapColor.Jet:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Jet;
+                    break;
+                    case ScottHeatMapColor.Magma:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Magma;
+                    break;
+                    case ScottHeatMapColor.Matter:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Matter;
+                    break;
+                    case ScottHeatMapColor.Oxy:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Oxy;
+                    break;
+                    case ScottHeatMapColor.Phase:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Phase;
+                    break;
+                    case ScottHeatMapColor.Plasma:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Plasma;
+                    break;
+                    case ScottHeatMapColor.Rain:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Rain;
+                    break;
+                    break;
+                    case ScottHeatMapColor.Solar:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Solar;
+                    break;
+                    case ScottHeatMapColor.Speed:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Speed;
+                    break;
+                    case ScottHeatMapColor.Tarn:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Tarn;
+                    break;
+                    case ScottHeatMapColor.Tempo:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Tempo;
+                    break;
+                    case ScottHeatMapColor.Thermal:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Thermal;
+                    break;
+                    case ScottHeatMapColor.Topo:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Topo;
+                    break;
+
+                    case ScottHeatMapColor.Turbid:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Turbid;
+                    break;
+                    case ScottHeatMapColor.Turbo:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Turbo;
+                    break;
+                    case ScottHeatMapColor.Viridis:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Viridis;
+                    break;
+                default:
+                    _scottColormap = ScottPlot.Drawing.Colormap.Turbo;
+                    break;
             }
 
+
+            return _scottColormap;
         }
+    }
 
-
+    public enum ScottHeatMapColor
+    {
+        Algae,Amp,Balance,Blues,Curl,Deep,Delta,Dense,Diff,Grayscale, GrayscaleR,Greens,Haline,Ice,Inferno,Jet,Magma,Matter,Oxy,Phase,Plasma,Rain,Solar,Speed,Tarn,Tempo,Thermal,Topo,Turbid,Turbo,Viridis,      
     }
 }
