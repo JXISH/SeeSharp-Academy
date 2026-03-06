@@ -28,10 +28,6 @@ namespace Peak_Frequency_Finder
         /// </summary>
         private void InitializeComponent()
         {
-            SeeSharpTools.JY.GUI.TabCursor tabCursor1 = new SeeSharpTools.JY.GUI.TabCursor();
-            SeeSharpTools.JY.GUI.TabCursor tabCursor2 = new SeeSharpTools.JY.GUI.TabCursor();
-            SeeSharpTools.JY.GUI.TabCursor tabCursor3 = new SeeSharpTools.JY.GUI.TabCursor();
-            SeeSharpTools.JY.GUI.TabCursor tabCursor4 = new SeeSharpTools.JY.GUI.TabCursor();
             this.buttonLoad = new System.Windows.Forms.Button();
             this.easyChartXTimeWaveform = new SeeSharpTools.JY.GUI.EasyChartX();
             this.easyChartXSpectrum = new SeeSharpTools.JY.GUI.EasyChartX();
@@ -49,6 +45,8 @@ namespace Peak_Frequency_Finder
             this.label3 = new System.Windows.Forms.Label();
             this.numericUpDownMaxPeakNum = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
+            this.progressBarAnalysis = new System.Windows.Forms.ProgressBar();
+            this.labelProgress = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStartFreq)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStopFreq)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvResults)).BeginInit();
@@ -168,24 +166,6 @@ namespace Peak_Frequency_Finder
             this.easyChartXTimeWaveform.Series.Count = 0;
             this.easyChartXTimeWaveform.Size = new System.Drawing.Size(1241, 280);
             this.easyChartXTimeWaveform.SplitView = false;
-            tabCursor1.Color = System.Drawing.Color.Cyan;
-            tabCursor1.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
-            tabCursor1.Enabled = true;
-            tabCursor1.Name = "TabCursor1";
-            tabCursor1.SeriesIndex = -1;
-            tabCursor1.Value = 0D;
-            tabCursor1.XValue = 0D;
-            tabCursor1.YValue = double.NaN;
-            tabCursor2.Color = System.Drawing.Color.Orange;
-            tabCursor2.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
-            tabCursor2.Enabled = true;
-            tabCursor2.Name = "TabCursor2";
-            tabCursor2.SeriesIndex = -1;
-            tabCursor2.Value = 0D;
-            tabCursor2.XValue = 0D;
-            tabCursor2.YValue = double.NaN;
-            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor1);
-            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor2);
             this.easyChartXTimeWaveform.TabIndex = 2;
             this.easyChartXTimeWaveform.XCursor.AutoInterval = true;
             this.easyChartXTimeWaveform.XCursor.Color = System.Drawing.Color.DeepSkyBlue;
@@ -302,24 +282,6 @@ namespace Peak_Frequency_Finder
             this.easyChartXSpectrum.Series.Count = 0;
             this.easyChartXSpectrum.Size = new System.Drawing.Size(1241, 280);
             this.easyChartXSpectrum.SplitView = false;
-            tabCursor3.Color = System.Drawing.Color.Cyan;
-            tabCursor3.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
-            tabCursor3.Enabled = true;
-            tabCursor3.Name = "TabCursor1";
-            tabCursor3.SeriesIndex = -1;
-            tabCursor3.Value = 0D;
-            tabCursor3.XValue = 0D;
-            tabCursor3.YValue = double.NaN;
-            tabCursor4.Color = System.Drawing.Color.Orange;
-            tabCursor4.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
-            tabCursor4.Enabled = true;
-            tabCursor4.Name = "TabCursor2";
-            tabCursor4.SeriesIndex = -1;
-            tabCursor4.Value = 0D;
-            tabCursor4.XValue = 0D;
-            tabCursor4.YValue = double.NaN;
-            this.easyChartXSpectrum.TabCursorContainer.Add(tabCursor3);
-            this.easyChartXSpectrum.TabCursorContainer.Add(tabCursor4);
             this.easyChartXSpectrum.TabIndex = 2;
             this.easyChartXSpectrum.XCursor.AutoInterval = true;
             this.easyChartXSpectrum.XCursor.Color = System.Drawing.Color.DeepSkyBlue;
@@ -382,7 +344,7 @@ namespace Peak_Frequency_Finder
             // 
             this.buttonAnalysis.Location = new System.Drawing.Point(804, 606);
             this.buttonAnalysis.Name = "buttonAnalysis";
-            this.buttonAnalysis.Size = new System.Drawing.Size(75, 23);
+            this.buttonAnalysis.Size = new System.Drawing.Size(100, 23);
             this.buttonAnalysis.TabIndex = 3;
             this.buttonAnalysis.Text = "Analysis";
             this.buttonAnalysis.UseVisualStyleBackColor = true;
@@ -427,6 +389,7 @@ namespace Peak_Frequency_Finder
             // checkBoxYAxisIsLog
             // 
             this.checkBoxYAxisIsLog.AutoSize = true;
+            this.checkBoxYAxisIsLog.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.checkBoxYAxisIsLog.Checked = true;
             this.checkBoxYAxisIsLog.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxYAxisIsLog.Location = new System.Drawing.Point(12, 298);
@@ -434,7 +397,7 @@ namespace Peak_Frequency_Finder
             this.checkBoxYAxisIsLog.Size = new System.Drawing.Size(42, 16);
             this.checkBoxYAxisIsLog.TabIndex = 7;
             this.checkBoxYAxisIsLog.Text = "Log";
-            this.checkBoxYAxisIsLog.UseVisualStyleBackColor = true;
+            this.checkBoxYAxisIsLog.UseVisualStyleBackColor = false;
             this.checkBoxYAxisIsLog.CheckedChanged += new System.EventHandler(this.checkBoxYAxisIsLog_CheckedChanged);
             // 
             // numericUpDownRelativeThreshold
@@ -494,11 +457,28 @@ namespace Peak_Frequency_Finder
             this.label4.TabIndex = 5;
             this.label4.Text = "Max Peak Number";
             // 
+            // progressBarAnalysis
+            // 
+            this.progressBarAnalysis.Location = new System.Drawing.Point(910, 608);
+            this.progressBarAnalysis.Name = "progressBarAnalysis";
+            this.progressBarAnalysis.Size = new System.Drawing.Size(150, 20);
+            this.progressBarAnalysis.TabIndex = 9;
+            // 
+            // labelProgress
+            // 
+            this.labelProgress.BackColor = System.Drawing.Color.Transparent;
+            this.labelProgress.Location = new System.Drawing.Point(912, 593);
+            this.labelProgress.Name = "labelProgress";
+            this.labelProgress.Size = new System.Drawing.Size(140, 12);
+            this.labelProgress.TabIndex = 8;
+            this.labelProgress.Text = "Label Progress";
+            // 
             // PeakFrequencyFinderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1544, 641);
+            this.Controls.Add(this.labelProgress);
             this.Controls.Add(this.checkBoxYAxisIsLog);
             this.Controls.Add(this.dgvResults);
             this.Controls.Add(this.label4);
@@ -506,6 +486,7 @@ namespace Peak_Frequency_Finder
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numericUpDownMaxPeakNum);
+            this.Controls.Add(this.progressBarAnalysis);
             this.Controls.Add(this.numericUpDownRelativeThreshold);
             this.Controls.Add(this.numericUpDownStopFreq);
             this.Controls.Add(this.numericUpDownStartFreq);
@@ -544,6 +525,8 @@ namespace Peak_Frequency_Finder
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown numericUpDownMaxPeakNum;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ProgressBar progressBarAnalysis;
+        private System.Windows.Forms.Label labelProgress;
     }
 }
 

@@ -11,7 +11,7 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Peak_Frequency_Finder
@@ -33,7 +33,7 @@ namespace Peak_Frequency_Finder
         #endregion
 
         #region 私有域
-
+        private BackgroundWorker analysisWorker;
         #endregion
 
         /// <summary>
@@ -44,6 +44,24 @@ namespace Peak_Frequency_Finder
             InitializeComponent();
             signal = null;
             sampleRate = 0;
+            labelProgress.Visible = false;
+            progressBarAnalysis.Visible = false;
+            InitializeBackgroundWorker();
+        }
+
+        /// <summary>
+        /// 初始化BackgroundWorker
+        /// </summary>
+        private void InitializeBackgroundWorker()
+        {
+            analysisWorker = new BackgroundWorker
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            analysisWorker.DoWork += AnalysisWorker_DoWork;
+            analysisWorker.ProgressChanged += AnalysisWorker_ProgressChanged;
+            analysisWorker.RunWorkerCompleted += AnalysisWorker_RunWorkerCompleted;
         }
         #region 内部方法
         private void InitStartStopFrequency()
@@ -81,130 +99,40 @@ namespace Peak_Frequency_Finder
 
         private void buttonAnalysis_Click(object sender, EventArgs e)
         {
+            //防止重复点击
+            if (analysisWorker.IsBusy)
+            {
+                MessageBox.Show("分析正在进行中，请稍候...", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             //如果存在合理数据，进行分析
             if (signal != null && signal.Length > 0 && sampleRate > 0)
             {
                 try
                 {
-                    #region 预处理降采样
-                    double maxFreq = (double)numericUpDownStopFreq.Value;
-                    int downSampleRate = (int)Math.Floor(sampleRate / (maxFreq * 2.5));
-                    downSampleRate = Math.Max(1, downSampleRate);
-                    double[] resampledSignal;
-                    double resampledRate = sampleRate / downSampleRate;
-                    if (downSampleRate > 1)
-                    {
-                        EasyFilter lpf = new EasyFilter();
-                        lpf.DesignIIRFilter(IIRDesignMethod.Elliptic, IIRBandType.Lowpass, 3, 70, 1, 0.4 / downSampleRate, 0.6 / downSampleRate);
-                        double[] lowpassFiltered = lpf.Filtering(signal);
-                        resampledSignal = new double[lowpassFiltered.Length / downSampleRate];
-                        for (int i = 0; i < resampledSignal.Length; i++)
-                        {
-                            resampledSignal[i] = lowpassFiltered[(i+1) * downSampleRate-1];
-                        }
-                    }
-                    else
-                    {
-                        resampledSignal = signal;
-                    }
-                    #endregion
-                    #region 预处理滤波
-                    EasyFilter easyFilter = new EasyFilter();
-                    double passband1 = (double)numericUpDownStartFreq.Value;
-                    double passband2 = (double)numericUpDownStopFreq.Value;
-                    double cutoffband1 = 0.01 * resampledRate;
-                    double cutoffband2 = 0.49 * resampledRate;
-                    IIRBandType bandType = IIRBandType.Bandpass;
-                    //如果通带=0，使用低通滤波
-                    if (passband1 == 0)
-                    {
-                        bandType = IIRBandType.Lowpass;
-                    }
-                    else
-                    {
-                        //起始频率在0.05-0.4采样率之间
-                        passband1 = Math.Max(0.01 * resampledRate, passband1);
-                        passband1 = Math.Min(0.4 * resampledRate, passband1);
-                    }
-                    if (passband2 <= passband1)
-                        passband2 = 0.5*resampledRate;
-                    passband2 = Math.Min(0.5*resampledRate, passband2);
-                    if (passband2 >= 0.49*resampledRate)
-                    {
-                        bandType = IIRBandType.Highpass;
-                    }
-                    cutoffband1 = Math.Max(0.001*resampledRate, passband1 - 0.05 * resampledRate);
-                    cutoffband2 = Math.Min(0.49*resampledRate, passband2 + 0.05 * resampledRate);
-                    switch (bandType)
-                    {
-                        case IIRBandType.Bandpass:
-                            {
-                                easyFilter.DesignIIRFilter(IIRDesignMethod.Elliptic, bandType, 3, 50, resampledRate, passband1, cutoffband1, passband2, cutoffband2);
-                                break;
-                            }
-                        case IIRBandType.Highpass:
-                            {
-                                easyFilter.DesignIIRFilter(IIRDesignMethod.Elliptic, bandType, 3, 50, resampledRate, passband1, cutoffband1);
-                                break;
-                            }
-                        case IIRBandType.Lowpass:
-                            {
-                                easyFilter.DesignIIRFilter(IIRDesignMethod.Elliptic, bandType, 3, 50, resampledRate, passband2, cutoffband2);
-                                break;
-                            }
-                        default:
-                            {
-                                throw new Exception("不支持的滤波类型");
-                            }
-                    }
+                    //禁用按钮，启用进度条
+                    buttonAnalysis.Enabled = false;
+                    buttonLoad.Enabled = false;
+                    progressBarAnalysis.Value = 0;
+                    progressBarAnalysis.Visible = true;
+                    labelProgress.Visible = true;
+                    labelProgress.Text = "准备分析...";
 
-                    //滤波
-                    double[] filteredSignal = easyFilter.Filtering(resampledSignal);
-                    #endregion
-                    #region 分析
-                    //频谱分析
-                    double[] _freqAxis;
-                    double[] _fftAmp;
-                    (_freqAxis, _fftAmp) = ComputeFftSpectrum(filteredSignal, resampledRate);
+                    Application.DoEvents();
 
-                    //频率检出
-                    var matrixPencilFreq = MatrixPencilEstimate(filteredSignal, resampledRate, passband1, passband2
-                        , (double)numericUpDownRelativeThreshold.Value);
-                    var rawComponents = BuildComponentsWithFftAmplitude(matrixPencilFreq, _freqAxis, _fftAmp, passband1, passband2);
-                    List<DetectedComponent> _detected = SelectDisplayComponents(rawComponents, passband1, passband2
-                        ,(int)numericUpDownMaxPeakNum.Value, (double)numericUpDownRelativeThreshold.Value);
-                    //显示
-                    //修正频率控件值为实际值
-                    numericUpDownStartFreq.Value = (decimal)passband1;
-                    numericUpDownStopFreq.Value = (decimal)passband2;
-                    //显示列表
-                    PopulateResultsGrid(_detected);
-                    //显示频谱
-                    double[][] spectrumDisplayX=new double[2][];
-                    double[][] spectrumDisplayY=new double[2][];
-                    spectrumDisplayX[0] = _freqAxis;
-                    spectrumDisplayY[0] = _fftAmp;
-                    //第二对显示_detected全部元素
-                    spectrumDisplayX[1]=new double[_detected.Count];
-                    spectrumDisplayY[1]=new double[_detected.Count];
-                    for (int i = 0; i < _detected.Count; i++)
-                    {
-                        spectrumDisplayX[1][i] = _detected[i].FrequencyHz;
-                        spectrumDisplayY[1][i] = _detected[i].Amplitude;
-                    }
-                    easyChartXSpectrum.Plot(spectrumDisplayX, spectrumDisplayY);
-                    //设置第二条series为散点图
-                    easyChartXSpectrum.Series[1].Type = SeeSharpTools.JY.GUI.EasyChartXSeries.LineType.Point;
-                    easyChartXSpectrum.Series[1].Color = System.Drawing.Color.Red;
-                    easyChartXSpectrum.AxisY.IsLogarithmic = checkBoxYAxisIsLog.Checked;
-                    #endregion
-
+                    //启动后台工作
+                    analysisWorker.RunWorkerAsync();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
-                    return;
+                    ResetUIState();
                 }
+            }
+            else
+            {
+                MessageBox.Show("请先加载信号数据", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         private void PopulateResultsGrid(List<DetectedComponent> components)
@@ -221,6 +149,273 @@ namespace Peak_Frequency_Finder
             {
                 Console.WriteLine($"{c.FrequencyHz.ToString("F4", CultureInfo.InvariantCulture)},{c.Amplitude.ToString("G8", CultureInfo.InvariantCulture)}");
             }
+        }
+
+        /// <summary>
+        /// BackgroundWorker DoWork事件 - 执行分析
+        /// </summary>
+        private void AnalysisWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var worker = (BackgroundWorker)sender;
+
+            try
+            {
+                //报告初始进度
+                worker.ReportProgress(0, "开始分析...");
+
+                #region 预处理降采样
+                worker.ReportProgress(5, "预处理降采样...");
+                
+                double maxFreq = (double)numericUpDownStopFreq.Value;
+                int downSampleRate = (int)Math.Floor(sampleRate / (maxFreq * 2.5));
+                downSampleRate = Math.Max(1, downSampleRate);
+                double[] resampledSignal;
+                double resampledRate = sampleRate / downSampleRate;
+                if (downSampleRate > 1)
+                {
+                    EasyFilter lpf = new EasyFilter();
+                    lpf.DesignIIRFilter(IIRDesignMethod.Elliptic, IIRBandType.Lowpass, 3, 70, 1, 0.4 / downSampleRate, 0.6 / downSampleRate);
+                    double[] lowpassFiltered = lpf.Filtering(signal);
+                    resampledSignal = new double[lowpassFiltered.Length / downSampleRate];
+                    for (int i = 0; i < resampledSignal.Length; i++)
+                    {
+                        resampledSignal[i] = lowpassFiltered[(i+1) * downSampleRate-1];
+                    }
+                }
+                else
+                {
+                    resampledSignal = signal;
+                }
+                #endregion
+
+                #region 预处理滤波
+                worker.ReportProgress(10, "设计滤波器...");
+                
+                EasyFilter easyFilter = new EasyFilter();
+                double passband1 = (double)numericUpDownStartFreq.Value;
+                double passband2 = (double)numericUpDownStopFreq.Value;
+                double cutoffband1 = 0.01 * resampledRate;
+                double cutoffband2 = 0.49 * resampledRate;
+                IIRBandType bandType = IIRBandType.Bandpass;
+                
+                //如果通带=0，使用低通滤波
+                if (passband1 == 0)
+                {
+                    bandType = IIRBandType.Lowpass;
+                }
+                else
+                {
+                    //起始频率在0.05-0.4采样率之间
+                    passband1 = Math.Max(0.01 * resampledRate, passband1);
+                    passband1 = Math.Min(0.4 * resampledRate, passband1);
+                }
+                if (passband2 <= passband1)
+                    passband2 = 0.5*resampledRate;
+                passband2 = Math.Min(0.5*resampledRate, passband2);
+                if (passband2 >= 0.49*resampledRate)
+                {
+                    bandType = IIRBandType.Highpass;
+                }
+                cutoffband1 = Math.Max(0.001*resampledRate, passband1 - 0.05 * resampledRate);
+                cutoffband2 = Math.Min(0.49*resampledRate, passband2 + 0.05 * resampledRate);
+                
+                switch (bandType)
+                {
+                    case IIRBandType.Bandpass:
+                        {
+                            easyFilter.DesignIIRFilter(IIRDesignMethod.Elliptic, bandType, 3, 50, resampledRate, passband1, cutoffband1, passband2, cutoffband2);
+                            break;
+                        }
+                    case IIRBandType.Highpass:
+                        {
+                            easyFilter.DesignIIRFilter(IIRDesignMethod.Elliptic, bandType, 3, 50, resampledRate, passband1, cutoffband1);
+                            break;
+                        }
+                    case IIRBandType.Lowpass:
+                        {
+                            easyFilter.DesignIIRFilter(IIRDesignMethod.Elliptic, bandType, 3, 50, resampledRate, passband2, cutoffband2);
+                            break;
+                        }
+                    default:
+                        {
+                            throw new Exception("不支持的滤波类型");
+                        }
+                }
+
+                worker.ReportProgress(15, "应用滤波器...");
+
+                //滤波
+                double[] filteredSignal = easyFilter.Filtering(resampledSignal);
+                #endregion
+
+                #region 分析
+                worker.ReportProgress(20, "计算频谱...");
+                
+                //频谱分析
+                double[] _freqAxis;
+                double[] _fftAmp;
+                (_freqAxis, _fftAmp) = ComputeFftSpectrum(filteredSignal, resampledRate);
+
+                worker.ReportProgress(30, "Matrix Pencil频率检出...");
+
+                //频率检出 - 使用Progress回调
+                Progress<int> progress = new Progress<int>(percent =>
+                {
+                    int overallProgress = 30 + (int)(percent * 0.5); // 30-80%用于Matrix Pencil
+                    worker.ReportProgress(overallProgress, $"Matrix Pencil分析中... {percent}%");
+                });
+
+                var matrixPencilFreq = MatrixPencilEstimate(filteredSignal, resampledRate, passband1, passband2
+                    , (double)numericUpDownRelativeThreshold.Value, progress);
+
+                worker.ReportProgress(85, "构建频率分量...");
+
+                var rawComponents = BuildComponentsWithFftAmplitude(matrixPencilFreq, _freqAxis, _fftAmp, passband1, passband2);
+                
+                worker.ReportProgress(90, "选择显示分量...");
+
+                List<DetectedComponent> _detected = SelectDisplayComponents(rawComponents, passband1, passband2
+                    ,(int)numericUpDownMaxPeakNum.Value, (double)numericUpDownRelativeThreshold.Value);
+
+                worker.ReportProgress(95, "准备显示结果...");
+
+                //准备显示数据
+                var displayData = new
+                {
+                    passband1,
+                    passband2,
+                    detected = _detected,
+                    freqAxis = _freqAxis,
+                    fftAmp = _fftAmp,
+                    isLogAxis = checkBoxYAxisIsLog.Checked
+                };
+
+                e.Result = displayData;
+                worker.ReportProgress(100, "分析完成！");
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                e.Result = new { Error = ex.Message };
+            }
+        }
+
+        /// <summary>
+        /// BackgroundWorker ProgressChanged事件 - 更新进度
+        /// </summary>
+        private void AnalysisWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            if (e.ProgressPercentage <= 100)
+            {
+                progressBarAnalysis.Value = e.ProgressPercentage;
+            }
+            
+            if (e.UserState != null && e.UserState is string message)
+            {
+                labelProgress.Text = message;
+            }
+            
+            Application.DoEvents();
+        }
+
+        /// <summary>
+        /// BackgroundWorker RunWorkerCompleted事件 - 完成处理
+        /// </summary>
+        private void AnalysisWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            try
+            {
+                //首先检查是否有错误
+                if (e.Error != null)
+                {
+                    MessageBox.Show(e.Error.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (e.Result != null)
+                {
+                    //使用反射来检查是否有Error属性
+                    var resultType = e.Result.GetType();
+                    var errorProperty = resultType.GetProperty("Error");
+                    
+                    if (errorProperty != null)
+                    {
+                        var errorValue = errorProperty.GetValue(e.Result);
+                        if (errorValue != null)
+                        {
+                            MessageBox.Show(errorValue.ToString(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
+
+                    //显示结果
+                    dynamic result = e.Result;
+                    var _detected = (List<DetectedComponent>)result.detected;
+                    var _freqAxis = (double[])result.freqAxis;
+                    var _fftAmp = (double[])result.fftAmp;
+
+                    //修正频率控件值为实际值
+                    numericUpDownStartFreq.Value = (decimal)result.passband1;
+                    numericUpDownStopFreq.Value = (decimal)result.passband2;
+
+                    //显示列表
+                    PopulateResultsGrid(_detected);
+
+                    //显示频谱
+                    double[][] spectrumDisplayX = new double[2][];
+                    double[][] spectrumDisplayY = new double[2][];
+                    spectrumDisplayX[0] = _freqAxis;
+                    spectrumDisplayY[0] = _fftAmp;
+                    //第二对显示_detected全部元素
+                    spectrumDisplayX[1] = new double[_detected.Count];
+                    spectrumDisplayY[1] = new double[_detected.Count];
+                    for (int i = 0; i < _detected.Count; i++)
+                    {
+                        spectrumDisplayX[1][i] = _detected[i].FrequencyHz;
+                        spectrumDisplayY[1][i] = _detected[i].Amplitude;
+                    }
+                    easyChartXSpectrum.Plot(spectrumDisplayX, spectrumDisplayY);
+                    //设置第二条series为散点图
+                    easyChartXSpectrum.Series[1].Type = SeeSharpTools.JY.GUI.EasyChartXSeries.LineType.Point;
+                    easyChartXSpectrum.Series[1].Color = System.Drawing.Color.Red;
+                    easyChartXSpectrum.AxisY.IsLogarithmic = result.isLogAxis;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                ResetUIState();
+            }
+        }
+
+        /// <summary>
+        /// 重置UI状态
+        /// </summary>
+        private void ResetUIState()
+        {
+            buttonAnalysis.Enabled = true;
+            buttonLoad.Enabled = true;
+            
+            //延迟隐藏进度条，让用户看到100%
+            System.Threading.Tasks.Task.Delay(500).ContinueWith(_ => 
+            {
+                if (InvokeRequired)
+                {
+                    Invoke(new Action(() => 
+                    {
+                        progressBarAnalysis.Visible = false;
+                        labelProgress.Visible = false;
+                    }));
+                }
+                else
+                {
+                    progressBarAnalysis.Visible = false;
+                    labelProgress.Visible = false;
+                }
+            });
         }
         /// <summary>
         /// 不加窗的频谱，取得最佳频率分辨
@@ -262,8 +457,9 @@ namespace Peak_Frequency_Finder
         /// <param name="fMin"></param>
         /// <param name="fMax"></param>
         /// <param name="relativeThreshold">查找峰值的相对最大值的门限</param>
+        /// <param name="progress">进度报告回调(0-100)</param>
         /// <returns></returns>
-        private static List<double> MatrixPencilEstimate(double[] x, double fs, double fMin, double fMax, double relativeThreshold=0.1)
+        private static List<double> MatrixPencilEstimate(double[] x, double fs, double fMin, double fMax, double relativeThreshold=0.1, IProgress<int> progress = null)
         {
             var n = x.Length;
             var l = n / 3;
@@ -275,9 +471,13 @@ namespace Peak_Frequency_Finder
             l = Math.Min(Math.Max(l, 16), n - 2);
             var k = n - l;
 
+            progress?.Report(10); // 矩阵构建完成
+
             var y = DenseMatrix.Create(l, k, (r, c) => x[r + c]);
             var y1 = y.SubMatrix(0, l, 0, k - 1);
             var y2 = y.SubMatrix(0, l, 1, k - 1);
+
+            progress?.Report(30); // SVD计算完成
 
             var svd = y1.Svd(true);
             var s = svd.S.ToArray();
@@ -285,6 +485,8 @@ namespace Peak_Frequency_Finder
             {
                 return new List<double>();
             }
+
+            progress?.Report(50); // 奇异值处理完成
 
             var threshold = s[0] * relativeThreshold;
             var m = s.Count(v => v > threshold);
@@ -294,8 +496,12 @@ namespace Peak_Frequency_Finder
             var vt = svd.VT.SubMatrix(0, m, 0, svd.VT.ColumnCount);
             var sigmaInv = DenseMatrix.CreateDiagonal(m, m, i => 1.0 / s[i]);
 
+            progress?.Report(70); // 矩阵构建完成
+
             var y1Pinv = vt.TransposeThisAndMultiply(sigmaInv).Multiply(u.Transpose());
             var a = y1Pinv.Multiply(y2);
+
+            progress?.Report(85); // 特征值分解完成
 
             var evd = a.Evd();
             var freqList = new List<double>();
@@ -319,6 +525,8 @@ namespace Peak_Frequency_Finder
                 }
             }
 
+            progress?.Report(95); // 频率筛选完成
+
             freqList.Sort();
 
             var merged = new List<double>();
@@ -330,6 +538,8 @@ namespace Peak_Frequency_Finder
                     merged.Add(f);
                 }
             }
+
+            progress?.Report(100); // 全部完成
 
             return merged;
         }
