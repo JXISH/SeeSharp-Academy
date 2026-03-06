@@ -54,6 +54,7 @@ namespace Spectrum_Viewer
             this.label7 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.formsScottPlot = new ScottPlot.FormsPlot();
+            this.buttonFindFrequencies = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSampleRate)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWindowLength)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownJTFAWinLength)).BeginInit();
@@ -432,9 +433,9 @@ namespace Spectrum_Viewer
             // 
             this.buttonLoad.Location = new System.Drawing.Point(12, 438);
             this.buttonLoad.Name = "buttonLoad";
-            this.buttonLoad.Size = new System.Drawing.Size(75, 23);
+            this.buttonLoad.Size = new System.Drawing.Size(119, 23);
             this.buttonLoad.TabIndex = 1;
-            this.buttonLoad.Text = "Load";
+            this.buttonLoad.Text = "Load CSV";
             this.buttonLoad.UseVisualStyleBackColor = true;
             this.buttonLoad.Click += new System.EventHandler(this.buttonLoad_Click);
             // 
@@ -514,7 +515,7 @@ namespace Spectrum_Viewer
             this.checkBoxSpectrumDB.AutoSize = true;
             this.checkBoxSpectrumDB.Checked = true;
             this.checkBoxSpectrumDB.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxSpectrumDB.Location = new System.Drawing.Point(393, 17);
+            this.checkBoxSpectrumDB.Location = new System.Drawing.Point(370, 16);
             this.checkBoxSpectrumDB.Name = "checkBoxSpectrumDB";
             this.checkBoxSpectrumDB.Size = new System.Drawing.Size(90, 16);
             this.checkBoxSpectrumDB.TabIndex = 4;
@@ -525,7 +526,7 @@ namespace Spectrum_Viewer
             // checkBoxCepstrum
             // 
             this.checkBoxCepstrum.AutoSize = true;
-            this.checkBoxCepstrum.Location = new System.Drawing.Point(502, 16);
+            this.checkBoxCepstrum.Location = new System.Drawing.Point(466, 16);
             this.checkBoxCepstrum.Name = "checkBoxCepstrum";
             this.checkBoxCepstrum.Size = new System.Drawing.Size(72, 16);
             this.checkBoxCepstrum.TabIndex = 4;
@@ -622,9 +623,9 @@ namespace Spectrum_Viewer
             this.groupBoxSpectrumSettings.Controls.Add(this.label2);
             this.groupBoxSpectrumSettings.Controls.Add(this.checkBoxSpectrumDB);
             this.groupBoxSpectrumSettings.Controls.Add(this.numericUpDownWindowLength);
-            this.groupBoxSpectrumSettings.Location = new System.Drawing.Point(218, 432);
+            this.groupBoxSpectrumSettings.Location = new System.Drawing.Point(152, 432);
             this.groupBoxSpectrumSettings.Name = "groupBoxSpectrumSettings";
-            this.groupBoxSpectrumSettings.Size = new System.Drawing.Size(600, 76);
+            this.groupBoxSpectrumSettings.Size = new System.Drawing.Size(541, 41);
             this.groupBoxSpectrumSettings.TabIndex = 5;
             this.groupBoxSpectrumSettings.TabStop = false;
             this.groupBoxSpectrumSettings.Text = "Spectrum Settings";
@@ -703,6 +704,16 @@ namespace Spectrum_Viewer
             this.formsScottPlot.Size = new System.Drawing.Size(728, 444);
             this.formsScottPlot.TabIndex = 110;
             // 
+            // buttonFindFrequencies
+            // 
+            this.buttonFindFrequencies.Location = new System.Drawing.Point(699, 438);
+            this.buttonFindFrequencies.Name = "buttonFindFrequencies";
+            this.buttonFindFrequencies.Size = new System.Drawing.Size(119, 23);
+            this.buttonFindFrequencies.TabIndex = 1;
+            this.buttonFindFrequencies.Text = "Find Frequencies";
+            this.buttonFindFrequencies.UseVisualStyleBackColor = true;
+            this.buttonFindFrequencies.Click += new System.EventHandler(this.buttonFindFrequencies_Click);
+            // 
             // SpectrumViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -711,6 +722,7 @@ namespace Spectrum_Viewer
             this.Controls.Add(this.groupBoxJTFASettgins);
             this.Controls.Add(this.groupBoxSpectrumSettings);
             this.Controls.Add(this.buttonJTFA);
+            this.Controls.Add(this.buttonFindFrequencies);
             this.Controls.Add(this.buttonLoad);
             this.Controls.Add(this.easyChartXSectionSpectrum);
             this.Controls.Add(this.easyChartXWaveformSection);
@@ -757,6 +769,7 @@ namespace Spectrum_Viewer
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox comboBoxColorType;
         private ScottPlot.FormsPlot formsScottPlot;
+        private System.Windows.Forms.Button buttonFindFrequencies;
     }
 }
 

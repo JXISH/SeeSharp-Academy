@@ -1,6 +1,7 @@
 using CSV_Loader;
 using MathNet.Numerics;
 using MathNet.Numerics.IntegralTransforms;
+using Peak_Frequency_Finder;
 using ScottPlot;
 using SeeSharpTools.JXI.SignalProcessing.JTFA;
 using SeeSharpTools.JY.DSP.Fundamental;
@@ -376,6 +377,24 @@ namespace Spectrum_Viewer
 
 
             return _scottColormap;
+        }
+
+        private void buttonFindFrequencies_Click(object sender, EventArgs e)
+        {
+            //检查波形数据正常
+            if (waveformSection != null && waveformSection.Length > 0 && (double)numericUpDownSampleRate.Value > 0)
+            {
+                using (var peakFrequencyFinderForm = new PeakFrequencyFinderForm())
+                {
+                    // 将截取的信号传入Form
+                    peakFrequencyFinderForm.signal = new double[waveformSection.Length];
+                    Array.Copy(waveformSection, peakFrequencyFinderForm.signal, waveformSection.Length);
+                    peakFrequencyFinderForm.sampleRate = (double)numericUpDownSampleRate.Value;
+                    peakFrequencyFinderForm.UpdateTimeWaveform();
+                    // 模态显示，阻塞父窗体直到子窗体关闭
+                    peakFrequencyFinderForm.ShowDialog(this);
+                }
+            }
         }
     }
 

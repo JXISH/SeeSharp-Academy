@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E585F586-F877-474C-877F-73BD75D13F86}</ProjectGuid>
+    <ProjectGuid>{282A52CF-22A1-4338-B420-B71E95166201}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Spectrum_Viewer</RootNamespace>
-    <AssemblyName>Spectrum Viewer</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <RootNamespace>Peak_Frequency_Finder</RootNamespace>
+    <AssemblyName>Peak Frequency Finder</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,17 +36,8 @@
     <Reference Include="MathNet.Numerics">
       <HintPath>..\External\MathNet.Numerics.dll</HintPath>
     </Reference>
-    <Reference Include="ScottPlot">
-      <HintPath>..\External\ScottPlot.dll</HintPath>
-    </Reference>
-    <Reference Include="ScottPlot.WinForms">
-      <HintPath>..\External\ScottPlot.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="SeeSharpTools.JXI.SignalProcessing">
-      <HintPath>..\External\SeeSharpTools.JXI.SignalProcessing.dll</HintPath>
-    </Reference>
-    <Reference Include="SeeSharpTools.JY.DSP.Fundamental">
-      <HintPath>..\External\SeeSharpTools.JY.DSP.Fundamental.dll</HintPath>
+    <Reference Include="SeeSharpTools.JY.DSP.Utility.Filter1D">
+      <HintPath>..\External\SeeSharpTools.JY.DSP.Utility.Filter1D.dll</HintPath>
     </Reference>
     <Reference Include="SeeSharpTools.JY.GUI">
       <HintPath>..\External\SeeSharpTools.JY.GUI.dll</HintPath>
@@ -55,7 +45,10 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\External\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -67,14 +60,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SpectrumViewerForm.cs">
+    <Compile Include="PeakFrequencyFinderForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SpectrumViewerForm.Designer.cs">
-      <DependentUpon>SpectrumViewerForm.cs</DependentUpon>
+    <Compile Include="PeakFrequencyFinderForm.Designer.cs">
+      <DependentUpon>PeakFrequencyFinderForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="PeakFrequencyFinderForm.resx">
+      <DependentUpon>PeakFrequencyFinderForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -83,11 +79,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="SpectrumViewerForm.resx">
-      <DependentUpon>SpectrumViewerForm.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -105,10 +97,6 @@
     <ProjectReference Include="..\CSV Loader\CSV Loader.csproj">
       <Project>{a1b2c3d4-e5f6-4a5b-8c9d-1e2f3a4b5c6d}</Project>
       <Name>CSV Loader</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Peak Frequency Finder\Peak Frequency Finder.csproj">
-      <Project>{282a52cf-22a1-4338-b420-b71e95166201}</Project>
-      <Name>Peak Frequency Finder</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
