@@ -28,6 +28,8 @@ namespace Peak_Frequency_Finder
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.buttonLoad = new System.Windows.Forms.Button();
             this.easyChartXTimeWaveform = new SeeSharpTools.JY.GUI.EasyChartX();
             this.easyChartXSpectrum = new SeeSharpTools.JY.GUI.EasyChartX();
@@ -37,9 +39,6 @@ namespace Peak_Frequency_Finder
             this.numericUpDownStopFreq = new System.Windows.Forms.NumericUpDown();
             this.buttonAnalysis = new System.Windows.Forms.Button();
             this.dgvResults = new System.Windows.Forms.DataGridView();
-            this.colIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colFrequency = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAmplitude = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.checkBoxYAxisIsLog = new System.Windows.Forms.CheckBox();
             this.numericUpDownRelativeThreshold = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
@@ -47,6 +46,11 @@ namespace Peak_Frequency_Finder
             this.label4 = new System.Windows.Forms.Label();
             this.progressBarAnalysis = new System.Windows.Forms.ProgressBar();
             this.labelProgress = new System.Windows.Forms.Label();
+            this.buttonExport = new System.Windows.Forms.Button();
+            this.colIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colFrequency = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAmplitude = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.buttonCopy = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStartFreq)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownStopFreq)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvResults)).BeginInit();
@@ -344,7 +348,7 @@ namespace Peak_Frequency_Finder
             // 
             this.buttonAnalysis.Location = new System.Drawing.Point(804, 606);
             this.buttonAnalysis.Name = "buttonAnalysis";
-            this.buttonAnalysis.Size = new System.Drawing.Size(100, 23);
+            this.buttonAnalysis.Size = new System.Drawing.Size(75, 23);
             this.buttonAnalysis.TabIndex = 3;
             this.buttonAnalysis.Text = "Analysis";
             this.buttonAnalysis.UseVisualStyleBackColor = true;
@@ -362,29 +366,8 @@ namespace Peak_Frequency_Finder
             this.dgvResults.RowHeadersVisible = false;
             this.dgvResults.RowTemplate.Height = 23;
             this.dgvResults.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvResults.Size = new System.Drawing.Size(273, 619);
+            this.dgvResults.Size = new System.Drawing.Size(273, 566);
             this.dgvResults.TabIndex = 6;
-            // 
-            // colIndex
-            // 
-            this.colIndex.HeaderText = "#";
-            this.colIndex.Name = "colIndex";
-            this.colIndex.ReadOnly = true;
-            this.colIndex.Width = 40;
-            // 
-            // colFrequency
-            // 
-            this.colFrequency.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colFrequency.HeaderText = "Frequency";
-            this.colFrequency.Name = "colFrequency";
-            this.colFrequency.ReadOnly = true;
-            // 
-            // colAmplitude
-            // 
-            this.colAmplitude.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colAmplitude.HeaderText = "Amplitude";
-            this.colAmplitude.Name = "colAmplitude";
-            this.colAmplitude.ReadOnly = true;
             // 
             // checkBoxYAxisIsLog
             // 
@@ -459,7 +442,7 @@ namespace Peak_Frequency_Finder
             // 
             // progressBarAnalysis
             // 
-            this.progressBarAnalysis.Location = new System.Drawing.Point(910, 608);
+            this.progressBarAnalysis.Location = new System.Drawing.Point(885, 608);
             this.progressBarAnalysis.Name = "progressBarAnalysis";
             this.progressBarAnalysis.Size = new System.Drawing.Size(150, 20);
             this.progressBarAnalysis.TabIndex = 9;
@@ -467,11 +450,55 @@ namespace Peak_Frequency_Finder
             // labelProgress
             // 
             this.labelProgress.BackColor = System.Drawing.Color.Transparent;
-            this.labelProgress.Location = new System.Drawing.Point(912, 593);
+            this.labelProgress.Location = new System.Drawing.Point(887, 593);
             this.labelProgress.Name = "labelProgress";
             this.labelProgress.Size = new System.Drawing.Size(140, 12);
             this.labelProgress.TabIndex = 8;
             this.labelProgress.Text = "Label Progress";
+            // 
+            // buttonExport
+            // 
+            this.buttonExport.Location = new System.Drawing.Point(1259, 605);
+            this.buttonExport.Name = "buttonExport";
+            this.buttonExport.Size = new System.Drawing.Size(110, 23);
+            this.buttonExport.TabIndex = 3;
+            this.buttonExport.Text = "Export ro CSV";
+            this.buttonExport.UseVisualStyleBackColor = true;
+            // 
+            // colIndex
+            // 
+            this.colIndex.HeaderText = "#";
+            this.colIndex.Name = "colIndex";
+            this.colIndex.ReadOnly = true;
+            this.colIndex.Width = 40;
+            // 
+            // colFrequency
+            // 
+            this.colFrequency.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle3.Format = "N2";
+            this.colFrequency.DefaultCellStyle = dataGridViewCellStyle3;
+            this.colFrequency.HeaderText = "Frequency";
+            this.colFrequency.Name = "colFrequency";
+            this.colFrequency.ReadOnly = true;
+            // 
+            // colAmplitude
+            // 
+            this.colAmplitude.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle4.Format = "0.000e0";
+            this.colAmplitude.DefaultCellStyle = dataGridViewCellStyle4;
+            this.colAmplitude.HeaderText = "Amplitude";
+            this.colAmplitude.Name = "colAmplitude";
+            this.colAmplitude.ReadOnly = true;
+            // 
+            // buttonCopy
+            // 
+            this.buttonCopy.Location = new System.Drawing.Point(1392, 605);
+            this.buttonCopy.Name = "buttonCopy";
+            this.buttonCopy.Size = new System.Drawing.Size(140, 23);
+            this.buttonCopy.TabIndex = 3;
+            this.buttonCopy.Text = "Copy to Clippboard";
+            this.buttonCopy.UseVisualStyleBackColor = true;
+            this.buttonCopy.Click += new System.EventHandler(this.buttonCopy_Click);
             // 
             // PeakFrequencyFinderForm
             // 
@@ -490,6 +517,8 @@ namespace Peak_Frequency_Finder
             this.Controls.Add(this.numericUpDownRelativeThreshold);
             this.Controls.Add(this.numericUpDownStopFreq);
             this.Controls.Add(this.numericUpDownStartFreq);
+            this.Controls.Add(this.buttonCopy);
+            this.Controls.Add(this.buttonExport);
             this.Controls.Add(this.buttonAnalysis);
             this.Controls.Add(this.buttonLoad);
             this.Controls.Add(this.easyChartXSpectrum);
@@ -517,9 +546,6 @@ namespace Peak_Frequency_Finder
         private System.Windows.Forms.NumericUpDown numericUpDownStopFreq;
         private System.Windows.Forms.Button buttonAnalysis;
         private System.Windows.Forms.DataGridView dgvResults;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colIndex;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colFrequency;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAmplitude;
         private System.Windows.Forms.CheckBox checkBoxYAxisIsLog;
         private System.Windows.Forms.NumericUpDown numericUpDownRelativeThreshold;
         private System.Windows.Forms.Label label3;
@@ -527,6 +553,11 @@ namespace Peak_Frequency_Finder
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ProgressBar progressBarAnalysis;
         private System.Windows.Forms.Label labelProgress;
+        private System.Windows.Forms.Button buttonExport;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colIndex;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colFrequency;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAmplitude;
+        private System.Windows.Forms.Button buttonCopy;
     }
 }
 
