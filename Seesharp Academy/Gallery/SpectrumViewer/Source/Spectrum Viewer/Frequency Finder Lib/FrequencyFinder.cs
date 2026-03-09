@@ -72,40 +72,43 @@ namespace Seesharp.JY.SignalProcessing.SuperResolution
             signal = inputSignal;
             sampleRate = inputSampleRate;
             //1. 预处理降采样
+            if(worker?.CancellationPending == true)
+                return;
             worker?.ReportProgress(5, "预处理降采样...");
             //允许通带单边定义
             double wantedFmax = Fstop;
             if(Fstart>=Fstop || Fstop <= 0)
                 wantedFmax = 0.5 * inputSampleRate;
-            DownSampling(wantedFmax); 
+            DownSampling(wantedFmax);
             //2. 预处理滤波
+            if (worker?.CancellationPending == true)
+                return;
             worker?.ReportProgress(15, "滤波...");
             ConditioningFiltering(Fstart, Fstop);
             //3. 频谱分析与频率检测
+            if (worker?.CancellationPending == true)
+                return;
             worker?.ReportProgress(20, "计算频谱...");
             SpectrumAnalysis();
             //4. 矩阵 pencil 频率检测
+            if (worker?.CancellationPending == true)
+                return;
             worker?.ReportProgress(30, "Matrix Pencil频率检出...");
             //频率检出 - 使用Progress回调
             Progress<int> progress = new Progress<int>(percent =>
             {
                 int overallProgress = 30 + (int)(percent * 0.5); // 30-80%用于Matrix Pencil
+                if (worker?.CancellationPending == true)
+                    return;
                 worker?.ReportProgress(overallProgress, $"Matrix Pencil分析中... {percent}%");
             });
-
             var matrixPencilFreq = MatrixPencilEstimate(filteredSignal, resampledRate, passband1, passband2
                 , relativePeakThreshold, progress);
-
             worker?.ReportProgress(85, "构建频率分量...");
-
             var rawComponents = BuildComponentsWithFftAmplitude(matrixPencilFreq, _freqAxis, _fftAmp, passband1, passband2);
-
             worker?.ReportProgress(90, "选择显示分量...");
-
             _detected = SelectDisplayComponents(rawComponents, passband1, passband2
                 , maxFrequencies, relativePeakThreshold);
-
-
             worker?.ReportProgress(100, "分析完成！");
         }
         /// <summary>
@@ -124,7 +127,7 @@ namespace Seesharp.JY.SignalProcessing.SuperResolution
             resampledRate = sampleRate / downSampleRate;
             if (downSampleRate > 1)
             {
-                EasyFilter lpf = new EasyFilter();
+                EasyClassicFilter lpf = new EasyClassicFilter();
                 lpf.DesignIIRFilter(IIRDesignMethod.Elliptic, IIRBandType.Lowpass, 3, 70, 1, 0.4 / downSampleRate, 0.6 / downSampleRate);
                 double[] lowpassFiltered = lpf.Filtering(signal);
                 resampledSignal = new double[lowpassFiltered.Length / downSampleRate];
@@ -150,7 +153,7 @@ namespace Seesharp.JY.SignalProcessing.SuperResolution
         /// <exception cref="Exception"></exception>
         public void ConditioningFiltering(double Fstart, double Fstop)
         {
-            EasyFilter easyFilter = new EasyFilter();
+            EasyClassicFilter easyFilter = new EasyClassicFilter();
             passband1 = Fstart;
             passband2 = Fstop;
             cutoffband1 = 0.01 * resampledRate;

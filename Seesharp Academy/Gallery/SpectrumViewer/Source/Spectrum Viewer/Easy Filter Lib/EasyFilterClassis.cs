@@ -17,7 +17,7 @@ namespace Seesharp.JY.DSP.SignalProcessing.Conditioning.Filter1D.EasyFilter
     /// - 支持多种设计方法（Kaiser窗、Parks-McClellan、Butterworth、Chebyshev、Elliptic）
     /// - 提供滤波、波特图分析、冲激响应分析
     /// </summary>
-    public class EasyFilter
+    public class EasyClassicFilter
     {
         #region public fields
         /// <summary>
@@ -112,7 +112,7 @@ namespace Seesharp.JY.DSP.SignalProcessing.Conditioning.Filter1D.EasyFilter
         /// <summary>
         /// 构造函数：初始化滤波器系数为空
         /// </summary>
-        public EasyFilter()
+        public EasyClassicFilter()
         {
             // 滤波系数设空，如遇异常，输出空系数
             _coef_a = null;

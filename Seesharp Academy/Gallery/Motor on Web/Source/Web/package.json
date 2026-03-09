@@ -1,0 +1,21 @@
+{
+  "name": "motor-monitor-web",
+  "version": "1.0.0",
+  "description": "锐视公学电机状态监测系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["motor", "monitoring", "redis", "3d", "visualization"],
+  "author": "SeeSharp Academy",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "redis": "^4.6.5",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

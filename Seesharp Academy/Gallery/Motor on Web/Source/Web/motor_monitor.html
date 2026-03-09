@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>锐视公学电机状态监测</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0d1126 100%);
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* 星空背景 */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(90deg, rgba(0,150,255,0.3) 0%, rgba(100,200,255,0.3) 50%, rgba(0,150,255,0.3) 100%);
+            border-bottom: 2px solid rgba(100,200,255,0.5);
+            box-shadow: 0 0 20px rgba(100,200,255,0.3);
+            z-index: 1;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(100,200,255,0.8), 0 0 20px rgba(100,200,255,0.5);
+            letter-spacing: 8px;
+            background: linear-gradient(90deg, #64c8ff 0%, #ffffff 50%, #64c8ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .main-container {
+            display: flex;
+            height: calc(100vh - 100px);
+            padding: 10px;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .left-panel {
+            flex: 0 0 25%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(10, 20, 40, 0.6);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 0 15px rgba(100, 200, 255, 0.2);
+        }
+        
+        .center-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(10, 20, 40, 0.6);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 0 15px rgba(100, 200, 255, 0.2);
+        }
+        
+        .model-container {
+            flex: 2;
+            position: relative;
+            background: rgba(0, 10, 20, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .instant-freq-container {
+            flex: 1;
+            background: rgba(0, 20, 40, 0.4);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .instant-freq-container .chart-title {
+            font-size: 1em;
+            color: #64c8ff;
+            margin-bottom: 8px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(100, 200, 255, 0.5);
+        }
+        
+        .instant-freq-container .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .instant-freq-container .chart-controls {
+            display: flex;
+            align-items: center;
+            font-size: 0.75em;
+            color: rgba(100, 200, 255, 0.8);
+        }
+        
+        .instant-freq-container .chart-controls input[type="checkbox"] {
+            margin-right: 4px;
+            accent-color: #64c8ff;
+        }
+        
+        .instant-freq-container .chart-controls label {
+            cursor: pointer;
+        }
+        
+        .instant-freq-container .chart-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .right-panel {
+            flex: 0 0 20%;
+            background: rgba(10, 20, 40, 0.6);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+            box-shadow: 0 0 15px rgba(100, 200, 255, 0.2);
+        }
+        
+        .chart-container {
+            flex: 1;
+            background: rgba(0, 20, 40, 0.4);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-title {
+            font-size: 1em;
+            color: #64c8ff;
+            margin-bottom: 8px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(100, 200, 255, 0.5);
+        }
+        
+        .chart-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        #model3d-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+        
+        .data-table th {
+            background: rgba(100, 200, 255, 0.3);
+            color: #64c8ff;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            font-weight: bold;
+        }
+        
+        .data-table td {
+            padding: 6px;
+            text-align: center;
+            border: 1px solid rgba(100, 200, 255, 0.2);
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: rgba(100, 200, 255, 0.05);
+        }
+        
+        .table-title {
+            font-size: 1.2em;
+            color: #64c8ff;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(100, 200, 255, 0.5);
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 15px;
+            background: rgba(0, 150, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.5);
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #0f0;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            color: #64c8ff;
+        }
+    </style>
+</head>
+<body>
+    <!-- 星空背景 -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- 题头 -->
+    <div class="header">
+        <h1>锐视公学电机状态监测</h1>
+    </div>
+    
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 左侧面板：曲线图 -->
+        <div class="left-panel">
+            <div class="chart-container">
+                <div class="chart-title">时域信号</div>
+                <div class="chart-wrapper">
+                    <canvas id="timeWaveformChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">频谱</div>
+                <div class="chart-wrapper">
+                    <canvas id="spectrumChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">即时频率历史</div>
+                <div class="chart-wrapper">
+                    <canvas id="frequencyHistoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 中间面板：3D模型 + 即时频率柱状图 -->
+        <div class="center-panel">
+            <div class="model-container">
+                <div id="model3d-container">
+                    <div class="status-indicator" id="statusIndicator">● 数据接收中</div>
+                    <div class="loading" id="loadingText">加载3D模型中...</div>
+                </div>
+            </div>
+            <div class="instant-freq-container">
+                <div class="chart-header">
+                    <div class="chart-title">即时频率及幅度</div>
+                    <div class="chart-controls">
+                        <input type="checkbox" id="autoScaleY" checked>
+                        <label for="autoScaleY">Y轴自动量程</label>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="instantFreqChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧面板：数据表格 -->
+        <div class="right-panel">
+            <div class="table-title">即时频率及幅度</div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>频率(Hz)</th>
+                        <th>幅度</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                    <!-- 数据将通过JavaScript动态填充 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- 引入Three.js和相关库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- 引入Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <script>
+    // ============================================================
+    // 配置常量
+    // ============================================================
+    const CONFIG = {
+        // 数据更新配置
+        DATA_FETCH_INTERVAL: 500,      // 数据获取间隔(ms)
+        MAX_HISTORY_POINTS: 50,        // 历史数据最大点数
+        
+        // 3D场景配置
+        MODEL_PATH: 'Model/船桨模型.glb',
+        AUTO_ROTATE_SPEED: 0.02,
+        INTERACTION_TIMEOUT: 3000,     // 用户交互后暂停自动旋转的时间(ms)
+        
+        // 图表颜色配置
+        COLORS: {
+            PRIMARY: 'rgba(100, 200, 255, 0.8)',
+            PRIMARY_BG: 'rgba(100, 200, 255, 0.2)',
+            SECONDARY: 'rgba(0, 255, 200, 0.8)',
+            SECONDARY_BG: 'rgba(0, 255, 200, 0.2)',
+            SCATTER: ['#64c8ff', '#00ffc8', '#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff']
+        },
+        
+        // 星空背景配置
+        STARS_COUNT: 100
+    };
+
+    // ============================================================
+    // 全局状态变量
+    // ============================================================
+    const AppState = {
+        // Three.js相关
+        scene: null,
+        camera: null,
+        renderer: null,
+        model: null,
+        controls: null,
+        rotateContainer: new THREE.Group(),
+        isUserInteracting: false,
+        autoRotate: true,
+        
+        // 频谱范围（用于即时频率柱状图）
+        spectrumMaxFreq: 1000,  // 默认值，会在收到数据后更新
+        instantFreqMaxAmplitude: 0,  // 用于固定量程模式
+        
+        // Chart.js相关
+        timeWaveformChart: null,
+        spectrumChart: null,
+        frequencyHistoryChart: null,
+        instantFreqChart: null,
+        
+        // 数据更新控制
+        lastUpdateTime: 0
+    };
+
+    // ============================================================
+    // UI模块 - 星空背景与状态指示
+    // ============================================================
+    const UIModule = {
+        createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < CONFIG.STARS_COUNT; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                const size = Math.random() * 2 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                starsContainer.appendChild(star);
+            }
+        },
+
+        updateStatusIndicator(connected) {
+            const indicator = document.getElementById('statusIndicator');
+            if (connected) {
+                indicator.textContent = '● 数据接收中';
+                indicator.style.color = '#0f0';
+            } else {
+                indicator.textContent = '● 连接中断';
+                indicator.style.color = '#f00';
+            }
+        },
+
+        updateLoadingText(text, isError = false) {
+            const loadingText = document.getElementById('loadingText');
+            loadingText.textContent = text;
+            if (isError) {
+                loadingText.style.color = '#ff6b6b';
+            }
+        },
+
+        hideLoadingText() {
+            document.getElementById('loadingText').style.display = 'none';
+        }
+    };
+
+    // ============================================================
+    // Three.js 3D模块 - 场景、模型、柱状图
+    // ============================================================
+    const ThreeModule = {
+        init() {
+            this.setupScene();
+            this.setupLights();
+            this.setupControls();
+            this.loadModel();
+            window.addEventListener('resize', () => this.onWindowResize());
+            this.animate();
+        },
+
+        setupScene() {
+            const container = document.getElementById('model3d-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            AppState.scene = new THREE.Scene();
+            AppState.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+            AppState.camera.position.set(0, 2, 5);
+
+            AppState.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            AppState.renderer.setSize(width, height);
+            AppState.renderer.setClearColor(0x000000, 0);
+            container.appendChild(AppState.renderer.domElement);
+        },
+
+        setupLights() {
+            const { scene } = AppState;
+            
+            // 环境光：柔和的科技蓝
+            scene.add(new THREE.AmbientLight(0x225588, 0.4));
+
+            // 主光源：偏冷的天蓝色
+            const sunLight = new THREE.DirectionalLight(0x66aadd, 1.0);
+            sunLight.position.set(15, 20, 15);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 1024;
+            sunLight.shadow.mapSize.height = 1024;
+            scene.add(sunLight);
+
+            // 补光：淡青色
+            const fillLight = new THREE.DirectionalLight(0x88ccff, 0.5);
+            fillLight.position.set(-12, 12, -8);
+            scene.add(fillLight);
+
+            // 边缘光：淡蓝色
+            const rimLight = new THREE.DirectionalLight(0x66bbff, 0.9);
+            rimLight.position.set(0, -20, 30);
+            scene.add(rimLight);
+        },
+
+        setupControls() {
+            const { camera, renderer } = AppState;
+            
+            AppState.controls = new THREE.OrbitControls(camera, renderer.domElement);
+            AppState.controls.enableDamping = true;
+            AppState.controls.dampingFactor = 0.05;
+
+            AppState.controls.addEventListener('start', () => {
+                AppState.isUserInteracting = true;
+            });
+            AppState.controls.addEventListener('end', () => {
+                setTimeout(() => {
+                    AppState.isUserInteracting = false;
+                }, CONFIG.INTERACTION_TIMEOUT);
+            });
+        },
+
+        loadModel() {
+            const loader = new THREE.GLTFLoader();
+            loader.load(
+                CONFIG.MODEL_PATH,
+                (gltf) => this.onModelLoaded(gltf),
+                (xhr) => this.onModelProgress(xhr),
+                (error) => this.onModelError(error)
+            );
+        },
+
+        onModelLoaded(gltf) {
+            const { scene, camera, controls, rotateContainer } = AppState;
+            AppState.model = gltf.scene;
+
+            // 计算包围盒并居中模型
+            const box = new THREE.Box3().setFromObject(AppState.model);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            
+            AppState.model.position.set(-center.x, -center.y, -center.z);
+            
+            // 调整相机位置
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const fov = camera.fov * (Math.PI / 180);
+            const cameraZ = Math.abs(maxDim / 1.5 / Math.tan(fov / 2)) * 1.5;
+            
+            camera.position.set(0, maxDim * 0.3, cameraZ);
+            camera.lookAt(0, 0, 0);
+            
+            controls.target.set(0, 0, 0);
+            controls.update();
+            
+            // 添加模型到旋转容器
+            scene.add(rotateContainer);
+            rotateContainer.add(AppState.model);
+
+            UIModule.hideLoadingText();
+            console.log('模型加载成功！');
+        },
+
+        onModelProgress(xhr) {
+            const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
+            UIModule.updateLoadingText('加载中: ' + percent + '%');
+        },
+
+        onModelError(error) {
+            console.error('模型加载失败:', error);
+            UIModule.updateLoadingText('模型加载失败', true);
+        },
+
+        onWindowResize() {
+            const container = document.getElementById('model3d-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            AppState.camera.aspect = width / height;
+            AppState.camera.updateProjectionMatrix();
+            AppState.renderer.setSize(width, height);
+        },
+
+        animate() {
+            requestAnimationFrame(() => this.animate());
+            
+            const { autoRotate, isUserInteracting, rotateContainer, controls, renderer, scene, camera } = AppState;
+            
+            if (autoRotate && !isUserInteracting && rotateContainer) {
+                rotateContainer.rotation.y += CONFIG.AUTO_ROTATE_SPEED;
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+    };
+
+    // ============================================================
+    // Chart.js 2D图表模块
+    // ============================================================
+    const ChartModule = {
+        getBaseOptions() {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        ticks: { color: 'rgba(100, 200, 255, 0.7)', maxTicksLimit: 5 },
+                        grid: { color: 'rgba(100, 200, 255, 0.1)' }
+                    },
+                    y: {
+                        ticks: { color: 'rgba(100, 200, 255, 0.7)', maxTicksLimit: 5 },
+                        grid: { color: 'rgba(100, 200, 255, 0.1)' }
+                    }
+                },
+                animation: { duration: 300 }
+            };
+        },
+
+        init() {
+            this.initTimeWaveformChart();
+            this.initSpectrumChart();
+            this.initFrequencyHistoryChart();
+            this.initInstantFreqChart();
+        },
+
+        initTimeWaveformChart() {
+            const ctx = document.getElementById('timeWaveformChart').getContext('2d');
+            const options = this.getBaseOptions();
+            
+            AppState.timeWaveformChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        borderColor: CONFIG.COLORS.PRIMARY,
+                        backgroundColor: CONFIG.COLORS.PRIMARY_BG,
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        fill: {
+                            target: 'origin',
+                            below: CONFIG.COLORS.PRIMARY_BG,
+                            above: CONFIG.COLORS.PRIMARY_BG
+                        }
+                    }]
+                },
+                options: {
+                    ...options,
+                    scales: { ...options.scales, y: { ...options.scales.y, min: undefined } }
+                }
+            });
+        },
+
+        initSpectrumChart() {
+            const ctx = document.getElementById('spectrumChart').getContext('2d');
+            const options = this.getBaseOptions();
+            
+            AppState.spectrumChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        borderColor: CONFIG.COLORS.SECONDARY,
+                        backgroundColor: CONFIG.COLORS.SECONDARY_BG,
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        fill: 'start'
+                    }]
+                },
+                options: {
+                    ...options,
+                    scales: { ...options.scales, x: { ...options.scales.x, maxTicksLimit: 10 } }
+                }
+            });
+        },
+
+        initFrequencyHistoryChart() {
+            const ctx = document.getElementById('frequencyHistoryChart').getContext('2d');
+            const options = this.getBaseOptions();
+            
+            AppState.frequencyHistoryChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: [], datasets: [] },
+                options: {
+                    ...options,
+                    elements: { point: { radius: 4 } },
+                    showLine: false
+                }
+            });
+        },
+
+        updateTimeWaveform(waveform, dT) {
+            const labels = waveform.map((_, i) => (i * dT * 1000).toFixed(1));
+            AppState.timeWaveformChart.data.labels = labels;
+            AppState.timeWaveformChart.data.datasets[0].data = waveform;
+            AppState.timeWaveformChart.update('none');
+        },
+
+        updateSpectrum(spectrum, dF) {
+            const labels = spectrum.map((_, i) => (i * dF).toFixed(1));
+            AppState.spectrumChart.data.labels = labels;
+            AppState.spectrumChart.data.datasets[0].data = spectrum;
+            AppState.spectrumChart.update('none');
+        },
+
+        updateFrequencyHistory(frequencies) {
+            const timestamp = new Date().toLocaleTimeString();
+            const chart = AppState.frequencyHistoryChart;
+            
+            frequencies.forEach((freq, index) => {
+                let dataset = chart.data.datasets[index];
+                
+                if (!dataset) {
+                    const color = CONFIG.COLORS.SCATTER[index % CONFIG.COLORS.SCATTER.length];
+                    dataset = {
+                        label: '频率' + (index + 1),
+                        data: [],
+                        borderColor: color,
+                        backgroundColor: color,
+                        showLine: false,
+                        pointRadius: 1,
+                        pointBackgroundColor: CONFIG.COLORS.SCATTER[1],
+                        pointBorderColor: CONFIG.COLORS.SCATTER[1]
+                    };
+                    chart.data.datasets.push(dataset);
+                }
+                
+                // Y轴显示频率值
+                dataset.data.push(freq);
+                
+                if (dataset.data.length > CONFIG.MAX_HISTORY_POINTS) {
+                    dataset.data.shift();
+                }
+            });
+            
+            if (chart.data.labels.length > CONFIG.MAX_HISTORY_POINTS) {
+                chart.data.labels.shift();
+            }
+            chart.data.labels.push(timestamp);
+            
+            chart.update('none');
+        },
+
+        initInstantFreqChart() {
+            const ctx = document.getElementById('instantFreqChart').getContext('2d');
+            const options = this.getBaseOptions();
+            
+            AppState.instantFreqChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [],
+                        borderColor: [],
+                        borderWidth: 1,
+                        barThickness: 4,
+                        maxBarThickness: 4
+                    }]
+                },
+                options: {
+                    ...options,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: (items) => items[0] ? `频率: ${items[0].label} Hz` : '',
+                                label: (item) => `幅度: ${item.raw.y.toExponential(1)}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: 0,
+                            title: {
+                                display: true,
+                                text: '频率 (Hz)',
+                                color: 'rgba(100, 200, 255, 0.8)'
+                            },
+                            ticks: { color: 'rgba(100, 200, 255, 0.7)', maxTicksLimit: 10 },
+                            grid: { color: 'rgba(100, 200, 255, 0.1)' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '幅度',
+                                color: 'rgba(100, 200, 255, 0.8)'
+                            },
+                            ticks: {
+                                color: 'rgba(100, 200, 255, 0.7)',
+                                maxTicksLimit: 5,
+                                callback: function(value) {
+                                    return value.toExponential(1);
+                                }
+                            },
+                            grid: { color: 'rgba(100, 200, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        },
+
+        updateInstantFreqChart(frequencies, amplitudes, maxFreq) {
+            if (!frequencies || !amplitudes || frequencies.length === 0) return;
+            
+            const chart = AppState.instantFreqChart;
+            const currentMaxAmplitude = Math.max(...amplitudes, 0.000001);
+            const autoScale = document.getElementById('autoScaleY').checked;
+            
+            // 更新历史最大幅度（用于固定量程模式）
+            if (currentMaxAmplitude > AppState.instantFreqMaxAmplitude) {
+                AppState.instantFreqMaxAmplitude = currentMaxAmplitude;
+            }
+            
+            // 决定用于颜色计算的最大幅度
+            const maxAmplitudeForColor = autoScale ? currentMaxAmplitude : AppState.instantFreqMaxAmplitude;
+            
+            // 准备数据：每个频率点作为一个柱子
+            const barData = frequencies.map((freq, i) => ({
+                x: freq,
+                y: amplitudes[i] || 0
+            }));
+            
+            // 根据幅度计算颜色（从青蓝到红色渐变）
+            const backgroundColors = amplitudes.map(amp => {
+                const intensity = amp / maxAmplitudeForColor;
+                const r = Math.round(50 + intensity * 205);
+                const g = Math.round(200 - intensity * 150);
+                const b = Math.round(255 - intensity * 180);
+                return `rgba(${r}, ${g}, ${b}, 0.85)`;
+            });
+            
+            const borderColors = amplitudes.map(amp => {
+                const intensity = amp / maxAmplitudeForColor;
+                const r = Math.round(100 + intensity * 155);
+                const g = Math.round(200 - intensity * 100);
+                const b = Math.round(255 - intensity * 155);
+                return `rgba(${r}, ${g}, ${b}, 1)`;
+            });
+            
+            chart.data.datasets[0].data = barData;
+            chart.data.datasets[0].backgroundColor = backgroundColors;
+            chart.data.datasets[0].borderColor = borderColors;
+            
+            // 设置X轴范围与频谱图一致
+            chart.options.scales.x.max = maxFreq;
+            
+            // 设置Y轴范围
+            if (autoScale) {
+                chart.options.scales.y.max = undefined;  // 自动量程
+            } else {
+                chart.options.scales.y.max = AppState.instantFreqMaxAmplitude * 1.1;  // 固定量程
+            }
+            
+            chart.update('none');
+        }
+    };
+
+    // ============================================================
+    // 数据表格模块
+    // ============================================================
+    const TableModule = {
+        update(frequencies, amplitudes) {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+
+            if (!frequencies || !amplitudes) return;
+
+            const maxLength = Math.max(frequencies.length, amplitudes.length);
+            
+            for (let i = 0; i < maxLength; i++) {
+                const row = document.createElement('tr');
+                const freq = frequencies[i] !== undefined ? frequencies[i].toFixed(2) : '-';
+                const amp = amplitudes[i] !== undefined ? amplitudes[i].toFixed(6) : '-';
+                
+                row.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${freq}</td>
+                    <td>${amp}</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+    };
+
+    // ============================================================
+    // 数据获取与更新模块
+    // ============================================================
+    const DataModule = {
+        async fetchData() {
+            const now = Date.now();
+            if (now - AppState.lastUpdateTime < CONFIG.DATA_FETCH_INTERVAL) {
+                return;
+            }
+            AppState.lastUpdateTime = now;
+
+            try {
+                const response = await fetch('/api/motor-data');
+                if (!response.ok) throw new Error('Failed to fetch data');
+                
+                const data = await response.json();
+                UIModule.updateStatusIndicator(true);
+                this.processData(data);
+            } catch (error) {
+                console.error('获取数据失败:', error);
+                UIModule.updateStatusIndicator(false);
+            }
+        },
+
+        processData(data) {
+            // 更新时域信号
+            if (data.TimeWaveform && data.Waveform_dT) {
+                ChartModule.updateTimeWaveform(data.TimeWaveform, data.Waveform_dT);
+            }
+
+            // 更新频谱
+            if (data.Spectrum && data.Spectrum_dF) {
+                ChartModule.updateSpectrum(data.Spectrum, data.Spectrum_dF);
+                // 保存频谱最大频率，用于即时频率柱状图
+                AppState.spectrumMaxFreq = data.Spectrum.length * data.Spectrum_dF;
+            }
+
+            // 更新即时频率柱状图（Chart.js 2D图表）
+            if (data.Frequencies && data.Amplitudes) {
+                ChartModule.updateInstantFreqChart(data.Frequencies, data.Amplitudes, AppState.spectrumMaxFreq);
+            }
+
+            // 更新频率历史散点图
+            if (data.Frequencies) {
+                ChartModule.updateFrequencyHistory(data.Frequencies);
+            }
+
+            // 更新数据表格
+            if (data.Frequencies && data.Amplitudes) {
+                TableModule.update(data.Frequencies, data.Amplitudes);
+            }
+        },
+
+        startPolling() {
+            setInterval(() => this.fetchData(), CONFIG.DATA_FETCH_INTERVAL);
+            this.fetchData();
+        }
+    };
+
+    // ============================================================
+    // 应用初始化
+    // ============================================================
+    function initApp() {
+        UIModule.createStars();
+        ThreeModule.init();
+        ChartModule.init();
+        DataModule.startPolling();
+    }
+
+    // 启动应用
+    initApp();
+    </script>
+</body>
+</html>

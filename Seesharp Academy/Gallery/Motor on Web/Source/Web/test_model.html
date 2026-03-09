@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D模型测试</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        #info {
+            background: #333;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        #model-container {
+            width: 100%;
+            height: 500px;
+            background: #000;
+            border: 2px solid #444;
+            border-radius: 5px;
+        }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .warning { color: #ff0; }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h2>3D模型加载测试</h2>
+        <p>测试不同的模型路径：</p>
+        <ul>
+            <li>路径1: <code>Model/船桨模型.glb</code></li>
+            <li>路径2: <code>./Model/船桨模型.glb</code></li>
+            <li>路径3: <code>/Model/船桨模型.glb</code></li>
+        </ul>
+        <p id="status" class="warning">正在测试...</p>
+    </div>
+    
+    <div id="model-container"></div>
+    
+    <div id="log" style="margin-top: 20px; font-family: monospace; font-size: 12px;"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script>
+        const logDiv = document.getElementById('log');
+        const statusDiv = document.getElementById('status');
+        let modelLoaded = false;
+        
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#f00' : type === 'success' ? '#0f0' : '#fff';
+            logDiv.innerHTML += `<div style="color: ${color}">[${time}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[${type}] ${message}`);
+        }
+
+        function testModelPath(path) {
+            return new Promise((resolve, reject) => {
+                log(`正在测试路径: ${path}`, 'info');
+                
+                const container = document.getElementById('model-container');
+                container.innerHTML = '';
+                
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x000000);
+                
+                const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+                camera.position.set(0, 2, 5);
+                
+                const renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                container.appendChild(renderer.domElement);
+                
+                const light = new THREE.AmbientLight(0xffffff, 1);
+                scene.add(light);
+                const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+                dirLight.position.set(5, 10, 7.5);
+                scene.add(dirLight);
+                
+                const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                
+                const loader = new THREE.GLTFLoader();
+                
+                let timeout = setTimeout(() => {
+                    if (!modelLoaded) {
+                        reject(new Error('加载超时 (10秒)'));
+                    }
+                }, 10000);
+                
+                loader.load(
+                    path,
+                    (gltf) => {
+                        clearTimeout(timeout);
+                        modelLoaded = true;
+                        scene.add(gltf.scene);
+                        
+                        const box = new THREE.Box3().setFromObject(gltf.scene);
+                        const center = box.getCenter(new THREE.Vector3());
+                        const size = box.getSize(new THREE.Vector3());
+                        
+                        const maxDim = Math.max(size.x, size.y, size.z);
+                        const fov = camera.fov * (Math.PI / 180);
+                        let cameraZ = Math.abs(maxDim / 2 * Math.tan(fov * 2));
+                        cameraZ *= 2.5;
+                        camera.position.z = cameraZ;
+                        camera.position.y = cameraZ * 0.5;
+                        camera.lookAt(center);
+                        
+                        controls.target.copy(center);
+                        controls.update();
+                        
+                        function animate() {
+                            requestAnimationFrame(animate);
+                            gltf.scene.rotation.y += 0.01;
+                            controls.update();
+                            renderer.render(scene, camera);
+                        }
+                        animate();
+                        
+                        log(`✓ 成功加载模型: ${path}`, 'success');
+                        resolve(path);
+                    },
+                    (xhr) => {
+                        if (xhr.total > 0) {
+                            const percent = (xhr.loaded / xhr.total * 100).toFixed(1);
+                            log(`  下载进度: ${percent}%`, 'info');
+                        }
+                    },
+                    (error) => {
+                        clearTimeout(timeout);
+                        log(`✗ 加载失败: ${path}`, 'error');
+                        log(`  错误: ${error.message || error}`, 'error');
+                        reject(error);
+                    }
+                );
+            });
+        }
+
+        async function runTests() {
+            const paths = [
+                'Model/船桨模型.glb',
+                './Model/船桨模型.glb',
+                '/Model/船桨模型.glb',
+                'model/船桨模型.glb',
+                './model/船桨模型.glb'
+            ];
+            
+            for (const path of paths) {
+                modelLoaded = false;
+                try {
+                    await testModelPath(path);
+                    statusDiv.innerHTML = `<span class="success">✓ 成功！正确的路径是: <code>${path}</code></span>`;
+                    statusDiv.className = 'success';
+                    log(`\n找到正确的路径！请更新 motor_monitor.html 中的模型路径为: ${path}`, 'success');
+                    break;
+                } catch (error) {
+                    log(`路径 ${path} 不可用`, 'error');
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+        }
+
+        // 开始测试
+        log('开始测试3D模型加载...', 'info');
+        runTests().catch(err => {
+            statusDiv.innerHTML = `<span class="error">✗ 所有路径都失败了</span>`;
+            log('所有测试路径都失败了。请检查：', 'error');
+            log('1. 模型文件是否存在于 Model/ 目录', 'error');
+            log('2. 文件名是否正确（包括扩展名）', 'error');
+            log('3. 浏览器控制台是否有CORS错误', 'error');
+        });
+    </script>
+</body>
+</html>
