@@ -9,6 +9,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSV Loader", "CSV Loader\CS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peak Frequency Finder", "Peak Frequency Finder\Peak Frequency Finder.csproj", "{282A52CF-22A1-4338-B420-B71E95166201}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Try MathNET Using MKL", "Test\MKL\Try MathNET Using MKL\Try MathNET Using MKL.csproj", "{44A67963-842F-4200-B2A1-1C9DFF6AD58A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frequency Finder Class", "Frequency Finder Lib\Frequency Finder Class.csproj", "{3A126B4C-8740-4BC4-A773-23DDE2CEF11C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyFilterClass", "Easy Filter Lib\EasyFilterClass.csproj", "{2E2DB3E5-C6C8-4A1A-9AFB-55757CB92186}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{979686A4-B4EB-40D4-A32F-8B39D9A7AB0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,9 +37,26 @@ Global
 		{282A52CF-22A1-4338-B420-B71E95166201}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{282A52CF-22A1-4338-B420-B71E95166201}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{282A52CF-22A1-4338-B420-B71E95166201}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44A67963-842F-4200-B2A1-1C9DFF6AD58A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44A67963-842F-4200-B2A1-1C9DFF6AD58A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44A67963-842F-4200-B2A1-1C9DFF6AD58A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44A67963-842F-4200-B2A1-1C9DFF6AD58A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A126B4C-8740-4BC4-A773-23DDE2CEF11C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A126B4C-8740-4BC4-A773-23DDE2CEF11C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A126B4C-8740-4BC4-A773-23DDE2CEF11C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A126B4C-8740-4BC4-A773-23DDE2CEF11C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E2DB3E5-C6C8-4A1A-9AFB-55757CB92186}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E2DB3E5-C6C8-4A1A-9AFB-55757CB92186}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E2DB3E5-C6C8-4A1A-9AFB-55757CB92186}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E2DB3E5-C6C8-4A1A-9AFB-55757CB92186}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{44A67963-842F-4200-B2A1-1C9DFF6AD58A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{3A126B4C-8740-4BC4-A773-23DDE2CEF11C} = {979686A4-B4EB-40D4-A32F-8B39D9A7AB0D}
+		{2E2DB3E5-C6C8-4A1A-9AFB-55757CB92186} = {979686A4-B4EB-40D4-A32F-8B39D9A7AB0D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6470CD64-249F-4879-90D0-4D0DAACFA24C}

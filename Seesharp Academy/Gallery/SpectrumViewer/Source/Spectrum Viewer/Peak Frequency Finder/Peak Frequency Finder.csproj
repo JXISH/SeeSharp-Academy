@@ -116,6 +116,14 @@
       <Project>{a1b2c3d4-e5f6-4a5b-8c9d-1e2f3a4b5c6d}</Project>
       <Name>CSV Loader</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Easy Filter Lib\EasyFilterClass.csproj">
+      <Project>{2e2db3e5-c6c8-4a1a-9afb-55757cb92186}</Project>
+      <Name>EasyFilterClass</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Frequency Finder Lib\Frequency Finder Class.csproj">
+      <Project>{3a126b4c-8740-4bc4-a773-23dde2cef11c}</Project>
+      <Name>Frequency Finder Class</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
