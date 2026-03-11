@@ -106,6 +106,18 @@ if %ERRORLEVEL% EQU 0 (
 )
 
 :SKIP_REDIS
+echo.
+echo ============================================
+echo   是否启动Python数据仿真？
+echo   (Y)是 - 启动Python仿真器生成测试数据
+echo   (N)否 - 跳过，使用外部数据源
+echo ============================================
+set /p start_python="请选择 (Y/N) [默认Y]: "
+if /i "%start_python%"=="N" (
+    echo [跳过] Python数据仿真器...
+    goto SKIP_PYTHON
+)
+
 echo [2/3] 启动Python数据模拟器...
 cd /d "%~dp0Test"
 start "Python-Simulator" cmd /k "echo Python Data Simulator Running... && python test_motor_data.py && pause"
@@ -114,8 +126,18 @@ cd /d "%~dp0"
 REM 等待Python启动
 timeout /t 2 /nobreak >nul
 
+:SKIP_PYTHON
+
 echo [3/3] 启动Node.js Web服务器...
 start "NodeJS-Web-Server" cmd /k "echo Web Server Running on port 3000... && echo. && npm start && pause"
+
+REM 等待Web服务器启动
+echo [等待] Web服务器启动中...
+timeout /t 3 /nobreak >nul
+
+REM 打开浏览器
+echo [打开] 浏览器访问监控页面...
+start "" "http://localhost:3000/motor_monitor.html"
 
 echo.
 echo ============================================

@@ -195,14 +195,17 @@ namespace FormExample
                 double df;
                 CalculateSpectrum(waveform, sampleRate, out spectrum, out df);
 
+                // Find peaks in spectrum
+                frequencyFinder.FindFrequencies(waveform, sampleRate, 0.02 * sampleRate, 0.45 * sampleRate, 15, 0.05);
+
                 // Display spectrum
-                easyChartXSpectrum.Plot(spectrum, 0, df);
+                UpdateSpectrumChartX(spectrum, df, frequencyFinder);
 
                 // Update results table
-                UpdateResultsTable(waveform, sampleRate);
+                UpdateResultsTable(frequencyFinder);
 
                 // Report to Redis
-                ReportToRedis(waveform, dt, spectrum, df);
+                ReportToRedis(waveform, dt, spectrum, df, frequencyFinder);
 
                 acquisitionCount++;
             }
@@ -225,24 +228,49 @@ namespace FormExample
             Spectrum.PowerSpectrum(waveform, sampleRate, ref spectrum, out df, unit, windowType, 0.0, asPSD);
         }
 
-        private void UpdateResultsTable(double[] waveform, double sampleRate)
+        private void UpdateSpectrumChartX(double[] Spectrum, double dF, FrequencyFinder FreqFinder)
         {
-            // Find peaks in spectrum
-            frequencyFinder.FindFrequencies(waveform,sampleRate,0.1*sampleRate,0.4*sampleRate,15,0.1);
+            //显示频谱
+            double[][] spectrumDisplayX = new double[2][];
+            double[][] spectrumDisplayY = new double[2][];
+            spectrumDisplayY[0] = Spectrum;
+            spectrumDisplayX[0] = new double[Spectrum.Length];
+            for (int i = 0; i < Spectrum.Length; i++)
+            {
+                spectrumDisplayX[0][i] = i * dF;
+            }
+            //第二对显示_detected全部元素
+            spectrumDisplayX[1] = new double[FreqFinder.Detected.Count];
+            spectrumDisplayY[1] = new double[FreqFinder.Detected.Count];
+            for (int i = 0; i < FreqFinder.Detected.Count; i++)
+            {
+                spectrumDisplayX[1][i] = FreqFinder.Detected[i].FrequencyHz;
+                //取频谱幅度显示检出频率
+                int index = (int)Math.Round(FreqFinder.Detected[i].FrequencyHz / dF);
+                spectrumDisplayY[1][i] = Spectrum[index];
+            }
+            easyChartXSpectrum.Plot(spectrumDisplayX, spectrumDisplayY);
+            //设置第二条series为散点图
+            easyChartXSpectrum.Series[1].Type = SeeSharpTools.JY.GUI.EasyChartXSeries.LineType.Point;
+            easyChartXSpectrum.Series[1].Color = System.Drawing.Color.Red;
+        }
+        private void UpdateResultsTable(FrequencyFinder FreqFinder)
+        {
+
 
             // Update DataGridView
             dgvResults.Rows.Clear();
-            for (int i = 0; i < frequencyFinder.Detected.Count; i++)
+            for (int i = 0; i < FreqFinder.Detected.Count; i++)
             {
                 dgvResults.Rows.Add(
                     i + 1,
-                    frequencyFinder.Detected[i].FrequencyHz.ToString("F1"),
-                    frequencyFinder.Detected[i].Amplitude.ToString("0.000e0")
+                    FreqFinder.Detected[i].FrequencyHz.ToString("F1"),
+                    FreqFinder.Detected[i].Amplitude.ToString("0.000e0")
                 );
             }
         }
 
-        private void ReportToRedis(double[] waveform, double dt, double[] spectrum, double df)
+        private void ReportToRedis(double[] waveform, double dt, double[] spectrum, double df, FrequencyFinder FreqFinder)
         {
             if (db == null)
             {
@@ -266,10 +294,10 @@ namespace FormExample
                 //get frequency and amplitude from frequencyFinder
                 string frequenciesStr = "";
                 string amplitudesStr = "";
-                for (int i = 0; i < frequencyFinder.Detected.Count; i++)
+                for (int i = 0; i < FreqFinder.Detected.Count; i++)
                 {
-                    frequenciesStr += frequencyFinder.Detected[i].FrequencyHz.ToString("F1") + ",";
-                    amplitudesStr += frequencyFinder.Detected[i].Amplitude.ToString("0.000e0") + ",";
+                    frequenciesStr += FreqFinder.Detected[i].FrequencyHz.ToString("F1") + ",";
+                    amplitudesStr += FreqFinder.Detected[i].Amplitude.ToString("0.000e0") + ",";
                 }
                 //trim out last comma
                 frequenciesStr = frequenciesStr.TrimEnd(',');
