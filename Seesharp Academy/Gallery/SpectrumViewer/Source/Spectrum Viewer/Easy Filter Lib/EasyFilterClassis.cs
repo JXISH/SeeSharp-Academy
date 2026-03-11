@@ -235,10 +235,10 @@ namespace Seesharp.JY.DSP.SignalProcessing.Conditioning.Filter1D.EasyFilter
             _coef_a = null;
             _coef_b = null;
             //参数合理化检查
-            if (SampleRate <= 0 || CenterFrequency<0 || CenterFrequency >= SampleRate/2 
-                || BandWidth <= 0 || CornerAttenuation <= 0)
+            if (SampleRate <= 0 || CenterFrequency<=0 || CenterFrequency >= SampleRate/2 
+                || BandWidth <= 0 || BandWidth >= SampleRate / 2 || CornerAttenuation <= 0)
             {
-                throw new Exception("陷波滤波器采样率>0，0<中心频率<采样率/2，带宽>0，衰减>0");
+                throw new Exception("陷波滤波器采样率>0，0<中心频率<采样率/2，0<带宽<采样率/2，衰减>0");
             }
             SelectedFilterType = AntialiasingFilterType.IIR;
             //设计滤波器
@@ -252,7 +252,7 @@ namespace Seesharp.JY.DSP.SignalProcessing.Conditioning.Filter1D.EasyFilter
                 case PeakNotchType.Notch:
                     {
                         double bFactor = 1 / (1 + gama * (Math.Sqrt(1 - attnLinear * attnLinear) / attnLinear));
-                        _coef_b = new double[3] { bFactor, beta * bFactor, -bFactor };
+                        _coef_b = new double[3] { bFactor, beta * bFactor, bFactor };
                         _coef_a = new double[3] { 1, beta * bFactor, 2 * bFactor - 1 };
                     }
                     break;
