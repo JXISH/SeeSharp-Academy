@@ -206,6 +206,75 @@ namespace Seesharp.JY.DSP.SignalProcessing.Conditioning.Filter1D.EasyFilter
             //滤波器设计
             DesignFilter();
         }
+        /// <summary>
+        /// 陷波滤波器设计
+        /// </summary>
+        /// <param name="SampleRate">采样率</param>
+        /// <param name="CenterFrequency">中心频率</param>
+        /// <param name="QFactor">Q值(线性值，3dB带宽)</param>
+        /// <param name="CenterType">中心频率衰减(Notch)还是通过(Peak)</param>
+        public void DesignNotchFilter(double SampleRate, double CenterFrequency, double QFactor,
+            PeakNotchType CenterType)
+        { 
+            double bw = CenterFrequency / QFactor;
+            double attnDB = 3.01;
+            DesignNotchFilter(SampleRate, CenterFrequency, bw, attnDB, CenterType);
+        }
+        /// <summary>
+        /// 陷波滤波器设计
+        /// </summary>
+        /// <param name="SampleRate">采样率</param>
+        /// <param name="CenterFrequency">中心频率</param>
+        /// <param name="BandWidth">带宽</param>
+        /// <param name="CornerAttenuation">带宽边缘衰减(>0) (单位dB)</param>
+        /// <param name="CenterType">中心频率衰减(Notch)还是通过(Peak)</param>
+        public  void DesignNotchFilter(double SampleRate, double CenterFrequency, double BandWidth, double CornerAttenuation,
+            PeakNotchType CenterType)
+        {
+            //滤波系数设空，如遇异常，输出空系数
+            _coef_a = null;
+            _coef_b = null;
+            //参数合理化检查
+            if (SampleRate <= 0 || CenterFrequency<0 || CenterFrequency >= SampleRate/2 
+                || BandWidth <= 0 || CornerAttenuation <= 0)
+            {
+                throw new Exception("陷波滤波器采样率>0，0<中心频率<采样率/2，带宽>0，衰减>0");
+            }
+            SelectedFilterType = AntialiasingFilterType.IIR;
+            //设计滤波器
+            double attnLinear = Math.Pow(10, -CornerAttenuation / 20);
+            double omegaCenter = 2 * Math.PI * CenterFrequency / SampleRate;
+            double normalOmegaBW = 2 * Math.PI * BandWidth / SampleRate;
+            double beta = -2 * Math.Cos(omegaCenter);
+            double gama = Math.Tan(normalOmegaBW / 2);
+            switch (CenterType)
+            {
+                case PeakNotchType.Notch:
+                    {
+                        double bFactor = 1 / (1 + gama * (Math.Sqrt(1 - attnLinear * attnLinear) / attnLinear));
+                        _coef_b = new double[3] { bFactor, beta * bFactor, -bFactor };
+                        _coef_a = new double[3] { 1, beta * bFactor, 2 * bFactor - 1 };
+                    }
+                    break;
+                case PeakNotchType.Peak:
+                    {
+                        double bFactor = 1 / (1 + gama * (attnLinear / Math.Sqrt(1 - attnLinear * attnLinear)));
+                        _coef_b = new double[3] { 1-bFactor, 0, bFactor-1 };
+                        _coef_a = new double[3] { 1, beta * bFactor, 2 * bFactor - 1 };
+                    }
+                    break;
+                default:
+                    throw new Exception("陷波滤波器类型错误");
+            }
+        }
+        /// <summary>
+        /// 陷波类型，Notch: 陷波滤波，Peak: 峰频滤波
+        /// </summary>
+        public enum PeakNotchType
+        {
+            Notch,
+            Peak
+        }
         #endregion
 
         #region 滤波器阶数估计
