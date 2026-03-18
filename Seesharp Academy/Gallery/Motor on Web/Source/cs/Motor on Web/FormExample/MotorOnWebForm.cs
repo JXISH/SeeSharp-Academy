@@ -1,3 +1,8 @@
+using JYUSB1202;
+using JYUSB1601;
+using Seesharp.JY.SignalProcessing.SuperResolution;
+using SeeSharpTools.JY.DSP.Fundamental;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -5,18 +10,25 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using JYUSB1202;
-using Seesharp.JY.SignalProcessing.SuperResolution;
-using SeeSharpTools.JY.DSP.Fundamental;
-using StackExchange.Redis;
 
 namespace FormExample
 {
+    // Enum for hardware selection
+    public enum HardwareType
+    {
+        USB1202,
+        USB1601
+    }
+
     public partial class MotorOnWebForm : Form
     {
         // DAQ related variables
-        private JYUSB1202AITask aiTask = null;
+        private JYUSB1202AITask aiTask1202 = null;
+        private JYUSB1601AITask aiTask1601 = null;
+        private JYUSB1601AOTask aoTask1601 = null;
+        private HardwareType selectedHardware = HardwareType.USB1202;
         private bool isAcquiring = false;
         private int acquisitionCount = 0;
         
@@ -35,11 +47,9 @@ namespace FormExample
 
         private void InitializeForm()
         {
-            //// Wire up event handlers
-            //btStart.Click += BtStart_Click;
-            //btStop.Click += BtStop_Click;
-            //timerMain.Tick += TimerMain_Tick;
-            
+            comboBox1.SelectedIndex = 0;
+            btStart.Enabled = true;
+            btStop.Enabled = false;
             // Initialize Redis connection
             try
             {
@@ -92,19 +102,48 @@ namespace FormExample
                 double sampleRate = (double)numericUpDownSampleRate.Value;
                 int blockLength = (int)numericUpDownBlockLength.Value;
 
-                // Create AI task
-                aiTask = new JYUSB1202AITask(deviceName);
-                
-                // Add channel
-                aiTask.AddChannel(channelIndex, -2.5, 2.5, AITerminal.PSEUDIFF, AICoupling.AC, true);
-                
-                // Configure acquisition mode
-                aiTask.Mode = AIMode.Finite;
-                aiTask.SampleRate = sampleRate;
-                aiTask.SamplesToAcquire = blockLength;
-                
-                // Start acquisition
-                aiTask.Start();
+                // Determine hardware type from comboBox selection
+                selectedHardware = (comboBox1.SelectedIndex == 1) ? HardwareType.USB1601 : HardwareType.USB1202;
+
+                if (selectedHardware == HardwareType.USB1202)
+                {
+                    // Create USB1202 AI task
+                    aiTask1202 = new JYUSB1202AITask(deviceName);
+                    
+                    // Add channel with USB1202 specific parameters (coupling, IEPE)
+                    aiTask1202.AddChannel(channelIndex, -2.5, 2.5, JYUSB1202.AITerminal.PSEUDIFF, AICoupling.AC, true);
+                    
+                    // Configure acquisition mode
+                    aiTask1202.Mode = JYUSB1202.AIMode.Finite;
+                    aiTask1202.SampleRate = sampleRate;
+                    aiTask1202.SamplesToAcquire = blockLength;
+                    
+                    // Start acquisition
+                    aiTask1202.Start();
+                }
+                else // USB1601
+                {
+                    //通过AO0给出驱动电压5V
+                    aoTask1601 = new JYUSB1601AOTask(deviceName);
+                    aoTask1601.AddChannel(0);
+                    aoTask1601.Mode= AOMode.Single;
+                    double[] writeValue = new double[1] { 5.0 };
+                    aoTask1601.WriteSinglePoint(writeValue);
+                    aoTask1601.Start();
+                    // Create USB1601 AI task
+                    aiTask1601 = new JYUSB1601AITask(deviceName);
+                    
+                    // Add channel with USB1601 specific parameters (no coupling/IEPE, uses RSE)
+                    aiTask1601.AddChannel(channelIndex, -10.0, 10.0, JYUSB1601.AITerminal.RSE);
+                    
+                    // Configure acquisition mode
+                    aiTask1601.Mode = JYUSB1601.AIMode.Finite;
+                    aiTask1601.SampleRate = sampleRate;
+                    aiTask1601.SamplesToAcquire = blockLength;
+                    
+                    // Start acquisition
+                    aiTask1601.Start();
+                }
                 
                 isAcquiring = true;
                 acquisitionCount = 0;
@@ -112,7 +151,7 @@ namespace FormExample
                 // Disable configuration controls
                 groupBoxMonitorSettings.Enabled = false;
                 btStart.Enabled = false;
-
+                btStop.Enabled = true;
                 // Start the timer
                 double interval = (double)numericUpDownMonitorInterval.Value * 1000; // Convert to milliseconds
                 timerMain.Interval = (int)interval;
@@ -140,11 +179,24 @@ namespace FormExample
                 // Stop the timer
                 timerMain.Stop();
 
-                // Stop DAQ task
-                if (aiTask != null)
+                // Stop DAQ task based on hardware type
+                if (selectedHardware == HardwareType.USB1202)
                 {
-                    aiTask.Stop();
-                    aiTask = null;
+                    if (aiTask1202 != null)
+                    {
+                        aiTask1202.Stop();
+                        aiTask1202 = null;
+                    }
+                }
+                else // USB1601
+                {
+                    if (aiTask1601 != null)
+                    {
+                        aiTask1601.Stop();
+                        aiTask1601 = null;
+                        aoTask1601.Stop();
+                        aoTask1601 = null;
+                    }
                 }
 
                 isAcquiring = false;
@@ -152,6 +204,7 @@ namespace FormExample
                 // Enable configuration controls
                 groupBoxMonitorSettings.Enabled = true;
                 btStart.Enabled = true;
+                btStop.Enabled = false;
             }
             catch (Exception ex)
             {
@@ -179,11 +232,23 @@ namespace FormExample
                 
                 // Perform finite acquisition - read into double array
                 double[] waveform = new double[blockLength];
-                aiTask.ReadData(ref waveform, -1);
                 
-                // Restart task for next acquisition
-                aiTask.Stop();
-                aiTask.Start();
+                if (selectedHardware == HardwareType.USB1202)
+                {
+                    aiTask1202.ReadData(ref waveform, -1);
+                    
+                    // Restart task for next acquisition
+                    aiTask1202.Stop();
+                    aiTask1202.Start();
+                }
+                else // USB1601
+                {
+                    aiTask1601.ReadData(ref waveform, -1);
+                    
+                    // Restart task for next acquisition
+                    aiTask1601.Stop();
+                    aiTask1601.Start();
+                }
                 
                 double dt = 1.0 / sampleRate;
 
@@ -196,7 +261,7 @@ namespace FormExample
                 CalculateSpectrum(waveform, sampleRate, out spectrum, out df);
 
                 // Find peaks in spectrum
-                frequencyFinder.FindFrequencies(waveform, sampleRate, 0.02 * sampleRate, 0.45 * sampleRate, 15, 0.05);
+                frequencyFinder.FindFrequencies(waveform, sampleRate, sampleRate*0.1, sampleRate*0.4, 15, 0.05);
 
                 // Display spectrum
                 UpdateSpectrumChartX(spectrum, df, frequencyFinder);

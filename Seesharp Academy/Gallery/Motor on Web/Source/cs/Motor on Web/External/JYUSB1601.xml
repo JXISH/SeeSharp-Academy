@@ -1,0 +1,2399 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>JYUSB1601</name>
+    </assembly>
+    <members>
+        <member name="T:JYUSB1601.JYUSB1601Device">
+            <summary>
+            JYUSB1601Device Class
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.BoardClockRate">
+            <summary>
+            BoardClockRate
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.DiffChannelCount">
+            <summary>
+            DiffChannelCount
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.SEChannelCount">
+            <summary>
+            SEChannelCount
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.MaxSampleRateSingleChannel">
+            <summary>
+            AIMaxSampleRateSingleChannel
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.MaxSampleRateMutilChannel">
+            <summary>
+            AIMaxSampleRateMutilChannel
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.AIBufferSize">
+            <summary>
+            AIBufferSize Unit: Byte
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.IsAISync">
+            <summary>
+            IsAISync
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.AOChannelCount">
+            <summary>
+            AOChannelCount
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.MaxUpdateRate">
+            <summary>
+            AOMaxUpdateRateSingleChannel
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.IsAOSync">
+            <summary>
+            IsAOSync
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.SerialNumber">
+            <summary>
+            SerialNumber
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601Device.Handle">
+            <summary>
+            Card Handle
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Device.Release">
+            <summary>
+            关闭AD设备,禁止传输,并释放资源，该函数自动在类的析构函数中执行
+            </summary>
+            <returns></returns>
+            <exception cref="T:JYUSB1601.JYDriverException"></exception>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Device.Finalize">
+            <summary>
+            析构函数，释放硬件资源
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_AI_Continuous" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_AI_Single" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_AI_BandWidth_39K" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_Digital" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_Soft" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_AO_Finite" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_AO_ContinuousWrapping" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_AO_ContinuousNoWrapping" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_AO_Single" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_Zero" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_Hold" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.USB1601_InternalClock" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.USB1601_ExternalClock" -->
+        <!-- Badly formed XML comment ignored for member "F:JYUSB1601.JYUSB1601Import.JYUSB1601_CO_LowLevel" -->
+        <member name="M:JYUSB1601.JYUSB1601Import.JYUSB1601_AI_SetSampleClock(System.IntPtr,System.Int32,System.Double)">
+            设置AI采样时钟
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Import.JYUSB1601_AI_CheckBufferStatus(System.IntPtr,System.UInt32@,System.UInt64@,System.Boolean@)">
+            获取缓冲区状态
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Import.JYUSB1601_AI_ReadSinglePoint(System.IntPtr,System.Double[],System.Int32)">
+            AI读取单点数据
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Import.JYUSB1601_AI_ReadRawSinglePoint(System.IntPtr,System.Int16[],System.Int32)">
+            AI读取单点数据
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Import.JYUSB1601_AI_DisableCalibration(System.IntPtr,System.Byte)">
+            AI禁用校准系数
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Import.JYUSB1601_AO_DisableCalibration(System.IntPtr,System.Byte)">
+            AO禁用校准系数
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Import.JYUSB1601_AO_CheckBufferStatus(System.IntPtr,System.UInt32@,System.UInt64@,System.Boolean@)">
+            检查AO缓存状态
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Import.JYUSB1601_AO_WriteData(System.IntPtr,System.IntPtr,System.UInt32,System.Int32,System.UInt32@)">
+            AO写入数据
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Import.JYUSB1601_AO_WriteData(System.IntPtr,System.Double[],System.UInt32,System.Int32,System.UInt32@)">
+            AO写入数据
+        </member>
+        <member name="T:JYUSB1601.JYLogLevel">
+            <summary>
+            message level
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYLogLevel.DEBUG">
+            <summary>
+            DEBUG
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYLogLevel.INFO">
+            <summary>
+            INFO
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYLogLevel.WARN">
+            <summary>
+            WARN
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYLogLevel.ERROR">
+            <summary>
+            ERROR
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYLogLevel.FATAL">
+            <summary>
+            FATAL
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.JYLog">
+            <summary>
+            JYLog
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYLog.LogLevel">
+            <summary>
+            LogLevel
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYLog._logMsgQ">
+            <summary>
+            log message queue
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYLog.EnableLog">
+            <summary>
+            EnableLog
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYLog.Print(System.String,System.Object[])">
+            <summary>
+            printf message
+            </summary>
+            <param name="logMsg">logmessage</param>
+            <param name="args">param</param>
+        </member>
+        <member name="M:JYUSB1601.JYLog.Print(JYUSB1601.JYLogLevel,System.String,System.Object[])">
+            <summary>
+            printf message
+            </summary>
+            <param name="logLevel">logLevel</param>
+            <param name="logMsg">logmessage</param>
+            <param name="args">param</param>
+        </member>
+        <member name="M:JYUSB1601.JYLog.FuncWriteLog">
+            <summary>
+            FuncWriteLog
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.JYDriverExceptionPublic">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.UnKnown">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.OpenDeviceFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.CloseDeviceFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.ResetDeviceFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.GetDevicePropertyFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.SetDevicePropertyFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.HardwareResourceIsReserved">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.MethodNotPermitedToCallWhenCurrentStatus">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.InvalidUserDataBuffer">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.NoChannelAdded">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.NotSupportOperationForCurrentDevice">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.CreatTaskFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.StartTaskFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.StopTaskFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.TaskHasNotStarted">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.TaskHasStartedCannotPerformTheSetOperation">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.ChannelNumberParameterInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.ChannelInputRangeParameterInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.ChannelTerminalParameterInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.ChannelCouplingParameterInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.SampeleModeParameterInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.SampleClockParameterInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.SampleRateParameterInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.UpdateRateParameterInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.TriggerParameterInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.ReferenceTriggerDoesNotMatchWithSampleMode">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.PretriggerPointCanNotBeLongerThanTheNumberOfFinitePoint">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.ReadDataFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.ReadDataTimeout">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.WriteDataFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.WriteDataTimeout">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.WriteDataLengthCannotBeLessThanN">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.BufferDataOverflow">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.BufferDataDownflow">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.CheckBufferFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.PointInvalidInFiniteMode">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.ReadPointInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.OnlySupportRecordMode">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.SendSoftTirggerFailed">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.TaskTimeout">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.CounterParametersInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.WritePointInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.SignalExportDestinationInvalid">
+            <summary>
+            JYDriverExceptionPublic
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverExceptionPublic.InvalidParameter">
+            <summary>
+            <para xml:lang="zh_CN">无效参数。</para>
+            <para xml:lang="en_US">Invaild parameter.</para>
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.JYDriverException">
+            <summary>
+            JYDriverException
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYDriverException.FollowingException">
+            <summary>
+            JYDriverException
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYDriverException.#ctor(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="errorCode"></param>
+        </member>
+        <member name="M:JYUSB1601.JYDriverException.#ctor(JYUSB1601.JYDriverExceptionPublic)">
+            <summary>
+            
+            </summary>
+            <param name="exceptionCode"></param>
+        </member>
+        <member name="M:JYUSB1601.JYDriverException.#ctor(System.String,JYUSB1601.JYDriverExceptionPublic)">
+            <summary>
+            
+            </summary>
+            <param name="msg"></param>
+            <param name="exceptionCode"></param>
+        </member>
+        <member name="M:JYUSB1601.JYDriverException.#ctor(JYUSB1601.JYDriverExceptionPublic,System.String,System.Object[])">
+            <summary>
+            
+            </summary>
+            <param name="exceptionCode"></param>
+            <param name="msg"></param>
+            <param name="args"></param>
+        </member>
+        <member name="M:JYUSB1601.JYDriverException.#ctor(System.Int32,System.String,System.Object[])">
+            <summary>
+            
+            </summary>
+            <param name="errorCode"></param>
+            <param name="msg"></param>
+            <param name="args"></param>
+        </member>
+        <member name="M:JYUSB1601.JYDriverException.#ctor(System.String,System.Exception)">
+            <summary>
+            
+            </summary>
+            <param name="msg"></param>
+            <param name="innerException"></param>
+        </member>
+        <member name="F:JYUSB1601.JYDriverException.ErrorCode">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYDriverException.ExceptionName">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.JYUSB1601AITask">
+            <summary>
+            JYUSB1601 Analog Input Task.
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.#ctor">
+            <summary>
+            Constructor, Used to create an AI task by a slot number
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.#ctor(System.String)">
+            <summary>
+            Constructor. Used to create an AI task by a board name.
+            </summary>
+            <param name="boardName">Board name(device alias), set by device manager</param>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.Channels">
+            <summary>
+            List of AI channels,(1601 support 16 SE channel)
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.Mode">
+            <summary>
+            AI acquisition mode，support Single/Finite/Continuous/Record
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.SampleRate">
+            <summary>
+            Sample rate per channel. Maximum sample rate is 250K for single channel, 250K/N for multichannel (N)
+            The defalut sample rate = 10k
+            You can read this property to obtain the sample rate that will actually take effect in the current configuration.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.SamplesToAcquire">
+            <summary>
+            Number of samples to be read per channel. Only valid when <see cref="P:JYUSB1601.JYUSB1601AITask.Mode"/> is <see cref="F:JYUSB1601.AIMode.Finite"/>.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.BufLenInSamples">
+            <summary>
+            Number of samples per channel can be storage in the buffer, the Proprety <see cref="P:JYUSB1601.JYUSB1601AITask.SamplesToAcquire"/> must be less than or equal to this value.        
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.AvailableSamples">
+            <summary>
+            Number of samples per channel that can be read in the buffer .  Valid when <see cref="P:JYUSB1601.JYUSB1601AITask.Mode"/> is NOT <see cref="F:JYUSB1601.AIMode.Single"/>.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.TransferedSamples">
+            <summary>
+            The number of samples that have been transfered from the local buffer (per channel).  Valid when <see cref="P:JYUSB1601.JYUSB1601AITask.Mode"/> is NOT <see cref="F:JYUSB1601.AIMode.Single"/>.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.SampleClock">
+            <summary>
+            AI Sample Clock Configuration
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.Trigger">
+            <summary>
+            AI Trigger Configuration
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.Bandwidth">
+            <summary>
+            AI Bandwidth.defalut: 80KHz
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.Record">
+            <summary>
+            ai Data streaming Configuration
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.SignalExport">
+            <summary>
+            Export AI Signal Configuration
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AITask.Device">
+            <summary>
+            Device 
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.AddChannel(System.Int32,System.Double,System.Double,JYUSB1601.AITerminal)">
+            <summary>
+            Add one channel.
+            </summary>
+            <param name="chnId">channel's physical number ，chnId=-1, add all channels。</param>
+            <param name="rangeLow">lower range limit for the channel，-10V,-5V defalut -10</param>
+            <param name="rangeHigh">higher range limit for the channel，10V,5V defalut 10</param>
+            <param name="terminalCfg">terminal input mode configuration，RSE/Differential.Default RSE </param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.AddChannel(System.Int32[],System.Double,System.Double,JYUSB1601.AITerminal)">
+            <summary>
+            Add a group of channels.
+            </summary>
+            <param name="chnsId">a group of channel physical numbers </param>
+            <param name="rangeLow">lower range limit for the channel，-10V,-5V defalut -10</param>
+            <param name="rangeHigh">higher range limit for the channel，10V,5V defalut 10</param>
+            <param name="terminalCfg">terminal input mode configuration，RSE/Differential.Default RSE </param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.AddChannel(System.Int32[],System.Double[],System.Double[],JYUSB1601.AITerminal)">
+            <summary>
+            Add a group of channels.
+            </summary>
+            <param name="chnsId">a group of channel physical numbers </param>
+            <param name="rangeLow">lower range limit for the channel，-10V,-5V</param>
+            <param name="rangeHigh">higher range limit for the channel，10V,5V</param>
+            <param name="terminalCfg">terminal input mode configuration，RSE/Differential.Default RSE </param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.RemoveChannel(System.Int32)">
+            <summary>
+            Delete the specified channel number. If it is -1, delete all channels.
+            </summary>
+            <param name="chnId">Specified channel ID.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadData(System.IntPtr,System.Int32,System.Int32)">
+            <summary>
+            Read one or multi-channel data by columns and store it in a data buffer. The buffer is pointed by C# data type IntPtr. 
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="samplesPerChannel">Number of samples per channel to read</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadData(System.Double[0:,0:]@,System.Int32,System.Int32)">
+            <summary>
+            Read the multi-channel data by columns and store it in a data buffer. Each channel is represented by one column of data.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="samplesPerChannel">Number of samples per channel to read</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadData(System.Double[0:,0:]@,System.Int32)">
+            <summary>
+            Read the multi-channel data by columns and store it in a data buffer. Each channel is represented by one column of data.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadData(System.Double[]@,System.Int32,System.Int32)">
+            <summary>
+            Read the one channel data and store it in a data buffer.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="samplesPerChannel">Number of samples per channel to read</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadData(System.Double[]@,System.Int32)">
+            <summary>
+            Read the one channel data and store it in a data buffer.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadRawData(System.IntPtr,System.Int32,System.Int32)">
+            <summary>
+            Read one or multi-channel raw data by columns and store it in a data buffer. The buffer is pointed by C# data type IntPtr.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="samplesPerChannel">Number of samples per channel to read</param>
+            <param name="timeout">timeout before generating error message, uint is ms。, timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadRawData(System.Int16[0:,0:]@,System.Int32,System.Int32)">
+            <summary>
+            Read the multi-channel raw data by columns and store it in a data buffer. Each channel is represented by one column of data.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="samplesPerChannel">Number of samples per channel to read</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish. </param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadRawData(System.Int16[0:,0:]@,System.Int32)">
+            <summary>
+            Read the multi-channel raw data by columns and store it in a data buffer. Each channel is represented by one column of data.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish. </param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadRawData(System.Int16[]@,System.Int32,System.Int32)">
+            <summary>
+            Read the one channel raw data and store it in a data buffer.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="samplesPerChannel">Number of samples per channel to read</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadRawData(System.Int16[]@,System.Int32)">
+            <summary>
+            Read the one channel raw data and store it in a data buffer.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.GetRecordPreviewData(System.Double[0:,0:]@,System.Int32,System.Int32)">
+            <summary>
+            Preview multi-channel data when streaming is in progress. Each column represents one channel.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="samplesPerChannel">Number of  preview samples per channel</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.GetRecordPreviewData(System.Double[0:,0:]@,System.Int32)">
+            <summary>
+            Preview multi-channel data when streaming is in progress. Each column represents one channel.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.GetRecordPreviewData(System.Double[]@,System.Int32,System.Int32)">
+            <summary>
+            Preview one channel data when streaming is in progress.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="samplesPerChannel">Number of  preview samples per channel</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.GetRecordPreviewData(System.Double[]@,System.Int32)">
+            <summary>
+            Preview one channel data when streaming is in progress.
+            </summary>
+            <param name="buf">Data buffer</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadSinglePoint(System.Double[]@)">
+            <summary>
+            Read one sample for all channels in register . Available when <see cref = "P:JYUSB1601.JYUSB1601AITask.Mode" /> is  <see cref = "F:JYUSB1601.AIMode.Single" />
+            </summary>
+            <param name="readValues">Values read. Array length >= <see cref = "P:JYUSB1601.JYUSB1601AITask.Channels" />.Count.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadSinglePoint(System.Double@,System.Int32)">
+            <summary>
+            Read one sample for specified channel in register. Available when <see cref = "P:JYUSB1601.JYUSB1601AITask.Mode" /> is  <see cref = "F:JYUSB1601.AIMode.Single" />
+            </summary>
+            <param name="readValue">value read</param>
+            <param name="channel">Specified channel numbers.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadRawSinglePoint(System.Int16[]@)">
+            <summary>
+            Read one raw sample for all channels in register . Available when <see cref = "P:JYUSB1601.JYUSB1601AITask.Mode" /> is  <see cref = "F:JYUSB1601.AIMode.Single" />
+            </summary>
+            <param name="readValues">Values read. Array length >= <see cref = "P:JYUSB1601.JYUSB1601AITask.Channels" />.Count.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ReadRawSinglePoint(System.Int16@,System.Int32)">
+            <summary>
+            Read one raw sample for specified channel in register. Available when <see cref = "P:JYUSB1601.JYUSB1601AITask.Mode" /> is  <see cref = "F:JYUSB1601.AIMode.Single" />
+            </summary>
+            <param name="readValue">value read</param>
+            <param name="channel">Specified channel numbers.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.GetRecordStatus(System.Double@,System.Boolean@)">
+            <summary>
+            get the streaming status.  Available when <see cref = "P:JYUSB1601.JYUSB1601AITask.Mode" /> is  <see cref = "F:JYUSB1601.AIMode.Record" />
+            </summary>
+            <param name="recordedLength">Length of the streamed</param>
+            <param name="recordDone">recordDone = false :streaming is not over.recordDone = true :streaming is over.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.WaitUntilDone(System.Int32)">
+            <summary>
+            Waiting until current task to complete.
+            </summary>
+            <param name="timeout">timeout = -1, wait until done, other positive number N, wait N mS. If not done, a timeout error generate.</param>
+            <returns></returns>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.Start">
+            <summary>
+            Start AI task .
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.SendSoftwareTrigger">
+            <summary>
+            Generate a software trigger. 
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.Stop">
+            <summary>
+            Stop AI task .
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.Finalize">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AITask.ScaleData(System.Int32[],System.Double[]@)">
+            <summary>
+            
+            </summary>
+            <param name="originalData"></param>
+            <param name="scaleData"></param>
+        </member>
+        <member name="T:JYUSB1601.AITerminal">
+            <summary>
+            AITerminal
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AITerminal.RSE">
+            <summary>
+            RSE
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AITerminal.Differential">
+            <summary>
+            Differential
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AIChannel">
+            <summary>
+            AI Channel parameter class .
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIChannel.ChannelID">
+            <summary>
+            AI channel ID.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIChannel.RangeLow">
+            <summary>
+            Low range limit an AI channel.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIChannel.RangeHigh">
+            <summary>
+            High range limit an AI channel.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIChannel.Terminal">
+            <summary>
+            Configure AI terminal.(RSE,Differential)
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.AIChannel.#ctor(System.Int32,System.Double,System.Double,JYUSB1601.AITerminal)">
+            <summary>
+            Constructor to create an AIChnParam task object.
+            </summary>
+            <param name="channelId">AI channel ID.</param>
+            <param name="rangeLow">Low range limit an AI channel.</param>
+            <param name="rangeHigh">High range limit an AI channel.</param>
+            <param name="terminalCfg">Configure AI terminal.</param>
+        </member>
+        <member name="T:JYUSB1601.AIBandwidth">
+            <summary>
+            AI BandWidth
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIBandwidth._39KHz">
+            <summary>
+            39KHz BandWidth
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIBandwidth._15KHz">
+            <summary>
+            15KHz BandWidth
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIBandwidth._80KHz">
+            <summary>
+            80KHz BandWidth
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AITriggerType">
+            <summary>
+            Trigger Type Digital/Analog/Immediate/Soft
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AITriggerType.Immediate">
+            <summary>
+            Immediate Trigger
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AITriggerType.Digital">
+            <summary>
+            Digital Trigger
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AITriggerType.Soft">
+            <summary>
+            Soft Trigger
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AIDigitalTriggerEdge">
+            <summary>
+            AI Digital Trigger Edge
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerEdge.Rising">
+            <summary>
+            RisingEdge
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerEdge.Falling">
+            <summary>
+            FallingEdge
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerEdge.HighLevel">
+            <summary>
+            High Level
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerEdge.LowLevel">
+            <summary>
+            Low Level
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AIMode">
+            <summary>
+            AIMode
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIMode.Single">
+            <summary>
+            Single
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIMode.Finite">
+            <summary>
+            Finite
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIMode.Continuous">
+            <summary>
+            Continuous
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIMode.Record">
+            <summary>
+            Record
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AISampleClockSource">
+            <summary>
+            AI Sample Clock Source
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AISampleClockSource.Internal">
+            <summary>
+            Internal Clock Source
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AISampleClockSource.External">
+            <summary>
+            External Clock Source
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AISampleClock">
+            <summary>
+            Sample clock configuration class
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AISampleClock.Source">
+            <summary>
+            AI Sample Clock Source. enum  Internal/External. The default value is <see cref="F:JYUSB1601.AISampleClockSource.Internal"/>.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AISampleClock.External">
+            <summary>
+            External Sample Clock Configuration. Valid when <see cref="P:JYUSB1601.AISampleClock.Source"/> is <see cref="F:JYUSB1601.AISampleClockSource.External"/>.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AIExternalSampleClock">
+            <summary>
+            External Sample Clock Configuration Class
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIExternalSampleClock.ExpectedRate">
+            <summary>
+            Expected External Sample Clock Rate
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AITrigger">
+            <summary>
+            Constructor to create an AITrigger task object. Used to build AI Trigger
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AITrigger.Type">
+            <summary>
+             AI trigger type. enum Analog/Digital/Immediate/Soft. The default value is <see cref="F:JYUSB1601.AITriggerType.Immediate"/>.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AITrigger.Digital">
+            <summary>
+             Digital Trigger Congfiguration. Valid when <see cref="P:JYUSB1601.AITrigger.Type"/> is <see cref="F:JYUSB1601.AITriggerType.Digital"/>.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AIDigitalTrigger">
+            <summary>
+            AI Digital trigger class.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIDigitalTrigger.Edge">
+            <summary>
+            Digital Trigger edge，Rising/Falling.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIDigitalTrigger.Source">
+            <summary>
+            Digital Trigger Source.Min pulse width 3us.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIDigitalTrigger.DebounceCount">
+            <summary>
+            AI Digital Trigger Debounce Count, unit us. range: 3- 65535
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AIDigitalTriggerSource">
+            <summary>
+            Output DestinationTerminal
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_0">
+            <summary>
+            DIO_0
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_1">
+            <summary>
+            DIO_1
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_2">
+            <summary>
+            DIO_2
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_3">
+            <summary>
+            DIO_3
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_4">
+            <summary>
+            DIO_4
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_5">
+            <summary>
+            DIO_5
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_6">
+            <summary>
+            DIO_6
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_7">
+            <summary>
+            DIO_7
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_8">
+            <summary>
+            DIO_8
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_9">
+            <summary>
+            DIO_9
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_10">
+            <summary>
+            DIO_10
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_11">
+            <summary>
+            DIO_11
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_12">
+            <summary>
+            DIO_12
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_13">
+            <summary>
+            DIO_13
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_14">
+            <summary>
+            DIO_14
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AIDigitalTriggerSource.DIO_15">
+            <summary>
+            DIO_15
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AIRecord">
+            <summary>
+            AI Record Parameters.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIRecord.FilePath">
+            <summary>
+            User specified file path.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIRecord.FileFormat">
+            <summary>
+            Streaming file format. enum BIN.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIRecord.Mode">
+            <summary>
+            stream mode . enum Finite/Infinite.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AIRecord.Length">
+            <summary>
+            User specified stream length in second. Only when <see cref="P:JYUSB1601.AIRecord.Mode"/> is <see cref="F:JYUSB1601.RecordMode.Finite"/>.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.FileFormat">
+            <summary>
+            Streaming file format. enum BIN.
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.FileFormat.Bin">
+            <summary>
+            <para xml:lang="zh_CN">BIN。</para>
+            <para xml:lang="en_US">BIN. </para>
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.RecordMode">
+            <summary>
+            stream mode .enum Finite/Infinite
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.RecordMode.Finite">
+            <summary>
+            Finite Streaming
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.RecordMode.Infinite">
+            <summary>
+            Infinite Streaming
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.SignalExportDestination">
+            <summary>
+            Output DestinationTerminal
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_0">
+            <summary>
+            DIO_0
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_1">
+            <summary>
+            DIO_1
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_2">
+            <summary>
+            DIO_2
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_3">
+            <summary>
+            DIO_3
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_4">
+            <summary>
+            DIO_4
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_5">
+            <summary>
+            DIO_5
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_6">
+            <summary>
+            DIO_6
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_7">
+            <summary>
+            DIO_7
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_8">
+            <summary>
+            DIO_8
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_9">
+            <summary>
+            DIO_9
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_10">
+            <summary>
+            DIO_10
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_11">
+            <summary>
+            DIO_11
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_12">
+            <summary>
+            DIO_12
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_13">
+            <summary>
+            DIO_13
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_14">
+            <summary>
+            DIO_14
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.SignalExportDestination.DIO_15">
+            <summary>
+            DIO_15
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AISignalExportSource">
+            <summary>
+            AI Signal Export Source
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AISignalExportSource.StartTrig">
+            <summary>
+            AI_StartTrig
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AISignalExportSource.SampleClock">
+            <summary>
+            AI_SampleClock
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AISignalExport">
+            <summary>
+            AI Signal Export Class
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AISignalExport.Destination">
+            <summary>
+            Export Signal List
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.AISignalExport.Add(JYUSB1601.AISignalExportSource,JYUSB1601.SignalExportDestination)">
+            <summary>
+            Export one Signal to Desination
+            </summary>
+            <param name="source">AI Signal Source</param>
+            <param name="destination">Export Desination</param>
+        </member>
+        <member name="M:JYUSB1601.AISignalExport.Add(JYUSB1601.AISignalExportSource,System.Collections.Generic.List{JYUSB1601.SignalExportDestination})">
+            <summary>
+            Export one Signal to Mutil Desination
+            </summary>
+            <param name="source">AI Signal Source</param>
+            <param name="destinations"> Mutil Export Desinations</param>
+        </member>
+        <member name="M:JYUSB1601.AISignalExport.Clear(JYUSB1601.SignalExportDestination)">
+            <summary>
+            Clear one Signal Export
+            </summary>
+            <param name="destination">Export Desination</param>
+        </member>
+        <member name="M:JYUSB1601.AISignalExport.ClearAll">
+            <summary>
+            Clear All Signal Export
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.AISignalExport.#ctor(JYUSB1601.JYUSB1601Device)">
+            <summary>
+            internal constructor
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.JYUSB1601AOTask">
+            <summary>
+            JYUSB1601 Analog Output Task
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.#ctor">
+            <summary>
+            Constructor,Used to create an AO Task by a slot number
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.#ctor(System.String)">
+            <summary>
+            Constructor. Used to create an AO task by a board name.
+            </summary>
+            <param name="boardName">Board name(device alias), set by device manager</param>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AOTask.Mode">
+            <summary>
+            Mode of AO Task. Select AO Mode from enum:ContinuousNoWrapping/ContinuousWrapping/Finite/Single.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AOTask.UpdateRate">
+            <summary>
+            Update rate per channel. Maximum update rate is 2.86M for single channel, 2M for two channels, 1.5M for three channels, 1.25M for four channels.
+            The defalut sample rate = 1000000
+            You can read this property to obtain the update rate that will actually take effect in the current configuration.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AOTask.SamplesToUpdate">
+            <summary>
+            Number of output samples to write per channel , Only valid when <see cref="P:JYUSB1601.JYUSB1601AOTask.Mode"/> is <see cref="F:JYUSB1601.AOMode.Finite"/>.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AOTask.AvaliableLenInSamples">
+            <summary>
+            Number of output samples per channel that can be write in AO buffuer.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AOTask.CompleteState">
+            <summary>
+            AO Output Complete State,  Default is Hold.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AOTask.TransferedSamples">
+            <summary>
+            The number of samples that have been transfered from the local buffer (per channel).  Valid when <see cref="P:JYUSB1601.JYUSB1601AOTask.Mode"/> is NOT <see cref="F:JYUSB1601.AOMode.Single"/>.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AOTask.SampleClock">
+            <summary>
+            AO Sample Clock Configuration .
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AOTask.Trigger">
+            <summary>
+            AO Trigger Configuration.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AOTask.SignalExport">
+            <summary>
+            Export AO Signal
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601AOTask.Device">
+            <summary>
+            Device 
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.AddChannel(System.Int32)">
+            <summary>
+            Add one channel. 
+            </summary>
+            <param name="chnId">channel's physical number ，chnId=-1, add all channels。</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.AddChannel(System.Int32[])">
+            <summary>
+            Add a group of channels.
+            </summary>
+            <param name="chnsId">a group of channel physical numbers。</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.RemoveChannel(System.Int32)">
+            <summary>
+            Delete the specified channel number. If it is -1, delete all channels.
+            </summary>
+            <param name="chnId">Specified channel ID.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.WriteData(System.IntPtr,System.Int32,System.Int32)">
+            <summary>
+            Write to AO buffer one or multi-channel data. The buffer is pointed by C# data type IntPtr.
+            </summary>
+            <param name="buf">data buffer.</param>
+            <param name="samplesPerChannel">Number of samples per channel</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.WriteData(System.Double[0:,0:],System.Int32)">
+            <summary>
+            Write multi-channel data to AO buffer, Each column represents one channel.
+            </summary>
+            <param name="buf">AO buffer for data.</param>
+            <param name="timeout">timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.WriteData(System.Double[],System.Int32)">
+            <summary>
+            Write one channel data  to AO buffer.
+            </summary>
+            <param name="buf">AO buffer for  data.</param>
+            <param name="timeout">>timeout before generating error message, uint is ms。 timeout =-1 keep waiting until finish.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.WriteSinglePoint(System.Double[])">
+            <summary>
+            write one sample to all channels in register . Available when <see cref = "P:JYUSB1601.JYUSB1601AOTask.Mode" /> is  <see cref = "F:JYUSB1601.AOMode.Single" />
+            </summary>
+            <param name="writeValues">Write values. Array length >= <see cref = "P:JYUSB1601.JYUSB1601AOTask.Channels" />.Count.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.WriteSinglePoint(System.Double,System.Int32)">
+            <summary>
+            Write one sample to the specified channel in register.Available when <see cref = "P:JYUSB1601.JYUSB1601AOTask.Mode" /> is  <see cref = "F:JYUSB1601.AOMode.Single" />
+            </summary>
+            <param name="writeValue">Write value.</param>
+            <param name="channel">Specified channel. </param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.WaitUntilDone(System.Int32)">
+            <summary>
+            Waiting until current task to complete. Available when <see cref = "P:JYUSB1601.JYUSB1601AOTask.Mode" /> is  <see cref = "F:JYUSB1601.AOMode.Finite" />
+            </summary>
+            <param name="timeout">timeout = -1, wait until done, other positive number N, wait N mS. If not done, a timeout error generate.</param>
+            <returns></returns>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.Start">
+            <summary>
+            Start AO task .
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.SendSoftwareTrigger">
+            <summary>
+            Generate a software trigger.
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.Stop">
+            <summary>
+            Stop AO task .
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601AOTask.Finalize">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AOChannel">
+            <summary>
+            AO Channel parameter class
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AOChannel.ChannelID">
+            <summary>
+            AO channel ID.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AODigitalTriggerEdge">
+            <summary>
+            AO Digital Trigger Edge
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerEdge.Rising">
+            <summary>
+            RisingEdge
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerEdge.Falling">
+            <summary>
+            FallingEdge
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerEdge.HighLevel">
+            <summary>
+            High Level
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerEdge.LowLevel">
+            <summary>
+            Low Level
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.OutputCompleteState">
+            <summary>
+            Output Complete State
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.OutputCompleteState.Zero">
+            <summary>
+            Output Complete Zero
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.OutputCompleteState.Hold">
+            <summary>
+            Output Complete Hold in The last point
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AOMode">
+            <summary>
+            AOMode
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOMode.Single">
+            <summary>
+            Single
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOMode.Finite">
+            <summary>
+            Finite
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOMode.ContinuousNoWrapping">
+            <summary>
+            ContinuousNoWrapping
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOMode.ContinuousWrapping">
+            <summary>
+            ContinuousWrapping
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AOSampleClockSource">
+            <summary>
+            AO Sample Clock Source
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOSampleClockSource.Internal">
+            <summary>
+            Internal Clock Source
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOSampleClockSource.External">
+            <summary>
+            External Clock Source
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AOSampleClock">
+            <summary>
+            AO Sample clock configuration class
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AOSampleClock.Source">
+            <summary>
+            Clock Source. enum  Internal/External,The default value is <see cref="F:JYUSB1601.AOSampleClockSource.Internal"/>.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AOSampleClock.External">
+            <summary>
+            External Sample Clock Configuration,Valid when <see cref="P:JYUSB1601.AOSampleClock.Source"/> is <see cref="F:JYUSB1601.AOSampleClockSource.External"/>.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AOExternalSampleClock">
+            <summary>
+            External Sample Clock Configuration Class
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AOExternalSampleClock.ExpectedRate">
+            <summary>
+            Expected External Sample Clock Rate
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AOSignalExportSource">
+            <summary>
+            SourceSignal
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOSignalExportSource.StartTrig">
+            <summary>
+            AO_StartTrig
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOSignalExportSource.SampleClock">
+            <summary>
+            AO_SampleClock
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AOTriggerType">
+            <summary>
+            TriggerType Digital/Immediate/Soft
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOTriggerType.Immediate">
+            <summary>
+            Immediate Trigger
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOTriggerType.Digital">
+            <summary>
+            Digital Trigger
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AOTriggerType.Soft">
+            <summary>
+            Soft Trigger
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AOTrigger">
+            <summary>
+            Constructor to create an AOTrigger task object. Used to build AO Trigger
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AOTrigger.Type">
+            <summary>
+            AO trigger type. enum Immediate/Digital/Soft.The default value is <see cref="F:JYUSB1601.AOTriggerType.Immediate"/>.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AOTrigger.Digital">
+            <summary>
+            AO Digital Trigger. Min pulse width 3us. Valid when <see cref="P:JYUSB1601.AOTrigger.Type"/> is <see cref="F:JYUSB1601.AOTriggerType.Digital"/>.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AODigitalTrigger">
+            <summary>
+            AO Digital trigger .
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AODigitalTrigger.Source">
+            <summary>
+            AO Digital Trigger source. 
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AODigitalTrigger.Edge">
+            <summary>
+            Digital Trigger edge，Rising/Falling.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AODigitalTrigger.DebounceCount">
+            <summary>
+            AI Digital Trigger Debounce Count, unit us. range: 3- 65535
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AODigitalTriggerSource">
+            <summary>
+            Output DestinationTerminal
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_0">
+            <summary>
+            DIO_0
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_1">
+            <summary>
+            DIO_1
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_2">
+            <summary>
+            DIO_2
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_3">
+            <summary>
+            DIO_3
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_4">
+            <summary>
+            DIO_4
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_5">
+            <summary>
+            DIO_5
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_6">
+            <summary>
+            DIO_6
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_7">
+            <summary>
+            DIO_7
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_8">
+            <summary>
+            DIO_8
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_9">
+            <summary>
+            DIO_9
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_10">
+            <summary>
+            DIO_10
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_11">
+            <summary>
+            DIO_11
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_12">
+            <summary>
+            DIO_12
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_13">
+            <summary>
+            DIO_13
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_14">
+            <summary>
+            DIO_14
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.AODigitalTriggerSource.DIO_15">
+            <summary>
+            DIO_15
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.AOSignalExport">
+            <summary>
+            AO Signal Export Class
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.AOSignalExport.Destination">
+            <summary>
+            Export Signal List
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.AOSignalExport.Add(JYUSB1601.AOSignalExportSource,JYUSB1601.SignalExportDestination)">
+            <summary>
+            Export one Signal to Desination
+            </summary>
+            <param name="source">AO Signal Source</param>
+            <param name="destination">Export Desination</param>
+        </member>
+        <member name="M:JYUSB1601.AOSignalExport.Add(JYUSB1601.AOSignalExportSource,System.Collections.Generic.List{JYUSB1601.SignalExportDestination})">
+            <summary>
+            Export one Signal to Mutil Desination
+            </summary>
+            <param name="source">AO Signal Source</param>
+            <param name="destinations"> Mutil Export Desinations</param>
+        </member>
+        <member name="M:JYUSB1601.AOSignalExport.Clear(JYUSB1601.SignalExportDestination)">
+            <summary>
+            Clear one Signal Export
+            </summary>
+            <param name="destination">Export Desination</param>
+        </member>
+        <member name="M:JYUSB1601.AOSignalExport.ClearAll">
+            <summary>
+            Clear All Signal Export
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.AOSignalExport.#ctor(JYUSB1601.JYUSB1601Device)">
+            <summary>
+            internal constructor
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.JYUSB1601CITask">
+            <summary>
+            JYUSB1601 Counter Input Task
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601CITask.#ctor(System.Int32)">
+            <summary>
+            Constructor. Used to create an CI task by a slot number.
+            </summary>
+            <param name="channel">Counter channel suppor0-1</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601CITask.#ctor(System.String,System.Int32)">
+            <summary>
+            Constructor. Used to create an m task by a board name.
+            </summary>
+            <param name="boardName">Board name(device alias), set by device manager</param>
+            <param name="channel">Counter channel （5112 support0-1）.</param>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601CITask.Type">
+            <summary>
+            CI Application types.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601CITask.EdgeCounting">
+            <summary>
+            Edge Counting Configuration
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601CITask.FrequencyMeas">
+            <summary>
+            Frequency Measurement Configuration
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601CITask.PeriodMeas">
+            <summary>
+            Period Measurement Configuration
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601CITask.PulseMeas">
+            <summary>
+            Pulse Measurement Configuration
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601CITask.TwoEdgeSeparation">
+            <summary>
+            TwoEdgeSeparation
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601CITask.QuadEncoder">
+            <summary>
+            QuadEncoder
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601CITask.Device">
+            <summary>
+            Device 
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601CITask.Start">
+            <summary>
+            Start CI task . 
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601CITask.Stop">
+            <summary>
+            Stop CI task .
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601CITask.ReadSinglePoint(System.UInt32@)">
+            <summary>
+            Read a signle count value from register,  Available when <see cref="P:JYUSB1601.JYUSB1601CITask.Type"/> is <see cref="F:JYUSB1601.CIType.EdgeCounting"/> , <see cref="F:JYUSB1601.CIType.QuadEncoder"/> or <see cref="!:CIType.TwoPulseEncoder"/> 
+            </summary>
+            <param name="count">counter value。</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601CITask.ReadSinglePoint(System.Double@,System.Int32)">
+            <summary>
+            Read a signle frequency value or period value from register. Valid when <see cref="P:JYUSB1601.JYUSB1601CITask.Type"/> is <see cref="F:JYUSB1601.CIType.Frequency"/> or <see cref="F:JYUSB1601.CIType.Period"/>.
+            </summary>
+            <param name="measurement">
+            Measurement value. Indicates frequency in Hz when <see cref="P:JYUSB1601.JYUSB1601CITask.Type"/> is <see cref="F:JYUSB1601.CIType.Frequency"/>; Indicates period is seconds when <see cref="P:JYUSB1601.JYUSB1601CITask.Type"/> is <see cref="F:JYUSB1601.CIType.Period"/>.
+            </param>
+            <param name="timeout">   
+            Timeout (ms). Wait until the measurement is completed or timed out. If it times out, a timeout exception will be thrown. When the value is -1, it never times out.
+            </param>  
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601CITask.ReadSinglePoint(System.Double@,System.Double@,System.Int32)">
+            <summary>
+            Read a signle measurement of pulse's duration value, or two-edge separtion value (two results at a time) from register. Available when <see cref="P:JYUSB1601.JYUSB1601CITask.Type"/> is <see cref="F:JYUSB1601.CIType.Pulse"/> or <see cref="F:JYUSB1601.CIType.TwoEdgeSeparation"/>.
+            </summary>
+            <param name="measurement1">
+            Measurement Value 1. Indicates low level duration in seconds when <see cref="P:JYUSB1601.JYUSB1601CITask.Type"/> is <see cref="F:JYUSB1601.CIType.Pulse"/>；Indicates separation between the rising edge of the first signal and the rising edge of the second signal when <see cref="P:JYUSB1601.JYUSB1601CITask.Type"/> is <see cref="F:JYUSB1601.CIType.TwoEdgeSeparation"/>.
+            </param>
+            <param name="measurement2">
+            Measurement Value 2. Indicates high level duration in seconds when <see cref="P:JYUSB1601.JYUSB1601CITask.Type"/> is <see cref="F:JYUSB1601.CIType.Pulse"/> ；Indicates seperation between previous rising edge of the second signal and current rising edge of the first signal when <see cref="P:JYUSB1601.JYUSB1601CITask.Type"/> is <see cref="F:JYUSB1601.CIType.TwoEdgeSeparation"/>.
+            </param>
+            <param name="timeout">   
+            Timeout (ms). Wait until the measurement is completed or timed out. If it times out, a timeout exception will be thrown. When the value is -1, it never times out.
+            </param>  
+        </member>
+        <member name="T:JYUSB1601.CountDirection">
+            <summary>
+            Counter direction. enum Up/Down/External
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.CountDirection.Up">
+            <summary>
+            Counter increases
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.CountDirection.Down">
+            <summary>
+            Counter decreases
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.CIType">
+            <summary>
+            Counter Input Application Type.
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.CIType.EdgeCounting">
+            <summary>
+            Edge Counting
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.CIType.Period">
+            <summary>
+            Period Measure
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.CIType.Frequency">
+            <summary>
+            Frequenc Measure
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.CIType.Pulse">
+            <summary>
+            Pulse Measure
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.CIType.TwoEdgeSeparation">
+            <summary>
+            TwoEdgeSeparation Measure
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.CIType.QuadEncoder">
+            <summary>
+            QuadEncoder
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.EdgeType">
+            <summary>
+            Edge Type
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.EdgeType.Rising">
+            <summary>
+            Rising Edge
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.EdgeType.Falling">
+            <summary>
+            Falling Edge
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.EdgeType.Any">
+            <summary>
+            Any Edge
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.EdgeCounting">
+            <summary>
+            Configure CI EdgeCounting.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.EdgeCounting.InitialCount">
+            <summary>
+            Initial Count
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.EdgeCounting.Direction">
+            <summary>
+            Counter direction. enum Up/Down/External
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.EdgeCounting.Pause">
+            <summary>
+            Pause Trigger Configuration
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.EdgeCounting.OutEvent">
+            <summary>
+            Edge counting output event. A pulse will be generated when the count value reaches specified threshold
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.EdgeCntOunEvtIdleState">
+            <summary>
+            Output idle state when the event has not occurred.
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.EdgeCntOunEvtIdleState.LowLevel">
+            <summary>
+            Idle state is low level.
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.EdgeCntOunEvtIdleState.HighLevel">
+            <summary>
+            Idle state is high level.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.EdgeCountingOutEvent">
+            <summary>
+            Edge counting output event configuration class
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.EdgeCountingOutEvent.IdleState">
+            <summary>
+            Output idle state when the event has not occurred. The default value is <see cref="F:JYUSB1601.EdgeCntOunEvtIdleState.LowLevel"/>
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.EdgeCountingOutEvent.Threshold">
+            <summary>
+            Comparison threshold. The default value is 2^32-1
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.LevelPolarity">
+            <summary>
+            Level Polarity
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.LevelPolarity.LowLevel">
+            <summary>
+            Low level
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.LevelPolarity.HighLevel">
+            <summary>
+            High level
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.LevelPolarity.None">
+            <summary>
+            No active polarity.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.PauseTrigger">
+            <summary>
+            Pause trigger configuration class.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.PauseTrigger.ActivePolarity">
+            <summary>
+            Pause trigger active polarity. The default value is <see cref="F:JYUSB1601.LevelPolarity.None"/>, means the pause trigger is disabled.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.FrequencyMeas">
+            <summary>
+            Configure CI Measure.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.PeriodMeas">
+            <summary>
+            Configure CI Measure.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.PulseMeas">
+            <summary>
+            Configure CI Measure.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.TwoEdgeSeparation">
+            <summary>
+            Configure CI Measure.
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.TwoEdgeSeparation.#ctor(System.UInt32)">
+            <summary>
+            构造函数
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.QuadEncodingType">
+            <summary>
+            Quadrature Encoding Type
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.QuadEncodingType.X2">
+            <summary>
+            X2
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.QuadEncodingType.X4">
+            <summary>
+            X4
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.QuadEncoder">
+            <summary>
+            Configure CI Measure.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.QuadEncoder.EncodingType">
+            <summary>
+            Type of Encoding
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.QuadEncoder.ZReloadEnabled">
+            <summary>
+            In Encoder mode ,the Z signal enable
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.QuadEncoder.InitialCount">
+            <summary>
+            Initial Count
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.TwoPulseEncoder">
+            <summary>
+            Configure CI Measure.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.TwoPulseEncoder.InitialCount">
+            <summary>
+            Initial Count
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.JYUSB1601COTask">
+            <summary>
+            JYUSB1601 Counter Output Task
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601COTask.#ctor(System.Int32)">
+            <summary>
+            Constructor. Used to create an CO task by a slot number.
+            </summary>
+            <param name="channel">Counter channel （1601 support0-1）.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601COTask.#ctor(System.String,System.Int32)">
+            <summary>
+            Constructor. Used to create an CO task by a board name.
+            </summary>
+            <param name="boardName">Board name(device alias), set by device manager</param>
+            <param name="channel">Counter channel （5112 support0-1）.</param>
+        </member>
+        <member name="F:JYUSB1601.JYUSB1601COTask._pulse">
+            <summary>
+            <see cref="!:Mode"/>为<see cref="!:COMode.Single"/>时生效的输出脉冲参数
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601COTask.Pause">
+            <summary>
+            <para xml:lang="zh_CN">暂停触发配置</para>
+            <para xml:lang="en_US">Pause Trigger Configuration</para>
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601COTask.IdleState">
+            <summary>
+            Idle state when pulse output before start and after stop.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601COTask.Device">
+            <summary>
+            Device 
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601COTask.WriteSinglePoint(JYUSB1601.COPulse)">
+            <summary>
+            Write a single pulse parameter to the register. This function is also available after starting the task when the number of pulses being sent is infinite.
+            </summary>
+            <param name="pulse">
+            Pulse Parameter
+            </param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601COTask.Start">
+            <summary>
+            Start CO task .
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601COTask.Stop">
+            <summary>
+            Stop COtask . 
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601COTask.WaitUntilDone(System.Int32)">
+            <summary>
+            Waiting until current task to complete.
+            </summary>
+            <param name="timeout">timeout = -1, wait until done, other positive number N, wait N mS. If not done, a timeout error generate.</param>
+            <returns></returns>
+        </member>
+        <member name="T:JYUSB1601.COIdleState">
+            <summary>
+            Idle state when pulse output before start and after stop.
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.COIdleState.HighLevel">
+            <summary>
+            Idle state is high level.
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.COIdleState.LowLevel">
+            <summary>
+            Idle state is low level.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.COPulse">
+            <summary>
+            Pulse Parameter
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.COPulse.#ctor(JYUSB1601.COPulseType,System.Double,System.Double,System.Int32)">
+            <summary>
+            Pulse Parameter
+            </summary>
+            <param name="type">
+            The pulse type characteristics.
+            </param>
+            <param name="param1">
+            Parameter 1. Frequency (Hz) when constructed as <see cref="F:JYUSB1601.COPulseType.DutyCycleFrequency"/>; High duration in seconds when constructed as <see cref="F:JYUSB1601.COPulseType.HighLowTime"/>; High ticks of the clock when constructed as <see cref="F:JYUSB1601.COPulseType.HighLowTick"/>.
+            </param>
+            <param name="param2">
+            Parameter 1. Duty cycle (greater than 0 and less than 1) when constructed as <see cref="F:JYUSB1601.COPulseType.DutyCycleFrequency"/>; Low duration in seconds when constructed as <see cref="F:JYUSB1601.COPulseType.HighLowTime"/>; Low ticks of the clock when constructed as <see cref="F:JYUSB1601.COPulseType.HighLowTick"/>.
+            </param>
+            <param name="count">
+            Number of pulses. When the value is -1 (indicating that the number of pulses is infinite), pulses will be continuously sent until requested to stop.
+            </param>
+        </member>
+        <member name="P:JYUSB1601.COPulse.Count">
+            <summary>
+            待发送脉冲数
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.COPulse.IsCountUnlimited">
+            <summary>
+            待发送的脉冲数是否为无限
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.COPulseType">
+            <summary>
+            Set pulse type.enum DutyCycleFrequencyenum/HighLowTime/HighLowTick.
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.COPulseType.DutyCycleFrequency">
+            <summary>
+            Configure CO output pulse according to its DutyCycle and Freqency.
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.COPulseType.HighLowTime">
+            <summary>
+            Configure CO output pulse according to duration of its high/low  voltage levels.
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.COPulseType.HighLowTick">
+            <summary>
+            Configure CO output pulse according to its high/low  tick  level.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.JYUSB1601DITask">
+            <summary>
+            JYUSB1601 Digital Iuput Task
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DITask.#ctor">
+            <summary>
+            Constructor. Used to create an DItask by a slot number.
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DITask.#ctor(System.String)">
+            <summary>
+            Constructor. Used to create an DI task by a board name.
+            </summary>
+            <param name="boardName">Board name(device alias), set by device manager</param>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601DITask.Channels">
+            <summary>
+            List of DI channels,(1601 support 8 lines)
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601DITask.Device">
+            <summary>
+            Device 
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DITask.AddChannel(System.Int32)">
+            <summary>
+            Add one channel
+            </summary>
+            <param name="lineNum">line number  to be added.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DITask.AddChannel(System.Int32[])">
+            <summary>
+            Add a group of channel.
+            </summary>
+            <param name="linesNum">an array of line numbers of added lines. </param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DITask.RemoveChannel(System.Int32)">
+            <summary>
+            Delete the specified line number .If it is -1, delete all lines.
+            </summary>
+            <param name="lineNum">port number  to be delete.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DITask.Start">
+            <summary>
+            Start DI task .
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DITask.Stop">
+            <summary>
+            Stop DI task .
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DITask.ReadSinglePoint(System.Boolean@,System.Int32)">
+            <summary>
+            Read one sample for specified line in register.
+            </summary>
+            <param name="readValue">values read.</param>
+            <param name="line">Specified line number.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DITask.ReadSinglePoint(System.Boolean[]@)">
+            <summary>
+            Read one sample for all lines in register
+            </summary>
+            <param name="readValues">Values read. Buffer size >= number of lines.</param>
+        </member>
+        <member name="T:JYUSB1601.DIChannel">
+            <summary>
+            DI Channel parameter class .
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.DIChannel.LineNum">
+            <summary>
+            port number.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.JYUSB1601DOTask">
+            <summary>
+            JYUSB1601 Digital Output Task
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DOTask.#ctor">
+            <summary>
+            Constructor. Used to create an DOtask by a slot number.
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DOTask.#ctor(System.String)">
+            <summary>
+            Constructor. Used to create an DO task by a board name.
+            </summary>
+            <param name="boardName">Board name(device alias), set by device manager</param>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601DOTask.Channels">
+            <summary>
+            List of DO channels,(1601 support 8 lines)
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.JYUSB1601DOTask.Device">
+            <summary>
+            Device 
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DOTask.AddChannel(System.Int32)">
+            <summary>
+            Add one channel.
+            </summary>
+            <param name="lineNum">line number  to be added.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DOTask.AddChannel(System.Int32[])">
+            <summary>
+            Add a group of channels.
+            </summary>
+            <param name="linesNum">an array of line numbers of added lines.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DOTask.RemoveChannel(System.Int32)">
+            <summary>
+            Delete the specified line number .If it is -1, delete all lines.
+            </summary>
+            <param name="lineNum">line number  to be delete.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DOTask.Start">
+            <summary>
+            Start DO task .
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DOTask.Stop">
+            <summary>
+            Stop DO task .
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DOTask.WriteSinglePoint(System.Boolean,System.Int32)">
+            <summary>
+            Write one sample to the specified line in register.
+            </summary>
+            <param name="writeValue">Write values.</param>
+            <param name="line">Specified line.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DOTask.WriteSinglePoint(System.Boolean[])">
+            <summary>
+            write one sample to all lines in register .
+            </summary>
+            <param name="writeValues">Data to be written.Buffer size >= number of lines。</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601DOTask.Finalize">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.DOChannel">
+            <summary>
+            DO Channel parameter class .
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.DOChannel.LineNum">
+            <summary>
+            port number.
+            </summary>
+        </member>
+        <member name="T:JYUSB1601.JYUSB1601Miscellaneous">
+            <summary>
+            JYUSB1601 Miscellaneous parameters.
+            </summary>
+        </member>
+        <member name="F:JYUSB1601.JYUSB1601Miscellaneous._devices">
+            <summary>
+            List to keep param of all devices.
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Miscellaneous.SetAICalibrationState(JYUSB1601.JYUSB1601Device,System.Boolean)">
+            <summary>
+            Set AI calibration state
+            </summary>
+            <param name="device"></param>
+            <param name="disableCalibration">AI calibration of device is disabled when set as true. The default value is false.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Miscellaneous.GetAICalibrationState(JYUSB1601.JYUSB1601Device)">
+            <summary>
+            Return true if AI calibration of device is disabled.
+            </summary>
+            <param name="device"></param>
+            <returns> Return true if AI calibration of device is disabled.</returns>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Miscellaneous.SetAOCalibrationState(JYUSB1601.JYUSB1601Device,System.Boolean)">
+            <summary>
+            Set AO calibration state
+            </summary>
+            <param name="device"></param>
+            <param name="disableCalibration">AO calibration of device is disabled when set as true. The default value is false.</param>
+        </member>
+        <member name="M:JYUSB1601.JYUSB1601Miscellaneous.GetAOCalibrationState(JYUSB1601.JYUSB1601Device)">
+            <summary>
+            Return true if AO calibration of device is disabled.
+            </summary>
+            <param name="device"></param>
+            <returns> Return true if AO calibration of device is disabled.</returns>
+        </member>
+        <member name="T:JYUSB1601.DeviceMiscellaneousParam">
+            <summary>
+            Device miscellaneous param
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.DeviceMiscellaneousParam.Device">
+            <summary>
+            Device.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.DeviceMiscellaneousParam.DisableAICalibration">
+            <summary>
+            AI Calibration is disabled when this property is true. The default value is false.
+            </summary>
+        </member>
+        <member name="P:JYUSB1601.DeviceMiscellaneousParam.DisableAOCalibration">
+            <summary>
+            AO Calibration is disabled when this property is true. The default value is false.
+            </summary>
+        </member>
+        <member name="M:JYUSB1601.DeviceMiscellaneousParam.#ctor(JYUSB1601.JYUSB1601Device)">
+            <summary>
+            默认校准开启。
+            </summary>
+            <param name="device"></param>
+        </member>
+    </members>
+</doc>

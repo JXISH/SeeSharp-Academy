@@ -51,6 +51,8 @@ namespace FormExample
             this.colFrequency = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAmplitude = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBoxMonitorSettings = new System.Windows.Forms.GroupBox();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownChannelIndex)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSampleRate)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownBlockLength)).BeginInit();
@@ -301,7 +303,7 @@ namespace FormExample
             this.btStart.Image = null;
             this.btStart.ImageSize = new System.Drawing.Size(0, 0);
             this.btStart.ImageStretch = false;
-            this.btStart.Location = new System.Drawing.Point(628, 175);
+            this.btStart.Location = new System.Drawing.Point(628, 218);
             this.btStart.Name = "btStart";
             this.btStart.PreSetImage = SeeSharpTools.JY.GUI.EasyButton.ButtonPresetImage.None;
             this.btStart.Shadow = true;
@@ -313,7 +315,7 @@ namespace FormExample
             // 
             // textBoxDeviceName
             // 
-            this.textBoxDeviceName.Location = new System.Drawing.Point(148, 14);
+            this.textBoxDeviceName.Location = new System.Drawing.Point(147, 58);
             this.textBoxDeviceName.Name = "textBoxDeviceName";
             this.textBoxDeviceName.Size = new System.Drawing.Size(100, 21);
             this.textBoxDeviceName.TabIndex = 2;
@@ -322,7 +324,7 @@ namespace FormExample
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(18, 17);
+            this.label1.Location = new System.Drawing.Point(17, 61);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(71, 12);
             this.label1.TabIndex = 3;
@@ -331,7 +333,7 @@ namespace FormExample
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(18, 43);
+            this.label2.Location = new System.Drawing.Point(17, 87);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(83, 12);
             this.label2.TabIndex = 3;
@@ -340,7 +342,7 @@ namespace FormExample
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(18, 70);
+            this.label3.Location = new System.Drawing.Point(17, 114);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(107, 12);
             this.label3.TabIndex = 3;
@@ -349,7 +351,7 @@ namespace FormExample
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(18, 97);
+            this.label4.Location = new System.Drawing.Point(17, 141);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(77, 12);
             this.label4.TabIndex = 3;
@@ -358,7 +360,7 @@ namespace FormExample
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(18, 124);
+            this.label5.Location = new System.Drawing.Point(17, 168);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(125, 12);
             this.label5.TabIndex = 3;
@@ -371,14 +373,14 @@ namespace FormExample
             // 
             // numericUpDownChannelIndex
             // 
-            this.numericUpDownChannelIndex.Location = new System.Drawing.Point(148, 41);
+            this.numericUpDownChannelIndex.Location = new System.Drawing.Point(147, 85);
             this.numericUpDownChannelIndex.Name = "numericUpDownChannelIndex";
             this.numericUpDownChannelIndex.Size = new System.Drawing.Size(100, 21);
             this.numericUpDownChannelIndex.TabIndex = 4;
             // 
             // numericUpDownSampleRate
             // 
-            this.numericUpDownSampleRate.Location = new System.Drawing.Point(148, 68);
+            this.numericUpDownSampleRate.Location = new System.Drawing.Point(147, 112);
             this.numericUpDownSampleRate.Maximum = new decimal(new int[] {
             10000000,
             0,
@@ -395,7 +397,7 @@ namespace FormExample
             // 
             // numericUpDownBlockLength
             // 
-            this.numericUpDownBlockLength.Location = new System.Drawing.Point(148, 95);
+            this.numericUpDownBlockLength.Location = new System.Drawing.Point(147, 139);
             this.numericUpDownBlockLength.Maximum = new decimal(new int[] {
             1000000,
             0,
@@ -413,7 +415,7 @@ namespace FormExample
             // numericUpDownMonitorInterval
             // 
             this.numericUpDownMonitorInterval.DecimalPlaces = 1;
-            this.numericUpDownMonitorInterval.Location = new System.Drawing.Point(148, 122);
+            this.numericUpDownMonitorInterval.Location = new System.Drawing.Point(147, 166);
             this.numericUpDownMonitorInterval.Maximum = new decimal(new int[] {
             100000,
             0,
@@ -440,7 +442,7 @@ namespace FormExample
             this.btStop.Image = null;
             this.btStop.ImageSize = new System.Drawing.Size(0, 0);
             this.btStop.ImageStretch = false;
-            this.btStop.Location = new System.Drawing.Point(731, 175);
+            this.btStop.Location = new System.Drawing.Point(731, 218);
             this.btStop.Name = "btStop";
             this.btStop.PreSetImage = SeeSharpTools.JY.GUI.EasyButton.ButtonPresetImage.None;
             this.btStop.Shadow = true;
@@ -457,12 +459,12 @@ namespace FormExample
             this.colIndex,
             this.colFrequency,
             this.colAmplitude});
-            this.dgvResults.Location = new System.Drawing.Point(580, 218);
+            this.dgvResults.Location = new System.Drawing.Point(580, 276);
             this.dgvResults.Name = "dgvResults";
             this.dgvResults.RowHeadersVisible = false;
             this.dgvResults.RowTemplate.Height = 23;
             this.dgvResults.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvResults.Size = new System.Drawing.Size(273, 200);
+            this.dgvResults.Size = new System.Drawing.Size(273, 142);
             this.dgvResults.TabIndex = 7;
             // 
             // colIndex
@@ -492,6 +494,7 @@ namespace FormExample
             // 
             // groupBoxMonitorSettings
             // 
+            this.groupBoxMonitorSettings.Controls.Add(this.comboBox1);
             this.groupBoxMonitorSettings.Controls.Add(this.numericUpDownMonitorInterval);
             this.groupBoxMonitorSettings.Controls.Add(this.numericUpDownBlockLength);
             this.groupBoxMonitorSettings.Controls.Add(this.numericUpDownSampleRate);
@@ -500,14 +503,35 @@ namespace FormExample
             this.groupBoxMonitorSettings.Controls.Add(this.label4);
             this.groupBoxMonitorSettings.Controls.Add(this.label3);
             this.groupBoxMonitorSettings.Controls.Add(this.label2);
+            this.groupBoxMonitorSettings.Controls.Add(this.label6);
             this.groupBoxMonitorSettings.Controls.Add(this.label1);
             this.groupBoxMonitorSettings.Controls.Add(this.textBoxDeviceName);
             this.groupBoxMonitorSettings.Location = new System.Drawing.Point(583, 12);
             this.groupBoxMonitorSettings.Name = "groupBoxMonitorSettings";
-            this.groupBoxMonitorSettings.Size = new System.Drawing.Size(269, 154);
+            this.groupBoxMonitorSettings.Size = new System.Drawing.Size(269, 200);
             this.groupBoxMonitorSettings.TabIndex = 8;
             this.groupBoxMonitorSettings.TabStop = false;
             this.groupBoxMonitorSettings.Text = "Monitor Settings";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "JYUSB-1202",
+            "JYUSB-1601"});
+            this.comboBox1.Location = new System.Drawing.Point(147, 32);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(100, 20);
+            this.comboBox1.TabIndex = 5;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(17, 35);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(77, 12);
+            this.label6.TabIndex = 3;
+            this.label6.Text = "Device Model";
             // 
             // MotorOnWebForm
             // 
@@ -555,6 +579,8 @@ namespace FormExample
         private System.Windows.Forms.DataGridViewTextBoxColumn colFrequency;
         private System.Windows.Forms.DataGridViewTextBoxColumn colAmplitude;
         private System.Windows.Forms.GroupBox groupBoxMonitorSettings;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Label label6;
     }
 }
 
