@@ -260,18 +260,20 @@ namespace FormExample
                 double df;
                 CalculateSpectrum(waveform, sampleRate, out spectrum, out df);
 
-                // Find peaks in spectrum
-                frequencyFinder.FindFrequencies(waveform, sampleRate, sampleRate*0.1, sampleRate*0.4, 15, 0.05);
+                // Find peaks in spectrum,由于计算复杂度O(N^2)，不处理1024以上长度
+                if (waveform.Length <= 1024)
+                {
+                    frequencyFinder.FindFrequencies(waveform, sampleRate, sampleRate * 0.1, sampleRate * 0.4, 15, 0.05);
 
-                // Display spectrum
-                UpdateSpectrumChartX(spectrum, df, frequencyFinder);
+                    // Display spectrum
+                    UpdateSpectrumChartX(spectrum, df, frequencyFinder);
 
-                // Update results table
-                UpdateResultsTable(frequencyFinder);
+                    // Update results table
+                    UpdateResultsTable(frequencyFinder);
 
-                // Report to Redis
-                ReportToRedis(waveform, dt, spectrum, df, frequencyFinder);
-
+                    // Report to Redis
+                    ReportToRedis(waveform, dt, spectrum, df, frequencyFinder);
+                }
                 acquisitionCount++;
             }
             catch (Exception ex)

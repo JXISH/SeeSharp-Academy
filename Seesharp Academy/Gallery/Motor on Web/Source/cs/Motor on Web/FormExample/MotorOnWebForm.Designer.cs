@@ -29,8 +29,8 @@ namespace FormExample
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.easyChartXWaveform = new SeeSharpTools.JY.GUI.EasyChartX();
             this.easyChartXSpectrum = new SeeSharpTools.JY.GUI.EasyChartX();
             this.btStart = new SeeSharpTools.JY.GUI.EasyButton();
@@ -399,7 +399,7 @@ namespace FormExample
             // 
             this.numericUpDownBlockLength.Location = new System.Drawing.Point(147, 139);
             this.numericUpDownBlockLength.Maximum = new decimal(new int[] {
-            1000000,
+            1024,
             0,
             0,
             0});
@@ -477,8 +477,8 @@ namespace FormExample
             // colFrequency
             // 
             this.colFrequency.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle3.Format = "N2";
-            this.colFrequency.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Format = "N2";
+            this.colFrequency.DefaultCellStyle = dataGridViewCellStyle1;
             this.colFrequency.HeaderText = "Frequency";
             this.colFrequency.Name = "colFrequency";
             this.colFrequency.ReadOnly = true;
@@ -486,8 +486,8 @@ namespace FormExample
             // colAmplitude
             // 
             this.colAmplitude.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle4.Format = "0.000e0";
-            this.colAmplitude.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle2.Format = "0.000e0";
+            this.colAmplitude.DefaultCellStyle = dataGridViewCellStyle2;
             this.colAmplitude.HeaderText = "Amplitude";
             this.colAmplitude.Name = "colAmplitude";
             this.colAmplitude.ReadOnly = true;

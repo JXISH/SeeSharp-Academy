@@ -526,6 +526,19 @@
         <member name="M:JYUSB1202.JYUSB1202Import.JYUSB1202_AI_DisableCalibration(System.IntPtr,System.Byte)">
             AI禁用校准系数
         </member>
+        <member name="M:JYUSB1202.JYUSB1202Import.JYUSB1202_AI_GetScalingCoefficients(System.IntPtr,System.IntPtr,System.Int32)">
+            获取当前已启用通道的电压换算因子。
+        </member>
+        <member name="F:JYUSB1202.RawDataScalingCoefficients.Offset">
+            <summary>
+            0阶系数
+            </summary>
+        </member>
+        <member name="F:JYUSB1202.RawDataScalingCoefficients.Gain">
+            <summary>
+            1阶系数
+            </summary>
+        </member>
         <member name="T:JYUSB1202.JYUSB1202AITask">
             <summary>
             JYUSB1202 Analog Input Task.
@@ -765,6 +778,12 @@
             Waiting until current task to complete.
             </summary>
             <param name="timeout">timeout = -1, wait until done, other positive number N, wait N mS. If not done, a timeout error generate.</param>
+            <returns></returns>
+        </member>
+        <member name="M:JYUSB1202.JYUSB1202AITask.GetScalingCoefficients">
+            <summary>
+            在Commit()或Start()之后调用，获取当前任务已添加通道的电压换算因子，用于将Raw数据转换为电压值。
+            </summary>
             <returns></returns>
         </member>
         <member name="M:JYUSB1202.JYUSB1202AITask.Start">
