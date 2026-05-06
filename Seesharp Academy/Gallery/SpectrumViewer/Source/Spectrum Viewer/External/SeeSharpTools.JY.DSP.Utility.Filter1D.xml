@@ -273,6 +273,18 @@
             阻带衰减
             </summary>
         </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.ClassicDesignFilterConfig.IsNotchFilter">
+            <summary>
+            是否为陷波滤波器
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.FilterDesignForm.ReplaceInfinityWithZero(System.Double[]@)">
+            <summary>
+            检查并替换数组中的无穷值（Infinity/-Infinity）为0.0，直接修改原数组
+            </summary>
+            <param name="array">输入的double[]数组（会被直接修改）</param>
+            <exception cref="T:System.ArgumentNullException">数组为null时抛出</exception>
+        </member>
         <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.FilterDesignForm.components">
             <summary>
             Required designer variable.
@@ -288,6 +300,291 @@
             <summary>
             Required method for Designer support - do not modify
             the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter">
+            <summary>
+            简易滤波器设计类
+            
+            功能：
+            - 支持FIR和IIR滤波器设计
+            - 支持低通、高通、带通、带阻滤波器
+            - 支持多种设计方法（Kaiser窗、Parks-McClellan、Butterworth、Chebyshev、Elliptic）
+            - 提供滤波、波特图分析、冲激响应分析
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.SelectedFilterType">
+            <summary>
+            设计的滤波器类型
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.EstimatedFilterOrder">
+            <summary>
+            预计的滤波器阶数
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.PassbandRippleDB">
+            <summary>
+            通带波动 (dB)
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.StopbandRejectionDB">
+            <summary>
+            阻带抑制(dB)
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.passbandFreq">
+            <summary>
+            带通频率 (低通、高通的通带边界，和带通、带阻较低的通带边界)
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.passbandFreq2">
+            <summary>
+            第二通带频率（带通、带阻滤波器较高的通带边界）
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.cutoffFreq">
+            <summary>
+            截止频率 (高通、低通阻带边界，和带通、带阻较低的阻带边界)
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.cutoffFreq2">
+            <summary>
+            第二截止频率 (带通、带阻滤波器中的较高的阻带边界)
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.SampleRate">
+            <summary>
+            采样率
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter._coef_b">
+            <summary>
+            FIR滤波器系数b，FIR滤波系数，分子系数
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter._coef_a">
+            <summary>
+            FIR滤波器系数a，IIR滤波系数，分母系数
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter._z">
+            <summary>
+            IIR滤波器零点
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter._p">
+            <summary>
+            IIR滤波器极点
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter._k">
+            <summary>
+            IIR滤波器ZPK系数增益
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter._sos">
+            <summary>
+            SOS滤波器系数
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter._g">
+            <summary>
+            SOS滤波器增益系数
+            </summary>
+        </member>
+        <member name="P:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.FrequencyResponseAnalysisLength">
+            <summary>
+            滤波器频响分析长度
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.bodeMag">
+            <summary>
+            波特图幅度 (dB)
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.bodePhase">
+            <summary>
+            波特图相位 (degree)
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.bodeFreq">
+            <summary>
+            波特图频率 (Hz)
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.impulseResponseH">
+            <summary>
+             冲击响应幅度
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.impulseResponseT">
+            <summary>
+            冲击响应时间
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter._firNormallizedFrequencyEdges">
+            <summary>
+            Normallized to sample rate = 2, hard code according to conventions
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.filterHistory">
+            <summary>
+            滤波的历史状态(z)
+            </summary>
+        </member>
+        <member name="F:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter._sosZi">
+            <summary>
+            sos滤波的初始条件，连续滤波必备的历史状态
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.#ctor">
+            <summary>
+            构造函数：初始化滤波器系数为空
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.Dupplicate(SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter)">
+            <summary>
+            将源滤波器系数复制给当前滤波器
+            </summary>
+            <param name="SourceFilter"></param>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.DesignFIRFilter(SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.FIRDesignMethod,SeeSharpTools.JY.DSP.Utility.Filter1D.FIRBandType,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Boolean)">
+            <summary>
+            经典FIR滤波器设计
+            
+            根据通带/阻带参数自动估计滤波器阶数并设计滤波器
+            
+            参数：
+            - FIRDesignMethod: 设计方法（Kaiser窗或Parks-McClellan等纹波）
+            - BandType: 滤波器类型（低通、高通、带通、带阻）
+            - PassBandRipple_dB: 通带波动
+            - StopBandRejection_dB: 阻带抑制
+            - SampleRate: 采样率
+            - PassBandFrequency: 通带频率
+            - CutoffFrequency: 截止频率
+            - PassBandFrequency2: 第二通带频率（带通/带阻）
+            - CutoffFrequency2: 第二截止频率（带通/带阻）
+            - forceEvenOrder: 强制滤波器阶数是偶数，亦即奇数个滤波系数
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.DesignIIRFilter(SeeSharpTools.JY.DSP.Utility.Filter1D.IIRDesignMethod,SeeSharpTools.JY.DSP.Utility.Filter1D.IIRBandType,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            经典IIR滤波器设计
+            
+            根据通带/阻带参数自动估计滤波器阶数并设计滤波器
+            
+            参数：
+            - IIRDesignMethod: 设计方法（Butterworth/Chebyshev I/Chebyshev II/Elliptic）
+            - BandType: 滤波器类型（低通、高通、带通、带阻）
+            - PassBandRipple_dB: 通带波动
+            - StopBandRejection_dB: 阻带抑制
+            - SampleRate: 采样率
+            - PassBandFrequency: 通带频率
+            - CutoffFrequency: 截止频率
+            - PassBandFrequency2: 第二通带频率（带通/带阻）
+            - CutoffFrequency2: 第二截止频率（带通/带阻）
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.DesignSOSFilter(System.Int32,System.Double,System.Double[],System.Double,System.Double,SeeSharpTools.JY.DSP.Utility.Filter1D.IIRBandType,SeeSharpTools.JY.DSP.Utility.Filter1D.IIRDesignMethod)">
+            <summary>
+            已知滤波器阶数的SOS设计
+            </summary>
+            <param name="FilterOrder"></param>
+            <param name="SampleRate"></param>
+            <param name="PassbandFrequencies"></param>
+            <param name="PassbandRipple_dB"></param>
+            <param name="StopBandRejection_dB"></param>
+            <param name="BandType"></param>
+            <param name="DesignMethod"></param>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.DesignNotchFilter(System.Double,System.Double,System.Double,SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.PeakNotchType)">
+            <summary>
+            陷波滤波器设计
+            </summary>
+            <param name="SampleRate">采样率</param>
+            <param name="CenterFrequency">中心频率</param>
+            <param name="QFactor">Q值(线性值，3dB带宽)</param>
+            <param name="CenterType">中心频率衰减(Notch)还是通过(Peak)</param>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.DesignNotchFilter(System.Double,System.Double,System.Double,System.Double,SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.PeakNotchType)">
+            <summary>
+            陷波滤波器设计
+            </summary>
+            <param name="SampleRate">采样率</param>
+            <param name="CenterFrequency">中心频率</param>
+            <param name="BandWidth">带宽</param>
+            <param name="CornerAttenuation">带宽边缘衰减(>0) (单位dB)</param>
+            <param name="CenterType">中心频率衰减(Notch)还是通过(Peak)</param>
+        </member>
+        <member name="T:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.PeakNotchType">
+            <summary>
+            陷波类型，Notch: 陷波滤波，Peak: 峰频滤波
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.EstimateFilterOrder(System.Boolean)">
+            <summary>
+            从滤波器设计参数估计所需的滤波器阶数
+            
+            FIR阶数估计：
+            - Kaiser窗：基于Kaiser公式
+            - Parks-McClellan：基于经验公式
+            
+            IIR阶数估计：
+            - 基于滤波器类型和规格参数（通带/阻带波动）
+            </summary>
+            <param name="forceEvenOrder">强制要求滤波器阶数是偶数,输出FIR tab是奇数</param>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.DesignFilter">
+            <summary>
+            根据估计的阶数和设计参数进行滤波器系数计算
+            
+            FIR设计：
+            - Kaiser窗：使用Kaiser窗函数
+            - Equiripple：使用Parks-McClellan算法
+            
+            IIR设计：
+            - Butterworth：最大平坦响应
+            - Chebyshev I：通带等纹波
+            - Chebyshev II：阻带等纹波
+            - Elliptic：通带和阻带都是等纹波（阶数最低）
+            
+            参数验证：
+            - 确保频率参数合理（符合奈奎斯特定理）
+            - 确保通带和截止频率顺序正确
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.Filtering(System.Double[],System.Boolean)">
+            <summary>
+            对输入信号应用设计的滤波器，支持时间连续的数据块滤波
+            
+            根据滤波器类型选择相应的滤波方法：
+            - FIR滤波：直接卷积
+            - IIR滤波：递归滤波（差分方程）
+            - 未设计滤波器：直接返回原信号
+            </summary>
+            <param name="InputSignal">输入信号</param>
+            <returns>滤波后的信号</returns>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.FilteringSOS(System.Double[],System.Boolean)">
+            <summary>
+            对于输入信号实施SOS级联IIR滤波，支持时间连续的数据块滤波
+            </summary>
+            <param name="InputSignal">输入信号</param>
+            <param name="reset">滤波初始化，从补零开始</param>
+            <returns>滤波后信号</returns>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.FilteringSOS(System.Double[],System.Double[]@,System.Boolean)">
+            <summary>
+            对于输入信号实施SOS级联IIR滤波，支持时间连续的数据块滤波
+            </summary>
+            <param name="InputSignal">输入信号</param>
+            <param name="outputSignal">滤波后数据</param>
+            <param name="reset">滤波初始化，从补零开始</param>
+        </member>
+        <member name="T:SeeSharpTools.JY.DSP.Utility.Filter1D.EasyClassicFilter.FIRDesignMethod">
+            <summary>
+            FIR滤波器设计方法枚举
             </summary>
         </member>
         <member name="T:SeeSharpTools.JY.DSP.Utility.Filter1D.FilterExploration">
@@ -2037,6 +2334,18 @@
             </returns>
             <exception cref="T:System.Exception"></exception>
         </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.IIRDesign.ButterZPK(System.Int32,System.Double[],SeeSharpTools.JY.DSP.Utility.Filter1D.IIRBandType,System.Double)">
+            <summary>
+            Butterworth digital filter design return zpk
+            parameters ref method: Butter()
+            </summary>
+            <param name="n"></param>
+            <param name="wn"></param>
+            <param name="bandType"></param>
+            <param name="sampleRate"></param>
+            <returns>zeros poles and gain</returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
         <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.IIRDesign.Cheby1(System.Int32,System.Double[],System.Double,SeeSharpTools.JY.DSP.Utility.Filter1D.IIRBandType,System.Double)">
             <summary>
             <para>Chebyshev type I digital filter design.</para>
@@ -2071,6 +2380,12 @@
             </returns>
             <exception cref="T:System.Exception"></exception>
         </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.IIRDesign.Cheby1ZPK(System.Int32,System.Double[],System.Double,SeeSharpTools.JY.DSP.Utility.Filter1D.IIRBandType,System.Double)">
+            <summary>
+            Chebyshev type I digital filter design return zpk
+            parameters ref method: Cheby1()
+            </summary>
+        </member>
         <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.IIRDesign.Cheby2(System.Int32,System.Double[],System.Double,SeeSharpTools.JY.DSP.Utility.Filter1D.IIRBandType,System.Double)">
             <summary>
             <para>Chebyshev type II digital filter design.</para>
@@ -2104,6 +2419,12 @@
             <para>Chinese Simplified：转移函数的系数</para>
             </returns>
             <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.IIRDesign.Cheby2ZPK(System.Int32,System.Double[],System.Double,SeeSharpTools.JY.DSP.Utility.Filter1D.IIRBandType,System.Double)">
+            <summary>
+            Chebyshev type II digital filter design return zpk
+            parameters ref method: Cheby2()
+            </summary>
         </member>
         <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.IIRDesign.Ellip(System.Int32,System.Double[],System.Double,System.Double,SeeSharpTools.JY.DSP.Utility.Filter1D.IIRBandType,System.Double)">
             <summary>
@@ -2142,6 +2463,12 @@
             <para>Chinese Simplified：转移函数的系数</para>
             </returns>
             <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.IIRDesign.EllipZPK(System.Int32,System.Double[],System.Double,System.Double,SeeSharpTools.JY.DSP.Utility.Filter1D.IIRBandType,System.Double)">
+            <summary>
+            <para>Elliptic digital filter design return zpk.</para>
+            <para>Chinese Simplified：椭圆数字滤波器设计返回zpk</para>
+            </summary>
         </member>
         <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.IIRDesign.Bilinear(System.Double[],System.Double[],System.Double)">
             <summary>
@@ -3182,7 +3509,7 @@
         <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.IIRFiltering.SOSFilter(System.Double[0:,0:],System.Double[0:,0:])">
             <summary>
             <para>A cascaded second-order filter is used to filter the single-channel signal, and the architecture is a transposed Direct Form II type, which is used to reduce the numerical accuracy error of the high-order filter.</para>
-            <para>Chinese Simplified：使用级联的二阶滤波器对单通道信号进行滤波，架构是转置的Direct Form II型，用于降低高阶次滤波器的数值精度误差</para>
+            <para>Chinese Simplified：使用级联的二阶滤波器对多通道信号进行滤波，架构是转置的Direct Form II型，用于降低高阶次滤波器的数值精度误差</para>
             </summary>
             <param name="sos">
             <para>Second-order filter coefficient array, array size is [number of cascades,6], each row represents a second-order filter,
@@ -3368,6 +3695,39 @@
             <para>Chinese Simplified：常数延拓</para>
             </summary>
         </member>
+        <member name="T:SeeSharpTools.JY.DSP.Utility.Filter1D.ArbitraryResampler">
+            <summary>
+            任意时间重采样类
+            </summary>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.ArbitraryResampler.#ctor(System.Double,System.Double,System.Boolean,System.Boolean)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="bandwidth">假设输入信号采样率为1的通带带宽</param>
+            <param name="stopBandAttenuationDB">阻带抑制dB</param>
+            <param name="aliasFree">能奎斯特带内是否消除混叠，true: 截止带=0.5，false: 截止带=1-bandwidth</param>
+            <param name="powerOf2Interpolation">内插倍数是否强制2的整数幂，FPGA算法移植时有用</param>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.ArbitraryResampler.InterpolateX(System.Double,System.Double[],System.Double)">
+            <summary>
+            Multi-rate滤波内插
+            </summary>
+            <param name="t">时间</param>
+            <param name="X">被内插的数据</param>
+            <param name="expectedResampleInterval">期望的采样间隔，归一化：输入信号间隔为1</param>
+            <returns></returns>
+        </member>
+        <member name="M:SeeSharpTools.JY.DSP.Utility.Filter1D.ArbitraryResampler.InterpolateX(System.Double[],System.Double[],System.Double[]@)">
+            <summary>
+            Multi-rate滤波内插
+            </summary>
+            <param name="T">时间序列</param>
+            <param name="X">被内插的数据</param>
+            <param name="resampledX">内插后的数据</param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:SeeSharpTools.JY.DSP.Utility.Filter1D.ArbitraryResampler.InterpolateX(System.Double[],System.Double[][],System.Double[][]@)" -->
         <member name="T:SeeSharpTools.JY.DSP.Utility.Filter1D.Multirate">
             <summary>
             <para>Multisample rate signal processing involves resampling uniform or non-uniform data to a new fixed rate. This process involves decimation and linear interpolation or higher-order interpolation, all without introducing aliasing.</para>

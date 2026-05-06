@@ -28,8 +28,8 @@ namespace Spectrum_Viewer
         /// </summary>
         private void InitializeComponent()
         {
-            SeeSharpTools.JY.GUI.TabCursor tabCursor1 = new SeeSharpTools.JY.GUI.TabCursor();
-            SeeSharpTools.JY.GUI.TabCursor tabCursor2 = new SeeSharpTools.JY.GUI.TabCursor();
+            SeeSharpTools.JY.GUI.TabCursor tabCursor3 = new SeeSharpTools.JY.GUI.TabCursor();
+            SeeSharpTools.JY.GUI.TabCursor tabCursor4 = new SeeSharpTools.JY.GUI.TabCursor();
             this.easyChartXTimeWaveform = new SeeSharpTools.JY.GUI.EasyChartX();
             this.easyChartXWaveformSection = new SeeSharpTools.JY.GUI.EasyChartX();
             this.easyChartXSectionSpectrum = new SeeSharpTools.JY.GUI.EasyChartX();
@@ -55,6 +55,7 @@ namespace Spectrum_Viewer
             this.label5 = new System.Windows.Forms.Label();
             this.formsScottPlot = new ScottPlot.FormsPlot();
             this.buttonFindFrequencies = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSampleRate)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownWindowLength)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownJTFAWinLength)).BeginInit();
@@ -166,24 +167,24 @@ namespace Spectrum_Viewer
             this.easyChartXTimeWaveform.Series.Count = 0;
             this.easyChartXTimeWaveform.Size = new System.Drawing.Size(531, 200);
             this.easyChartXTimeWaveform.SplitView = false;
-            tabCursor1.Color = System.Drawing.Color.Cyan;
-            tabCursor1.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
-            tabCursor1.Enabled = true;
-            tabCursor1.Name = "TabCursor1";
-            tabCursor1.SeriesIndex = -1;
-            tabCursor1.Value = 0D;
-            tabCursor1.XValue = 0D;
-            tabCursor1.YValue = double.NaN;
-            tabCursor2.Color = System.Drawing.Color.Orange;
-            tabCursor2.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
-            tabCursor2.Enabled = true;
-            tabCursor2.Name = "TabCursor2";
-            tabCursor2.SeriesIndex = -1;
-            tabCursor2.Value = 0D;
-            tabCursor2.XValue = 0D;
-            tabCursor2.YValue = double.NaN;
-            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor1);
-            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor2);
+            tabCursor3.Color = System.Drawing.Color.Cyan;
+            tabCursor3.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
+            tabCursor3.Enabled = true;
+            tabCursor3.Name = "TabCursor1";
+            tabCursor3.SeriesIndex = -1;
+            tabCursor3.Value = 0D;
+            tabCursor3.XValue = 0D;
+            tabCursor3.YValue = double.NaN;
+            tabCursor4.Color = System.Drawing.Color.Orange;
+            tabCursor4.Direction = SeeSharpTools.JY.GUI.TabCursorUtility.TabCursorDirection.Vertical;
+            tabCursor4.Enabled = true;
+            tabCursor4.Name = "TabCursor2";
+            tabCursor4.SeriesIndex = -1;
+            tabCursor4.Value = 0D;
+            tabCursor4.XValue = 0D;
+            tabCursor4.YValue = double.NaN;
+            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor3);
+            this.easyChartXTimeWaveform.TabCursorContainer.Add(tabCursor4);
             this.easyChartXTimeWaveform.TabIndex = 0;
             this.easyChartXTimeWaveform.XCursor.AutoInterval = true;
             this.easyChartXTimeWaveform.XCursor.Color = System.Drawing.Color.DeepSkyBlue;
@@ -714,6 +715,16 @@ namespace Spectrum_Viewer
             this.buttonFindFrequencies.UseVisualStyleBackColor = true;
             this.buttonFindFrequencies.Click += new System.EventHandler(this.buttonFindFrequencies_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 470);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(119, 23);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "Load WVF";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // SpectrumViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -723,6 +734,7 @@ namespace Spectrum_Viewer
             this.Controls.Add(this.groupBoxSpectrumSettings);
             this.Controls.Add(this.buttonJTFA);
             this.Controls.Add(this.buttonFindFrequencies);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.buttonLoad);
             this.Controls.Add(this.easyChartXSectionSpectrum);
             this.Controls.Add(this.easyChartXWaveformSection);
@@ -770,6 +782,7 @@ namespace Spectrum_Viewer
         private System.Windows.Forms.ComboBox comboBoxColorType;
         private ScottPlot.FormsPlot formsScottPlot;
         private System.Windows.Forms.Button buttonFindFrequencies;
+        private System.Windows.Forms.Button button1;
     }
 }
 

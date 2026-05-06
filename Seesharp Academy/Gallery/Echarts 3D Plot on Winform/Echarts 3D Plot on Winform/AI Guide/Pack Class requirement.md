@@ -1,0 +1,4 @@
+用独立的C#文件WebView2Plots.cs封装出WebView2Waterfall, WebView2Bar3D两个类
+接收从接口传来的数据、X,Y轴初始、步进，X Y Z轴名称，winform的webView2控件指针
+WebView2Bar3D还有透明度
+主程序调用静态类完成绘图

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>3D Bar Plot</title>
+    <style>
+        html, body, #main {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src="echarts.min.js"></script>
+    <script src="echarts-gl.min.js"></script>
+</head>
+<body>
+    <div id="main"></div>
+    <script>
+        var myChart = echarts.init(document.getElementById('main'));
+
+        function render3DBar(data, transparencyPercent, xAxisName, yAxisName, zAxisName) {
+            // transparencyPercent: 0 = fully opaque, 100 = fully transparent
+            var opacity = 1.0 - transparencyPercent / 100.0;
+
+            // Calculate Z range for visualMap
+            var zMin = Infinity, zMax = -Infinity;
+            for (var i = 0; i < data.length; i++) {
+                var z = data[i][2];
+                if (z < zMin) zMin = z;
+                if (z > zMax) zMax = z;
+            }
+
+            var option = {
+                tooltip: {
+                    formatter: function (params) {
+                        var v = params.value;
+                        var x = parseFloat(v[0]).toFixed(2);
+                        var y = parseFloat(v[1]).toFixed(2);
+                        var z = parseFloat(v[2]).toFixed(4);
+                        return (xAxisName || 'X') + ': ' + x + '<br/>'
+                             + (yAxisName || 'Y') + ': ' + y + '<br/>'
+                             + (zAxisName || 'Z') + ': ' + z;
+                    }
+                },
+                visualMap: {
+                    show: true,
+                    dimension: 2,
+                    min: zMin,
+                    max: zMax,
+                    inRange: {
+                        color: ['#313695', '#4575b4', '#74add1', '#abd9e9',
+                                '#e0f3f8', '#ffffbf', '#fee090', '#fdae61',
+                                '#f46d43', '#d73027', '#a50026']
+                    }
+                },
+                xAxis3D: {
+                    type: 'value',
+                    name: xAxisName || 'X'
+                },
+                yAxis3D: {
+                    type: 'value',
+                    name: yAxisName || 'Y'
+                },
+                zAxis3D: {
+                    type: 'value',
+                    name: zAxisName || 'Z'
+                },
+                grid3D: {
+                    boxWidth: 200,
+                    boxDepth: 200,
+                    viewControl: {
+                        projection: 'perspective'
+                    },
+                    light: {
+                        main: {
+                            intensity: 1.2,
+                            shadow: false
+                        },
+                        ambient: {
+                            intensity: 0.3
+                        }
+                    }
+                },
+                series: [{
+                    type: 'bar3D',
+                    data: data.map(function(item) {
+                        return {
+                            value: [item[0], item[1], item[2]],
+
+                        };
+                    }),
+                    shading: 'color',
+                    label: {
+                        show: false
+                    },
+                    itemStyle: {
+                        opacity: opacity
+                    },
+                    emphasis: {
+                        label: {
+                            fontSize: 20,
+                            color: '#900',
+                            formatter: function (params) {
+                                return parseFloat(params.value[2]).toFixed(4);
+                            }
+                        },
+                        itemStyle: {
+                            color: '#900'
+                        }
+                    }
+                }]
+            };
+
+            myChart.setOption(option);
+        }
+
+        window.addEventListener('resize', function () {
+            myChart.resize();
+        });
+    </script>
+</body>
+</html>

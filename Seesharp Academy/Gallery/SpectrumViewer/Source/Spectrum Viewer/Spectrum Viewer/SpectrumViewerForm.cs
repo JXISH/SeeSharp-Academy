@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
+using JY.SignalPanel.WaveformFileEx;
 
 namespace Spectrum_Viewer
 {
@@ -604,6 +605,39 @@ namespace Spectrum_Viewer
             }
         }
         #endregion
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //弹窗选择一个*.wvf文件，返回路径
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "WVF Files (*.wvf)|*.wvf|All Files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string selectedFilePath = openFileDialog.FileName;
+                // 使用selectedFilePath进行后续处理
+                //获取文件信息
+                double[,] channelData;
+                string[] channelNames;
+
+                long length = AnalogWaveformFileHandler.Read(selectedFilePath, 0, -1, out channelData, out channelNames, out sampleRate);
+
+                // 获取并复制第一个通道的波形数据
+                waveform = new double[channelData.GetLength(0)];
+                for (int i = 0; i < channelData.GetLength(0); i++)
+                {
+                    waveform[i] = channelData[i, 0];
+                }
+
+                // 更新采样率显示
+                numericUpDownSampleRate.Value = (decimal)sampleRate;
+
+                // 在时域图表中显示完整波形
+                DisplayWaveform();
+
+                // 在窗体标题中显示当前加载的文件名
+                this.Text = "Spectrum Viewer: " + selectedFilePath;
+            }
+        }
     }
 
     #region 枚举定义

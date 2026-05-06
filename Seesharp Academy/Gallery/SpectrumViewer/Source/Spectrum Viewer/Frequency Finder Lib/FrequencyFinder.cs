@@ -1,6 +1,5 @@
 using MathNet.Numerics.IntegralTransforms;
 using MathNet.Numerics.LinearAlgebra.Double;
-using Seesharp.JY.DSP.SignalProcessing.Conditioning.Filter1D.EasyFilter;
 using SeeSharpTools.JY.DSP.Utility.Filter1D;
 using System;
 using System.Collections.Generic;
