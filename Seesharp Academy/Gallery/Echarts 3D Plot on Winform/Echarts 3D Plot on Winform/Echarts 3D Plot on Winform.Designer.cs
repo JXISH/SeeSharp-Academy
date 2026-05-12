@@ -33,9 +33,14 @@ namespace Echarts_3D_Plot_on_Winform
             this.webView23DBar = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.buttonDisplay3DBar = new System.Windows.Forms.Button();
             this.numericUpDownTransparency = new System.Windows.Forms.NumericUpDown();
+            this.webView23DWaterfall = new Microsoft.Web.WebView2.WinForms.WebView2();
+            this.buttonShowWaterfall = new System.Windows.Forms.Button();
+            this.checkBoxDB = new System.Windows.Forms.CheckBox();
+            this.checkBoxFilter = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.webView23DSurface)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.webView23DBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTransparency)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.webView23DWaterfall)).BeginInit();
             this.SuspendLayout();
             // 
             // webView23DSurface
@@ -92,14 +97,59 @@ namespace Echarts_3D_Plot_on_Winform
             0,
             0});
             // 
+            // webView23DWaterfall
+            // 
+            this.webView23DWaterfall.AllowExternalDrop = true;
+            this.webView23DWaterfall.CreationProperties = null;
+            this.webView23DWaterfall.DefaultBackgroundColor = System.Drawing.Color.White;
+            this.webView23DWaterfall.Location = new System.Drawing.Point(1042, 12);
+            this.webView23DWaterfall.Name = "webView23DWaterfall";
+            this.webView23DWaterfall.Size = new System.Drawing.Size(509, 395);
+            this.webView23DWaterfall.TabIndex = 0;
+            this.webView23DWaterfall.ZoomFactor = 1D;
+            // 
+            // buttonShowWaterfall
+            // 
+            this.buttonShowWaterfall.Location = new System.Drawing.Point(1444, 413);
+            this.buttonShowWaterfall.Name = "buttonShowWaterfall";
+            this.buttonShowWaterfall.Size = new System.Drawing.Size(107, 23);
+            this.buttonShowWaterfall.TabIndex = 1;
+            this.buttonShowWaterfall.Text = "Show Waterfall";
+            this.buttonShowWaterfall.UseVisualStyleBackColor = true;
+            this.buttonShowWaterfall.Click += new System.EventHandler(this.buttonShowWaterfall_Click);
+            // 
+            // checkBoxDB
+            // 
+            this.checkBoxDB.AutoSize = true;
+            this.checkBoxDB.Location = new System.Drawing.Point(1348, 417);
+            this.checkBoxDB.Name = "checkBoxDB";
+            this.checkBoxDB.Size = new System.Drawing.Size(36, 16);
+            this.checkBoxDB.TabIndex = 3;
+            this.checkBoxDB.Text = "dB";
+            this.checkBoxDB.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxFilter
+            // 
+            this.checkBoxFilter.AutoSize = true;
+            this.checkBoxFilter.Location = new System.Drawing.Point(1264, 417);
+            this.checkBoxFilter.Name = "checkBoxFilter";
+            this.checkBoxFilter.Size = new System.Drawing.Size(60, 16);
+            this.checkBoxFilter.TabIndex = 3;
+            this.checkBoxFilter.Text = "Filter";
+            this.checkBoxFilter.UseVisualStyleBackColor = true;
+            // 
             // FormEcharts3DPlot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1047, 445);
+            this.ClientSize = new System.Drawing.Size(1615, 445);
+            this.Controls.Add(this.checkBoxFilter);
+            this.Controls.Add(this.checkBoxDB);
             this.Controls.Add(this.numericUpDownTransparency);
             this.Controls.Add(this.buttonDisplay3DBar);
+            this.Controls.Add(this.buttonShowWaterfall);
             this.Controls.Add(this.buttonShow3DSurface);
+            this.Controls.Add(this.webView23DWaterfall);
             this.Controls.Add(this.webView23DBar);
             this.Controls.Add(this.webView23DSurface);
             this.Name = "FormEcharts3DPlot";
@@ -107,7 +157,9 @@ namespace Echarts_3D_Plot_on_Winform
             ((System.ComponentModel.ISupportInitialize)(this.webView23DSurface)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.webView23DBar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownTransparency)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.webView23DWaterfall)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -118,6 +170,10 @@ namespace Echarts_3D_Plot_on_Winform
         private Microsoft.Web.WebView2.WinForms.WebView2 webView23DBar;
         private System.Windows.Forms.Button buttonDisplay3DBar;
         private System.Windows.Forms.NumericUpDown numericUpDownTransparency;
+        private Microsoft.Web.WebView2.WinForms.WebView2 webView23DWaterfall;
+        private System.Windows.Forms.Button buttonShowWaterfall;
+        private System.Windows.Forms.CheckBox checkBoxDB;
+        private System.Windows.Forms.CheckBox checkBoxFilter;
     }
 }
 

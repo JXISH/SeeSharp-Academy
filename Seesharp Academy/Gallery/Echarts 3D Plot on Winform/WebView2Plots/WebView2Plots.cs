@@ -29,7 +29,7 @@ namespace WebView2Plots
         /// <param name="zAxisName">Z axis display name</param>
         public static async Task RenderAsync(WebView2 webView, double[,] data,
             double x0, double xStep, double y0, double yStep,
-            string xAxisName = "X", string yAxisName = "Y", string zAxisName = "Z")
+            string xAxisName = "X", string yAxisName = "Y", string zAxisName = "Z", ThreeDSurfaceType surfaceType = ThreeDSurfaceType.Surface)
         {
             int xCount = data.GetLength(0);
             int yCount = data.GetLength(1);
@@ -37,11 +37,14 @@ namespace WebView2Plots
             // Build JSON data array: [[x, y, z], ...]
             string jsonData = BuildJsonData(data, x0, xStep, y0, yStep, xCount, yCount);
 
+            string templateHtml = "threeDSurfaceWeb.html";
+            if(surfaceType == ThreeDSurfaceType.Waterfall)
+                templateHtml = "threeDWaterfallWeb.html";
             // Load threeDSurfaceWeb.html if not already loaded or if control changed
-            string htmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "threeDSurfaceWeb.html");
+            string htmlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, templateHtml);
             if (!File.Exists(htmlPath))
             {
-                MessageBox.Show("threeDSurfaceWeb.html not found at: " + htmlPath);
+                MessageBox.Show("{templateHtml} not found at: " + htmlPath);
                 return;
             }
 
@@ -193,5 +196,20 @@ namespace WebView2Plots
         {
             return s.Replace("\\", "\\\\").Replace("'", "\\'");
         }
+    }
+
+    /// <summary>
+    /// 3D曲面类型
+    /// </summary>
+    public enum ThreeDSurfaceType
+    {
+        /// <summary>
+        /// 具有网格的曲面
+        /// </summary>
+        Surface,
+        /// <summary>
+        /// 瀑布图
+        /// </summary>
+        Waterfall
     }
 }

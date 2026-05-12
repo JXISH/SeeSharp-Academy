@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net461\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.3912.50, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.WebView2.1.0.3912.50\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
     </Reference>
@@ -44,6 +47,15 @@
     <Reference Include="Microsoft.Web.WebView2.Wpf, Version=1.0.3912.50, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.WebView2.1.0.3912.50\lib\net462\Microsoft.Web.WebView2.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="SeeSharpTools.JY.ArrayUtility, Version=2.0.3.5, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SeeSharpTools.JY.ArrayUtility.2.0.3\lib\net462\SeeSharpTools.JY.ArrayUtility.dll</HintPath>
+    </Reference>
+    <Reference Include="SeeSharpTools.JY.DSP.Fundamental, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SeeSharpTools.JY.DSP.Fundamental.2.0.4\lib\net462\SeeSharpTools.JY.DSP.Fundamental.dll</HintPath>
+    </Reference>
+    <Reference Include="SeeSharpTools.JY.DSP.JTFA, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SeeSharpTools.JY.DSP.JTFA.2.0.4\lib\net462\SeeSharpTools.JY.DSP.JTFA.dll</HintPath>
+    </Reference>
     <Reference Include="SeeSharpTools.JY.File, Version=2.0.3.5, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SeeSharpTools.JY.File.2.0.3\lib\net462\SeeSharpTools.JY.File.dll</HintPath>
     </Reference>
@@ -51,6 +63,10 @@
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\System.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -94,6 +110,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\WebView2Plots\threeDWaterfallWeb.html">
+      <Link>threeDWaterfallWeb.html</Link>
+    </Content>
     <None Include="App.config" />
     <Content Include="..\WebView2Plots\threeDSurfaceWeb.html">
       <Link>threeDSurfaceWeb.html</Link>
@@ -126,6 +145,14 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.3912.50\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.3912.50\build\Microsoft.Web.WebView2.targets'))" />
     <Error Condition="!Exists('..\packages\SeeSharpTools.JY.File.2.0.3\build\net462\SeeSharpTools.JY.File.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SeeSharpTools.JY.File.2.0.3\build\net462\SeeSharpTools.JY.File.targets'))" />
+    <Error Condition="!Exists('..\packages\SeeSharpTools.JY.DSP.Runtime.1.5.0\build\net40\SeeSharpTools.JY.DSP.Runtime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SeeSharpTools.JY.DSP.Runtime.1.5.0\build\net40\SeeSharpTools.JY.DSP.Runtime.targets'))" />
+    <Error Condition="!Exists('..\packages\SeeSharpTools.JY.ArrayUtility.2.0.3\build\net462\SeeSharpTools.JY.ArrayUtility.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SeeSharpTools.JY.ArrayUtility.2.0.3\build\net462\SeeSharpTools.JY.ArrayUtility.targets'))" />
+    <Error Condition="!Exists('..\packages\SeeSharpTools.JY.DSP.Fundamental.2.0.4\build\net462\SeeSharpTools.JY.DSP.Fundamental.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SeeSharpTools.JY.DSP.Fundamental.2.0.4\build\net462\SeeSharpTools.JY.DSP.Fundamental.targets'))" />
+    <Error Condition="!Exists('..\packages\SeeSharpTools.JY.DSP.JTFA.2.0.4\build\net462\SeeSharpTools.JY.DSP.JTFA.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SeeSharpTools.JY.DSP.JTFA.2.0.4\build\net462\SeeSharpTools.JY.DSP.JTFA.targets'))" />
   </Target>
   <Import Project="..\packages\SeeSharpTools.JY.File.2.0.3\build\net462\SeeSharpTools.JY.File.targets" Condition="Exists('..\packages\SeeSharpTools.JY.File.2.0.3\build\net462\SeeSharpTools.JY.File.targets')" />
+  <Import Project="..\packages\SeeSharpTools.JY.DSP.Runtime.1.5.0\build\net40\SeeSharpTools.JY.DSP.Runtime.targets" Condition="Exists('..\packages\SeeSharpTools.JY.DSP.Runtime.1.5.0\build\net40\SeeSharpTools.JY.DSP.Runtime.targets')" />
+  <Import Project="..\packages\SeeSharpTools.JY.ArrayUtility.2.0.3\build\net462\SeeSharpTools.JY.ArrayUtility.targets" Condition="Exists('..\packages\SeeSharpTools.JY.ArrayUtility.2.0.3\build\net462\SeeSharpTools.JY.ArrayUtility.targets')" />
+  <Import Project="..\packages\SeeSharpTools.JY.DSP.Fundamental.2.0.4\build\net462\SeeSharpTools.JY.DSP.Fundamental.targets" Condition="Exists('..\packages\SeeSharpTools.JY.DSP.Fundamental.2.0.4\build\net462\SeeSharpTools.JY.DSP.Fundamental.targets')" />
+  <Import Project="..\packages\SeeSharpTools.JY.DSP.JTFA.2.0.4\build\net462\SeeSharpTools.JY.DSP.JTFA.targets" Condition="Exists('..\packages\SeeSharpTools.JY.DSP.JTFA.2.0.4\build\net462\SeeSharpTools.JY.DSP.JTFA.targets')" />
 </Project>

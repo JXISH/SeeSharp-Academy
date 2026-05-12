@@ -49,6 +49,9 @@
     <Compile Include="WebView2Plots.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="threeDWaterfallWeb.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <Content Include="threeDSurfaceWeb.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Waterfall 3D Surface</title>
+    <style>
+        html, body, #main {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src="echarts.min.js"></script>
+    <script src="echarts-gl.min.js"></script>
+</head>
+<body>
+    <div id="main"></div>
+    <script>
+        var myChart = echarts.init(document.getElementById('main'));
+
+        function renderSurface(data, xCount, yCount, xAxisName, yAxisName, zAxisName) {
+            var option = {
+                tooltip: {
+                    formatter: function (params) {
+                        var d = params.data;
+                        var x = parseFloat(d[0]).toFixed(2);
+                        var y = parseFloat(d[1]).toFixed(2);
+                        var z = parseFloat(d[2]).toFixed(4);
+                        return (xAxisName || 'X') + ': ' + x + '<br/>'
+                             + (yAxisName || 'Y') + ': ' + y + '<br/>'
+                             + (zAxisName || 'Z') + ': ' + z;
+                    }
+                },
+                visualMap: {
+                    show: true,
+                    dimension: 2,
+                    min: -2,
+                    max: 10,
+                    inRange: {
+                        color: ['#313695', '#4575b4', '#74add1', '#abd9e9',
+                                '#e0f3f8', '#ffffbf', '#fee090', '#fdae61',
+                                '#f46d43', '#d73027', '#a50026']
+                    }
+                },
+                xAxis3D: { type: 'value', name: xAxisName || 'X' },
+                yAxis3D: { type: 'value', name: yAxisName || 'Y' },
+                zAxis3D: { type: 'value', name: zAxisName || 'Z' },
+                grid3D: {
+                    viewControl: {
+                        projection: 'perspective'
+                    }
+                },
+                series: [{
+                    type: 'surface',
+                    wireframe: {
+                        show: false
+                    },
+                    shading: 'color',
+                    dataShape: [xCount, yCount],
+                    data: data
+                }]
+            };
+
+            // Calculate Z range for visualMap
+            var zMin = Infinity, zMax = -Infinity;
+            for (var i = 0; i < data.length; i++) {
+                var z = data[i][2];
+                if (z < zMin) zMin = z;
+                if (z > zMax) zMax = z;
+            }
+            option.visualMap.min = zMin;
+            option.visualMap.max = zMax;
+
+            myChart.setOption(option);
+        }
+
+        window.addEventListener('resize', function () {
+            myChart.resize();
+        });
+    </script>
+</body>
+</html>
