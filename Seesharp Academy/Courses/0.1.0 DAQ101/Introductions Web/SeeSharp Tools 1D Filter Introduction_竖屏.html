@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DSP滤波器教程 - 手机版</title>
+    <!-- Online resources for mobile -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --secondary: #059669;
+            --accent: #d97706;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 15px;
+            padding-bottom: 60px;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            padding: 2rem 1.25rem;
+            text-align: center;
+        }
+        header h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        header p { font-size: 0.9rem; opacity: 0.9; }
+        
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+        .bottom-nav a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 0.7rem;
+            padding: 0.25rem;
+            transition: color 0.2s;
+        }
+        .bottom-nav a.active, .bottom-nav a:hover { color: var(--primary); }
+        .bottom-nav .nav-icon { font-size: 1.3rem; margin-bottom: 0.15rem; }
+        
+        /* Sections */
+        .section { padding: 1.25rem; }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-left: 0.75rem;
+            border-left: 4px solid var(--primary);
+        }
+        .section-title .en { font-size: 0.75rem; color: var(--text-light); display: block; font-weight: 400; }
+        
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+        }
+        .card h3 {
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .card .subtitle { font-size: 0.8rem; color: var(--text-light); font-style: italic; }
+        
+        /* Term badges */
+        .term-badge {
+            display: inline-block;
+            background: var(--primary-light);
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            font-weight: 500;
+        }
+        .term-badge .en { color: var(--primary); font-size: 0.7rem; }
+        
+        /* Code */
+        .code-box {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.78rem;
+            line-height: 1.7;
+            margin: 0.75rem 0;
+            white-space: pre;
+        }
+        .code-box .cm { color: #6b7280; }
+        .code-box .kw { color: #93c5fd; }
+        .code-box .str { color: #86efac; }
+        .code-box .num { color: #fcd34d; }
+        .code-box .tp { color: #c4b5fd; }
+        
+        /* Flow */
+        .flow-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            margin: 1rem 0;
+        }
+        .flow-item {
+            background: var(--primary-light);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            text-align: center;
+            width: 80%;
+            max-width: 280px;
+        }
+        .flow-item .title { font-weight: 700; font-size: 0.9rem; }
+        .flow-item .en { font-size: 0.7rem; color: var(--text-light); }
+        .flow-arrow-down {
+            color: var(--primary);
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+        
+        /* Tables */
+        .table-wrap { overflow-x: auto; margin: 0.75rem 0; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 320px;
+        }
+        th, td { padding: 0.5rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--primary); color: white; font-weight: 600; white-space: nowrap; }
+        
+        /* Tip */
+        .tip {
+            background: #fefce8;
+            border-left: 4px solid var(--accent);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 0.75rem 0;
+            font-size: 0.85rem;
+        }
+        .tip strong { color: var(--accent); }
+        
+        .info {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 0.75rem 0;
+            font-size: 0.85rem;
+        }
+        
+        /* Accordion */
+        .accordion { margin: 0.75rem 0; }
+        .accordion-item {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+        .accordion-header {
+            padding: 0.75rem 1rem;
+            background: var(--card);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .accordion-header::after { content: '▼'; font-size: 0.7rem; transition: transform 0.3s; }
+        .accordion-item.open .accordion-header::after { transform: rotate(180deg); }
+        .accordion-body {
+            padding: 0 1rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s;
+        }
+        .accordion-item.open .accordion-body { max-height: 2000px; padding: 0.75rem 1rem; }
+        
+        /* Comparison */
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 0.75rem 0; }
+        .compare-item {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .compare-item h4 { font-size: 0.9rem; color: var(--primary); margin-bottom: 0.3rem; }
+        .compare-item .en { font-size: 0.7rem; color: var(--text-light); }
+        .compare-item ul { text-align: left; font-size: 0.8rem; padding-left: 1rem; margin-top: 0.5rem; }
+        
+        /* Interactive Canvas */
+        .demo-section { margin: 1rem 0; }
+        .demo-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .demo-controls label { font-size: 0.75rem; color: var(--text-light); font-weight: 600; }
+        .demo-controls select, .demo-controls input {
+            width: 100%;
+            padding: 0.4rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+        .btn-run {
+            grid-column: 1 / -1;
+            padding: 0.6rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-run:active { background: #1d4ed8; }
+        
+        canvas {
+            width: 100%;
+            height: 150px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 0.5rem;
+        }
+        .canvas-label { font-size: 0.75rem; font-weight: 600; color: var(--text-light); margin-bottom: 0.25rem; }
+        
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.5rem 0;
+        }
+        
+        /* SVG diagrams */
+        .svg-diagram { text-align: center; margin: 1rem 0; overflow-x: auto; }
+        .svg-diagram svg { max-width: 100%; height: auto; }
+        
+        /* Smooth scroll */
+        html { scroll-behavior: smooth; }
+        
+        /* Hide scrollbar */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+    </style>
+</head>
+<body>
+
+<header class="animate__animated animate__fadeIn">
+    <h1>📡 DSP 滤波器设计教程</h1>
+    <p>基于 SeeSharpTools 类库 · 中英对照 · 交互式学习</p>
+</header>
+
+<!-- Section: Overview -->
+<div class="section" id="sec-overview">
+    <div class="section-title">工作流程 <span class="en">Workflow</span></div>
+    
+    <div class="flow-vertical">
+        <div class="flow-item"><div class="title">① 参数设定</div><div class="en">Parameter Setup</div></div>
+        <div class="flow-arrow-down">↓</div>
+        <div class="flow-item"><div class="title">② 阶数估计</div><div class="en">Order Estimation</div></div>
+        <div class="flow-arrow-down">↓</div>
+        <div class="flow-item"><div class="title">③ 滤波器设计</div><div class="en">Filter Design</div></div>
+        <div class="flow-arrow-down">↓</div>
+        <div class="flow-item"><div class="title">④ 特性分析</div><div class="en">Analysis (Bode/Impulse)</div></div>
+        <div class="flow-arrow-down">↓</div>
+        <div class="flow-item"><div class="title">⑤ 信号滤波</div><div class="en">Apply Filter</div></div>
+    </div>
+    
+    <div class="info">
+        <strong>核心关键词：</strong><br>
+        <span class="term-badge">滤波器 <span class="en">Filter</span></span>
+        <span class="term-badge">采样率 <span class="en">Sample Rate</span></span>
+        <span class="term-badge">通带 <span class="en">Passband</span></span>
+        <span class="term-badge">阻带 <span class="en">Stopband</span></span>
+        <span class="term-badge">阶数 <span class="en">Order</span></span>
+        <span class="term-badge">系数 <span class="en">Coefficients</span></span>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Section: Concepts -->
+<div class="section" id="sec-concepts">
+    <div class="section-title">基本概念 <span class="en">Concepts</span></div>
+    
+    <div class="compare-grid">
+        <div class="compare-item">
+            <h4>FIR</h4>
+            <div class="en">有限脉冲响应</div>
+            <ul>
+                <li>无反馈</li>
+                <li>天然稳定</li>
+                <li>线性相位</li>
+                <li>阶数较高</li>
+            </ul>
+        </div>
+        <div class="compare-item">
+            <h4>IIR</h4>
+            <div class="en">无限脉冲响应</div>
+            <ul>
+                <li>有反馈</li>
+                <li>需验证稳定性</li>
+                <li>非线性相位</li>
+                <li>阶数低效率高</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Filter Types SVG for mobile -->
+    <div class="svg-diagram">
+        <svg viewBox="0 0 340 450" xmlns="http://www.w3.org/2000/svg">
+            <!-- Lowpass -->
+            <g transform="translate(5,0)">
+                <rect x="0" y="5" width="160" height="95" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+                <text x="80" y="22" text-anchor="middle" font-weight="bold" font-size="11" fill="#1e293b">低通 Lowpass</text>
+                <polyline points="15,50 50,50 60,52 70,65 80,82 95,88 145,88" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+                <text x="30" y="70" font-size="8" fill="#059669">通带</text>
+                <text x="110" y="70" font-size="8" fill="#dc2626">阻带</text>
+            </g>
+            <!-- Highpass -->
+            <g transform="translate(175,0)">
+                <rect x="0" y="5" width="160" height="95" rx="8" fill="#dcfce7" stroke="#059669" stroke-width="1.5"/>
+                <text x="80" y="22" text-anchor="middle" font-weight="bold" font-size="11" fill="#1e293b">高通 Highpass</text>
+                <polyline points="15,88 55,88 65,70 75,50 85,50 145,50" fill="none" stroke="#059669" stroke-width="2.5"/>
+                <text x="30" y="70" font-size="8" fill="#dc2626">阻带</text>
+                <text x="110" y="70" font-size="8" fill="#059669">通带</text>
+            </g>
+            <!-- Bandpass -->
+            <g transform="translate(5,110)">
+                <rect x="0" y="5" width="160" height="95" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+                <text x="80" y="22" text-anchor="middle" font-weight="bold" font-size="11" fill="#1e293b">带通 Bandpass</text>
+                <polyline points="15,88 35,88 45,70 55,50 85,50 95,70 105,88 145,88" fill="none" stroke="#d97706" stroke-width="2.5"/>
+                <text x="25" y="68" font-size="8" fill="#dc2626">阻</text>
+                <text x="70" y="68" font-size="8" fill="#059669">通带</text>
+                <text x="125" y="68" font-size="8" fill="#dc2626">阻</text>
+            </g>
+            <!-- Bandstop -->
+            <g transform="translate(175,110)">
+                <rect x="0" y="5" width="160" height="95" rx="8" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+                <text x="80" y="22" text-anchor="middle" font-weight="bold" font-size="11" fill="#1e293b">带阻 Bandstop</text>
+                <polyline points="15,50 35,50 45,60 55,88 85,88 95,60 105,50 145,50" fill="none" stroke="#db2777" stroke-width="2.5"/>
+                <text x="25" y="68" font-size="8" fill="#059669">通</text>
+                <text x="70" y="68" font-size="8" fill="#dc2626">阻带</text>
+                <text x="125" y="68" font-size="8" fill="#059669">通</text>
+            </g>
+            <!-- Notch -->
+            <g transform="translate(5,220)">
+                <rect x="0" y="5" width="160" height="95" rx="8" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"/>
+                <text x="80" y="22" text-anchor="middle" font-weight="bold" font-size="11" fill="#1e293b">陷波 Notch</text>
+                <polyline points="15,50 50,50 60,55 70,75 75,88 80,75 90,55 100,50 145,50" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+                <text x="80" y="70" text-anchor="middle" font-size="8" fill="#7c3aed">fc</text>
+            </g>
+            <!-- Peak -->
+            <g transform="translate(175,220)">
+                <rect x="0" y="5" width="160" height="95" rx="8" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+                <text x="80" y="22" text-anchor="middle" font-weight="bold" font-size="11" fill="#1e293b">峰频 Peak</text>
+                <polyline points="15,85 50,85 60,75 70,55 75,40 80,55 90,75 100,85 145,85" fill="none" stroke="#059669" stroke-width="2.5"/>
+                <text x="80" y="70" text-anchor="middle" font-size="8" fill="#059669">fc</text>
+            </g>
+            <!-- Legend -->
+            <g transform="translate(5,330)">
+                <rect x="0" y="5" width="330" height="110" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+                <text x="165" y="25" text-anchor="middle" font-weight="bold" font-size="11">六种滤波器类型频率响应</text>
+                <text x="15" y="45" font-size="9" fill="#64748b">• 低通/高通/带通/带阻：经典FIR和IIR均支持</text>
+                <text x="15" y="63" font-size="9" fill="#64748b">• 陷波/峰频：仅IIR，通过中心频率和Q值指定</text>
+                <text x="15" y="81" font-size="9" fill="#64748b">• 纵轴：幅度增益 | 横轴：频率</text>
+                <text x="15" y="99" font-size="9" fill="#64748b">• 通带(Passband)=信号保留 | 阻带(Stopband)=信号衰减</text>
+            </g>
+        </svg>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Section: Design -->
+<div class="section" id="sec-design">
+    <div class="section-title">滤波器设计 <span class="en">Filter Design</span></div>
+    
+    <div class="accordion">
+        <div class="accordion-item">
+            <div class="accordion-header">FIR 设计方法</div>
+            <div class="accordion-body">
+                <div class="card" style="border:none;padding:0;box-shadow:none;">
+                    <h3>Kaiser 窗函数法 <span class="subtitle">Kaiser Window</span></h3>
+                    <p>通过β参数控制主瓣/旁瓣折中，适合阻带衰减要求明确的场景。</p>
+                </div>
+                <div class="card" style="border:none;padding:0;box-shadow:none;margin-top:0.75rem;">
+                    <h3>等纹波法 <span class="subtitle">Equiripple / Parks-McClellan</span></h3>
+                    <p>最优化方法，给定阶数下过渡带最窄。</p>
+                </div>
+                <div class="code-box"><span class="cm">// FIR低通滤波器设计</span>
+filter.<span class="kw">DesignFIRFilter</span>(
+  FIRDesignMethod.<span class="str">Equiripple</span>, <span class="cm">// 等纹波法</span>
+  FIRBandType.<span class="str">Lowpass</span>,       <span class="cm">// 低通</span>
+  <span class="num">0.01</span>,  <span class="cm">// 通带波动 dB</span>
+  <span class="num">60.0</span>,  <span class="cm">// 阻带抑制 dB</span>
+  <span class="num">10000</span>, <span class="cm">// 采样率 Hz</span>
+  <span class="num">1000</span>,  <span class="cm">// 通带频率 Hz</span>
+  <span class="num">1500</span>   <span class="cm">// 截止频率 Hz</span>
+);</div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <div class="accordion-header">IIR 设计方法</div>
+            <div class="accordion-body">
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>方法</th><th>English</th><th>特点</th></tr></thead>
+                        <tbody>
+                            <tr><td>巴特沃思</td><td>Butterworth</td><td>最大平坦</td></tr>
+                            <tr><td>切比雪夫I</td><td>Chebyshev I</td><td>通带等纹波</td></tr>
+                            <tr><td>切比雪夫II</td><td>Chebyshev II</td><td>阻带等纹波</td></tr>
+                            <tr><td>椭圆</td><td>Elliptic</td><td>阶数最低</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-box"><span class="cm">// IIR带通滤波器设计</span>
+filter.<span class="kw">DesignIIRFilter</span>(
+  IIRDesignMethod.<span class="str">Elliptic</span>,
+  IIRBandType.<span class="str">Bandpass</span>,
+  <span class="num">0.5</span>,   <span class="cm">// 通带波动 dB</span>
+  <span class="num">40.0</span>,  <span class="cm">// 阻带抑制 dB</span>
+  <span class="num">44100</span>, <span class="cm">// 采样率</span>
+  <span class="num">500</span>,   <span class="cm">// 通带下边界</span>
+  <span class="num">200</span>,   <span class="cm">// 阻带下边界</span>
+  <span class="num">4000</span>,  <span class="cm">// 通带上边界</span>
+  <span class="num">6000</span>   <span class="cm">// 阻带上边界</span>
+);</div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <div class="accordion-header">Notch / Peak 滤波器</div>
+            <div class="accordion-body">
+                <p><strong>陷波(Notch)</strong>：在特定频率深度衰减，如去除50Hz工频。</p>
+                <p><strong>峰频(Peak)</strong>：仅让特定频率通过/增强。</p>
+                <div class="code-box"><span class="cm">// 陷波滤波器去除50Hz干扰</span>
+filter.<span class="kw">DesignNotchPeakFilter</span>(
+  <span class="num">1000</span>,  <span class="cm">// 采样率</span>
+  <span class="num">50</span>,    <span class="cm">// 中心频率 50Hz</span>
+  <span class="num">30</span>,    <span class="cm">// Q因子</span>
+  PeakNotchType.<span class="str">Notch</span>
+);</div>
+                <div class="tip">
+                    <strong>Q值：</strong>Q = 中心频率 / 带宽。Q越大，滤波越窄越精确。
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <div class="accordion-header">SOS 级联设计 (高阶稳定)</div>
+            <div class="accordion-body">
+                <p>已知阶数时直接设计SOS（二阶节级联），数值更稳定。</p>
+                <div class="code-box"><span class="cm">// 4阶Butterworth低通SOS设计</span>
+filter.<span class="kw">DesignSOSFilter</span>(
+  <span class="num">4</span>,      <span class="cm">// 阶数</span>
+  <span class="num">10000</span>,  <span class="cm">// 采样率</span>
+  <span class="kw">new double</span>[]{ <span class="num">1000</span> },
+  <span class="num">3.0</span>,    <span class="cm">// 通带波动</span>
+  <span class="kw">double</span>.NaN,
+  IIRBandType.<span class="str">Lowpass</span>,
+  IIRDesignMethod.<span class="str">Butterworth</span>
+);</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Section: Analysis -->
+<div class="section" id="sec-analysis">
+    <div class="section-title">滤波器分析 <span class="en">Analysis</span></div>
+    
+    <div class="card">
+        <h3>波特图 <span class="subtitle">Bode Plot</span></h3>
+        <p>幅度响应(dB) + 相位响应(°)，验证设计是否满足需求。</p>
+        <div class="code-box"><span class="kw">double</span>[] mag = filter.bodeMag;   <span class="cm">// 幅度dB</span>
+<span class="kw">double</span>[] phase = filter.bodePhase; <span class="cm">// 相位°</span>
+<span class="kw">double</span>[] freq = filter.bodeFreq;   <span class="cm">// 频率Hz</span></div>
+    </div>
+    
+    <div class="card">
+        <h3>冲激响应 <span class="subtitle">Impulse Response</span></h3>
+        <p>滤波器对单位脉冲的时域输出，揭示时域特性。</p>
+        <div class="code-box"><span class="kw">double</span>[] h = filter.impulseResponseH; <span class="cm">// 响应</span>
+<span class="kw">double</span>[] t = filter.impulseResponseT; <span class="cm">// 时间轴</span></div>
+    </div>
+    
+    <div class="tip">
+        <strong>分析长度：</strong><code>FrequencyResponseAnalysisLength</code> 默认1024点，可按需调整。
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Section: Filtering -->
+<div class="section" id="sec-filter">
+    <div class="section-title">滤波处理 <span class="en">Filtering</span></div>
+    
+    <div class="compare-grid">
+        <div class="compare-item">
+            <h4>Filtering()</h4>
+            <div class="en">通用滤波</div>
+            <ul>
+                <li>自动判断FIR/IIR</li>
+                <li>FIR直接卷积</li>
+                <li>IIR差分方程</li>
+            </ul>
+        </div>
+        <div class="compare-item">
+            <h4>FilteringSOS()</h4>
+            <div class="en">SOS级联滤波</div>
+            <ul>
+                <li>仅IIR</li>
+                <li>数值更稳定</li>
+                <li>推荐高阶使用</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="code-box"><span class="cm">// 基本滤波</span>
+<span class="kw">double</span>[] output = filter.Filtering(input, reset:<span class="kw">true</span>);
+
+<span class="cm">// SOS滤波（推荐高阶IIR）</span>
+<span class="kw">double</span>[] output = filter.FilteringSOS(input, reset:<span class="kw">true</span>);
+
+<span class="cm">// 连续流式数据：首块reset，后续保持状态</span>
+<span class="kw">var</span> y1 = filter.Filtering(chunk1, reset:<span class="kw">true</span>);
+<span class="kw">var</span> y2 = filter.Filtering(chunk2, reset:<span class="kw">false</span>);</div>
+    
+    <div class="card">
+        <h3>reset 参数说明</h3>
+        <p><strong>true</strong>：清空状态，处理独立信号段<br>
+        <strong>false</strong>：保持状态，实现连续流式滤波</p>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Section: Demo -->
+<div class="section" id="sec-demo">
+    <div class="section-title">动手实践 <span class="en">Interactive Demo</span></div>
+    
+    <div class="card">
+        <h3>交互式滤波演示</h3>
+        <div class="demo-controls">
+            <div>
+                <label>滤波器类型</label>
+                <select id="mFilterType">
+                    <option value="lowpass">低通 Lowpass</option>
+                    <option value="highpass">高通 Highpass</option>
+                </select>
+            </div>
+            <div>
+                <label>截止频率 (Hz)</label>
+                <input type="number" id="mCutoff" value="100" min="1">
+            </div>
+            <div>
+                <label>信号频率1 (Hz)</label>
+                <input type="number" id="mSigFreq" value="50" min="1">
+            </div>
+            <div>
+                <label>信号频率2 (Hz)</label>
+                <input type="number" id="mSigFreq2" value="200" min="1">
+            </div>
+            <button class="btn-run" onclick="mRunDemo()">▶ 运行演示</button>
+        </div>
+        
+        <div class="canvas-label">输入信号 (双频率叠加)</div>
+        <canvas id="mCanvasIn"></canvas>
+        <div class="canvas-label">滤波后输出</div>
+        <canvas id="mCanvasOut"></canvas>
+        <div class="canvas-label">频率响应</div>
+        <canvas id="mCanvasFreq"></canvas>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Section: AI Prompts -->
+<div class="section" id="sec-prompts">
+    <div class="section-title">AI 提示词速查 <span class="en">Prompt Reference</span></div>
+    
+    <div class="card">
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>需求描述</th><th>对应API</th></tr></thead>
+                <tbody>
+                    <tr><td>"低通滤波，截止1kHz"</td><td><code>DesignFIRFilter(...Lowpass...)</code></td></tr>
+                    <tr><td>"IIR高通，4阶Butterworth"</td><td><code>DesignSOSFilter(4,...Highpass...)</code></td></tr>
+                    <tr><td>"去除50Hz工频"</td><td><code>DesignNotchPeakFilter(...Notch)</code></td></tr>
+                    <tr><td>"实时连续滤波"</td><td><code>Filtering(..., reset:false)</code></td></tr>
+                    <tr><td>"保留500-2000Hz"</td><td><code>Bandpass, freq=500, freq2=2000</code></td></tr>
+                    <tr><td>"高阶IIR数值稳定"</td><td><code>FilteringSOS()</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="info">
+        <strong>编程提示词模板：</strong><br>
+        "设计一个[FIR/IIR][低通/高通/带通/带阻]滤波器，采样率[X]Hz，通带频率[Y]Hz，截止频率[Z]Hz，阻带衰减[W]dB，使用[设计方法]。"
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Section: Glossary -->
+<div class="section" id="sec-glossary">
+    <div class="section-title">术语表 <span class="en">Glossary</span></div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>中文</th><th>English</th><th>代码</th></tr></thead>
+            <tbody>
+                <tr><td>采样率</td><td>Sample Rate</td><td>SampleRate</td></tr>
+                <tr><td>通带频率</td><td>Passband Freq</td><td>passbandFreq</td></tr>
+                <tr><td>截止频率</td><td>Cutoff Freq</td><td>cutoffFreq</td></tr>
+                <tr><td>通带波动</td><td>Passband Ripple</td><td>PassbandRippleDB</td></tr>
+                <tr><td>阻带抑制</td><td>Stopband Rejection</td><td>StopbandRejectionDB</td></tr>
+                <tr><td>滤波器阶数</td><td>Filter Order</td><td>EstimatedFilterOrder</td></tr>
+                <tr><td>分子系数</td><td>b Coefficients</td><td>_coef_b</td></tr>
+                <tr><td>分母系数</td><td>a Coefficients</td><td>_coef_a</td></tr>
+                <tr><td>零点</td><td>Zeros</td><td>_z</td></tr>
+                <tr><td>极点</td><td>Poles</td><td>_p</td></tr>
+                <tr><td>中心频率</td><td>Center Frequency</td><td>CenterFrequency</td></tr>
+                <tr><td>Q值</td><td>Q Factor</td><td>QFactor</td></tr>
+                <tr><td>波特图</td><td>Bode Plot</td><td>bodeMag/bodePhase</td></tr>
+                <tr><td>冲激响应</td><td>Impulse Response</td><td>impulseResponseH</td></tr>
+                <tr><td>二阶节</td><td>SOS (Second-Order Sections)</td><td>_sos</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="section" style="text-align:center;padding:1.5rem 1.25rem 4rem;background:#1e293b;color:#e2e8f0;">
+    <p style="font-size:0.85rem;">登录简仪官网 <a href="https://jytek.com" target="_blank" style="color:#93c5fd;">jytek.com</a>，下载 JYPEDIA 文件。文件内附软件下载链接，可免费获取 SeeSharp Tools 软件及范例。</p>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <a href="#sec-overview" class="active"><span class="nav-icon">📋</span>概述</a>
+    <a href="#sec-concepts"><span class="nav-icon">💡</span>概念</a>
+    <a href="#sec-design"><span class="nav-icon">🔧</span>设计</a>
+    <a href="#sec-filter"><span class="nav-icon">📊</span>滤波</a>
+    <a href="#sec-demo"><span class="nav-icon">🎮</span>实践</a>
+</div>
+
+<script>
+// Accordion
+document.querySelectorAll('.accordion-header').forEach(header => {
+    header.addEventListener('click', () => {
+        const item = header.parentElement;
+        item.classList.toggle('open');
+    });
+});
+
+// Bottom nav active state
+const navLinks = document.querySelectorAll('.bottom-nav a');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(l => l.classList.remove('active'));
+            const id = entry.target.id;
+            const link = document.querySelector(`.bottom-nav a[href="#${id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { threshold: 0.3 });
+document.querySelectorAll('.section[id]').forEach(s => observer.observe(s));
+
+// Demo
+function mRunDemo() {
+    const type = document.getElementById('mFilterType').value;
+    const cutoff = parseFloat(document.getElementById('mCutoff').value);
+    const sigFreq = parseFloat(document.getElementById('mSigFreq').value);
+    const sigFreq2 = parseFloat(document.getElementById('mSigFreq2').value);
+    const sr = 1000;
+    const N = 300;
+    const dt = 1/sr;
+    
+    let input = [];
+    for(let i=0;i<N;i++){
+        input.push(Math.sin(2*Math.PI*sigFreq*i*dt) + 0.5*Math.sin(2*Math.PI*sigFreq2*i*dt));
+    }
+    
+    let output = mApplyFilter(input, type, cutoff, sr);
+    let freqR = mFreqResp(type, cutoff, sr);
+    
+    mDraw('mCanvasIn', input, '#2563eb');
+    mDraw('mCanvasOut', output, '#059669');
+    mDrawFreq('mCanvasFreq', freqR, sr);
+}
+
+function mApplyFilter(input, type, cutoff, sr) {
+    const fc = cutoff/sr; // normalized cutoff [0, 0.5]
+    const N = input.length;
+    let out = new Array(N).fill(0);
+    
+    // Windowed-sinc FIR filter
+    const M = 101;
+    let h = new Array(M).fill(0);
+    const mid = Math.floor(M/2);
+    
+    // Step 1: Design lowpass kernel
+    for(let i=0;i<M;i++){
+        const n = i - mid;
+        if(n === 0) { h[i] = 2*Math.PI*fc; }
+        else { h[i] = Math.sin(2*Math.PI*fc*n)/n; }
+        // Blackman window
+        h[i] *= 0.42 - 0.5*Math.cos(2*Math.PI*i/(M-1)) + 0.08*Math.cos(4*Math.PI*i/(M-1));
+    }
+    
+    // Step 2: Normalize lowpass to DC gain = 1
+    let s = h.reduce((a,b)=>a+b,0);
+    if(Math.abs(s)>1e-10) h = h.map(v=>v/s);
+    
+    // Step 3: For highpass, spectral inversion AFTER normalization
+    if(type === 'highpass'){
+        for(let i=0;i<M;i++) h[i] = -h[i];
+        h[mid] += 1;
+    }
+    
+    // Step 4: Convolve
+    for(let i=0;i<N;i++){
+        let acc = 0;
+        for(let j=0;j<M;j++){
+            if(i-j>=0) acc += h[j]*input[i-j];
+        }
+        out[i] = acc;
+    }
+    return out;
+}
+
+function mFreqResp(type, cutoff, sr) {
+    const pts=128; let r=new Array(pts);
+    const ny=sr/2;
+    for(let i=0;i<pts;i++){
+        const f=(i/pts)*ny; const nf=f/ny; const nc=cutoff/ny;
+        if(type==='lowpass'){
+            if(nf<=nc*0.9) r[i]=1;
+            else if(nf>=nc*1.3) r[i]=Math.pow(10,-3);
+            else { const t=(nf-nc*0.9)/(nc*0.4); r[i]=Math.pow(10,-3*t); }
+        } else {
+            if(nf>=nc*1.1) r[i]=1;
+            else if(nf<=nc*0.7) r[i]=Math.pow(10,-3);
+            else { const t=(nc*1.1-nf)/(nc*0.4); r[i]=Math.pow(10,-3*t); }
+        }
+    }
+    return r;
+}
+
+function mDraw(id, data, color) {
+    const c=document.getElementById(id); const ctx=c.getContext('2d');
+    const w=c.width=c.offsetWidth*2; const h=c.height=c.offsetHeight*2;
+    ctx.scale(2,2); const dw=c.offsetWidth; const dh=c.offsetHeight;
+    ctx.clearRect(0,0,dw,dh); ctx.fillStyle='#fff'; ctx.fillRect(0,0,dw,dh);
+    ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(20,dh/2);ctx.lineTo(dw-5,dh/2);ctx.stroke();
+    const max=Math.max(...data.map(Math.abs))||1;
+    ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.beginPath();
+    for(let i=0;i<data.length;i++){
+        const x=20+(i/data.length)*(dw-25); const y=dh/2-(data[i]/max)*(dh/2-10);
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+}
+
+function mDrawFreq(id, data, sr) {
+    const c=document.getElementById(id); const ctx=c.getContext('2d');
+    const w=c.width=c.offsetWidth*2; const h=c.height=c.offsetHeight*2;
+    ctx.scale(2,2); const dw=c.offsetWidth; const dh=c.offsetHeight;
+    ctx.clearRect(0,0,dw,dh); ctx.fillStyle='#fff'; ctx.fillRect(0,0,dw,dh);
+    ctx.strokeStyle='#7c3aed'; ctx.lineWidth=2; ctx.beginPath();
+    for(let i=0;i<data.length;i++){
+        const x=20+(i/data.length)*(dw-25);
+        const magDB=20*Math.log10(Math.max(data[i],0.0001));
+        const y=5+(-magDB/80)*(dh-15);
+        const cy=Math.max(5,Math.min(dh-10,y));
+        i===0?ctx.moveTo(x,cy):ctx.lineTo(x,cy);
+    }
+    ctx.stroke();
+    ctx.lineTo(dw-5,dh-10);ctx.lineTo(20,dh-10);ctx.closePath();
+    ctx.fillStyle='rgba(124,58,237,0.08)';ctx.fill();
+}
+
+window.addEventListener('load', mRunDemo);
+</script>
+
+</body>
+</html>

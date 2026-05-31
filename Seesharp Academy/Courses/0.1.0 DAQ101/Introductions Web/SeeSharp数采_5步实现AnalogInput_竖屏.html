@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>SeeSharp 数采 · 5 步实现 AI · 手机版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <style>
+    :root {
+      --c-bg: #0f172a;
+      --c-panel: #1e293b;
+      --c-panel-2: #273449;
+      --c-border: #334155;
+      --c-text: #e2e8f0;
+      --c-muted: #94a3b8;
+      --c-accent: #38bdf8;
+      --c-accent-2: #f472b6;
+      --c-step-1: #38bdf8;
+      --c-step-2: #a78bfa;
+      --c-step-3: #f472b6;
+      --c-step-4: #fb923c;
+      --c-step-5: #4ade80;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0;
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      color: var(--c-text);
+      font-family: "PingFang SC", "Microsoft YaHei", -apple-system, system-ui, sans-serif;
+      min-height: 100vh; overflow-x: hidden;
+    }
+    .wrap { padding: 16px 14px 32px; max-width: 480px; margin: 0 auto; }
+
+    /* Hero */
+    header.hero {
+      text-align: center; padding: 8px 0 18px;
+      border-bottom: 1px solid var(--c-border);
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      margin: 0; font-size: 20px; line-height: 1.3;
+      background: linear-gradient(90deg, #38bdf8, #f472b6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero .sub { color: var(--c-muted); font-size: 12px; margin-top: 4px; }
+    .hero .tag {
+      display: inline-block; margin-top: 8px;
+      background: rgba(56,189,248,0.14); color: var(--c-accent);
+      border: 1px solid rgba(56,189,248,0.4);
+      padding: 3px 10px; border-radius: 999px; font-size: 11px;
+    }
+
+    /* Step Tracker (horizontal pills, scroll) */
+    .step-bar {
+      display: flex; gap: 8px; overflow-x: auto;
+      padding: 4px 0 10px; margin: 0 -14px 14px; padding-left: 14px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .step-bar::-webkit-scrollbar { display: none; }
+    .step-pill {
+      flex: 0 0 auto; scroll-snap-align: start;
+      background: var(--c-panel); border: 1px solid var(--c-border);
+      border-radius: 999px; padding: 8px 14px;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .step-pill .num {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      background: var(--c-panel-2);
+    }
+    .step-pill[data-step="1"] .num { background: rgba(56,189,248,0.25); }
+    .step-pill[data-step="2"] .num { background: rgba(167,139,250,0.25); }
+    .step-pill[data-step="3"] .num { background: rgba(244,114,182,0.25); }
+    .step-pill[data-step="4"] .num { background: rgba(251,146,60,0.25); }
+    .step-pill[data-step="5"] .num { background: rgba(74,222,128,0.25); }
+    .step-pill.active { border-color: var(--c-accent); }
+    .step-pill[data-step="1"].active { background: rgba(56,189,248,0.15); border-color: var(--c-step-1); }
+    .step-pill[data-step="2"].active { background: rgba(167,139,250,0.15); border-color: var(--c-step-2); }
+    .step-pill[data-step="3"].active { background: rgba(244,114,182,0.15); border-color: var(--c-step-3); }
+    .step-pill[data-step="4"].active { background: rgba(251,146,60,0.15); border-color: var(--c-step-4); }
+    .step-pill[data-step="5"].active { background: rgba(74,222,128,0.15); border-color: var(--c-step-5); }
+    .step-pill[data-step="1"].active .num { background: var(--c-step-1); color: #0f172a; }
+    .step-pill[data-step="2"].active .num { background: var(--c-step-2); color: #0f172a; }
+    .step-pill[data-step="3"].active .num { background: var(--c-step-3); color: #0f172a; }
+    .step-pill[data-step="4"].active .num { background: var(--c-step-4); color: #0f172a; }
+    .step-pill[data-step="5"].active .num { background: var(--c-step-5); color: #0f172a; }
+
+    /* Card */
+    .card {
+      background: var(--c-panel); border: 1px solid var(--c-border);
+      border-radius: 14px; padding: 16px 14px;
+      margin-bottom: 14px;
+    }
+    .card h2 {
+      margin: 0 0 6px; font-size: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card h2 .num-large {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #0f172a; flex-shrink: 0;
+    }
+    [data-step="1"] .num-large { background: var(--c-step-1); }
+    [data-step="2"] .num-large { background: var(--c-step-2); }
+    [data-step="3"] .num-large { background: var(--c-step-3); }
+    [data-step="4"] .num-large { background: var(--c-step-4); }
+    [data-step="5"] .num-large { background: var(--c-step-5); }
+
+    .card .lead { color: var(--c-muted); font-size: 13px; margin: 8px 0 12px; line-height: 1.6; }
+
+    /* Concept block */
+    .concept {
+      background: var(--c-panel-2);
+      border-left: 3px solid var(--c-accent);
+      border-radius: 6px; padding: 10px 12px; margin: 10px 0;
+      font-size: 13px; line-height: 1.65;
+    }
+    .concept strong { color: var(--c-accent); }
+    .concept.warn { border-left-color: #facc15; }
+    .concept.warn strong { color: #facc15; }
+    .concept ul { margin: 4px 0 0; padding-left: 20px; line-height: 1.7; }
+
+    code {
+      background: rgba(56,189,248,0.12); color: var(--c-accent);
+      padding: 1px 6px; border-radius: 4px; font-size: 12px;
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    }
+
+    /* Property table → mobile uses cards instead */
+    .prop-list { margin-top: 10px; }
+    .prop-item {
+      background: var(--c-panel-2); border-radius: 8px;
+      padding: 10px 12px; margin-bottom: 8px;
+    }
+    .prop-item .pname {
+      font-family: ui-monospace, monospace; color: var(--c-accent);
+      font-size: 12.5px; font-weight: 600;
+    }
+    .prop-item .pdesc { font-size: 12.5px; margin-top: 4px; line-height: 1.55; }
+    .prop-item .pdesc .en { color: var(--c-muted); font-size: 11px; display: block; margin-top: 2px; }
+
+    /* Device card */
+    .device-card {
+      background: var(--c-panel-2); padding: 12px;
+      border-radius: 10px; margin: 10px 0;
+      display: flex; gap: 10px; align-items: center;
+    }
+    .device-card .icon { font-size: 28px; }
+    .device-card .info .title { font-weight: 600; font-size: 13px; }
+    .device-card .info .spec { color: var(--c-muted); font-size: 11px; margin-top: 2px; line-height: 1.5; }
+
+    /* Lab Controls */
+    .lab { margin-top: 10px; }
+    .ctrl {
+      margin-bottom: 12px;
+    }
+    .ctrl-label {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; margin-bottom: 6px;
+    }
+    .ctrl-label .en { color: var(--c-muted); font-size: 11px; }
+    .ctrl-label .readout {
+      color: var(--c-accent); font-family: ui-monospace, monospace;
+      font-size: 13px; font-weight: 600;
+    }
+    .ctrl input[type=range] {
+      width: 100%; height: 30px; -webkit-appearance: none; background: transparent;
+    }
+    .ctrl input[type=range]::-webkit-slider-runnable-track {
+      height: 6px; background: var(--c-panel-2); border-radius: 3px;
+    }
+    .ctrl input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 22px; height: 22px;
+      border-radius: 50%; background: var(--c-accent);
+      margin-top: -8px; cursor: pointer;
+      box-shadow: 0 2px 6px rgba(56,189,248,0.5);
+    }
+    .ctrl select {
+      width: 100%; background: var(--c-panel-2); color: var(--c-text);
+      border: 1px solid var(--c-border); border-radius: 8px;
+      padding: 10px 12px; font-size: 14px;
+      -webkit-appearance: none; appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%2394a3b8' d='M6 8L0 0h12z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    .hint {
+      font-size: 11px; color: var(--c-muted); margin-top: 4px;
+    }
+
+    /* Code Panel (mobile-friendly: scroll) */
+    .code-panel {
+      background: #0b1220; border: 1px solid var(--c-border);
+      border-radius: 8px; padding: 12px; margin-top: 12px;
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+      font-size: 11.5px; line-height: 1.55;
+      overflow: auto; max-height: 320px;
+      white-space: pre;
+      -webkit-overflow-scrolling: touch;
+    }
+    .code-panel .kw { color: #c084fc; }
+    .code-panel .type { color: #38bdf8; }
+    .code-panel .str { color: #fbbf24; }
+    .code-panel .num { color: #f472b6; }
+    .code-panel .cmt { color: #64748b; font-style: italic; }
+
+    /* Waveform */
+    .wave-box {
+      background: #0b1220; border: 1px solid var(--c-border);
+      border-radius: 8px; padding: 8px; margin-top: 12px;
+    }
+    .wave-box canvas { width: 100%; height: 160px; display: block; }
+    .wave-legend {
+      font-size: 11px; color: var(--c-muted); margin-top: 4px;
+    }
+    .wave-legend .swatch {
+      display: inline-block; width: 10px; height: 10px;
+      border-radius: 2px; margin-right: 6px; vertical-align: middle;
+      background: var(--c-accent);
+    }
+
+    /* Status */
+    .status-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+      margin-top: 10px;
+    }
+    .status-item {
+      background: var(--c-panel-2); border-radius: 8px;
+      padding: 8px 10px; text-align: center;
+    }
+    .status-item .k { color: var(--c-muted); font-size: 10px; display: block; margin-bottom: 2px; }
+    .status-item .v { color: var(--c-accent); font-size: 13px; font-weight: 600; font-family: ui-monospace, monospace; }
+
+    /* Buttons */
+    .btn-bar { display: flex; gap: 8px; margin-top: 12px; }
+    .btn {
+      flex: 1; padding: 12px; border-radius: 8px;
+      border: 1px solid var(--c-border);
+      background: var(--c-panel-2); color: var(--c-text);
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn.primary { background: var(--c-accent); color: #0f172a; border-color: var(--c-accent); }
+    .btn.danger { background: #ef4444; color: white; border-color: #ef4444; }
+
+    .nav-bar {
+      display: flex; gap: 8px; margin-top: 14px;
+    }
+    .nav-bar .btn { padding: 10px; font-size: 13px; }
+
+    .step-section { display: none; }
+    .step-section.active { display: block; animation: slideIn 0.25s ease; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Footer */
+    footer.cta {
+      margin-top: 18px; padding: 18px 16px;
+      background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(244,114,182,0.12));
+      border: 1px solid rgba(56,189,248,0.3); border-radius: 14px;
+      text-align: center;
+    }
+    footer.cta h3 { margin: 0 0 8px; font-size: 15px; color: var(--c-accent); }
+    footer.cta p { margin: 4px 0; color: var(--c-text); font-size: 13px; line-height: 1.6; }
+    footer.cta a { color: var(--c-accent-2); font-weight: 600; text-decoration: none; }
+
+    /* Tip banner */
+    .tip-banner {
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.3);
+      color: #86efac;
+      padding: 10px 12px; border-radius: 8px;
+      font-size: 12px; margin: 10px 0;
+      line-height: 1.55;
+    }
+
+    /* ===== Appendix · 附录 (mobile) ===== */
+    .appendix-section { margin-top: 18px; }
+    .appendix-card { margin-bottom: 14px; }
+    .appendix-card h2 .apx-badge {
+      background: var(--c-accent-2); color: #0f172a;
+      font-size: 11px; padding: 2px 8px; border-radius: 999px; margin-right: 4px;
+    }
+    .apx-tabs {
+      display: flex; gap: 6px;
+      overflow-x: auto;
+      padding: 4px 0 8px; margin: 10px -14px 12px; padding-left: 14px;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+    }
+    .apx-tabs::-webkit-scrollbar { display: none; }
+    .apx-tab {
+      flex: 0 0 auto; scroll-snap-align: start;
+      background: var(--c-panel-2); color: var(--c-text);
+      border: 1px solid var(--c-border); border-radius: 999px;
+      padding: 7px 13px; font-size: 12px; cursor: pointer;
+      white-space: nowrap;
+    }
+    .apx-tab.active {
+      background: var(--c-accent); color: #0f172a;
+      border-color: var(--c-accent); font-weight: 600;
+    }
+    .apx-canvas-wrap {
+      background: #0b1220; border: 1px solid var(--c-border);
+      border-radius: 8px; padding: 8px;
+    }
+    .apx-canvas-wrap canvas { width: 100%; height: 220px; display: block; }
+    .apx-desc {
+      font-size: 12.5px; line-height: 1.7;
+      background: var(--c-panel-2); border-radius: 8px;
+      padding: 12px 14px; margin-top: 10px;
+    }
+    .apx-desc h4 {
+      color: var(--c-accent); margin: 0 0 4px; font-size: 13.5px;
+    }
+    .apx-desc .en {
+      color: var(--c-muted); font-size: 11px;
+      display: block; margin: 0 0 8px;
+    }
+    .apx-desc p { margin: 6px 0; }
+    .apx-desc ul { margin: 4px 0; padding-left: 22px; line-height: 1.7; }
+    .apx-desc .warn-tip {
+      color: var(--c-warn); border-left: 3px solid var(--c-warn);
+      padding: 6px 10px; margin: 8px 0; background: rgba(250,204,21,0.08);
+      border-radius: 0 6px 6px 0; font-size: 12px;
+    }
+    .apx-desc .warn-tip.danger {
+      color: #fecaca;
+      border: 2px solid #ef4444;
+      border-left-width: 6px;
+      background: linear-gradient(90deg, rgba(239,68,68,0.18), rgba(239,68,68,0.06));
+      box-shadow: 0 0 0 1px rgba(239,68,68,0.35), 0 4px 14px rgba(239,68,68,0.18);
+      padding: 10px 12px; margin: 10px 0;
+      font-size: 12.5px; line-height: 1.6;
+      border-radius: 8px;
+    }
+    .apx-desc .warn-tip.danger strong { color: #fff; }
+    .apx-desc .warn-tip.danger code {
+      background: rgba(239,68,68,0.25); color: #fff5f5;
+    }
+    .apx-desc code {
+      background: rgba(56,189,248,0.12); color: var(--c-accent);
+      padding: 1px 5px; border-radius: 4px; font-size: 11.5px;
+    }
+    .apx-desc pre {
+      background: #0b1220; border: 1px solid var(--c-border);
+      border-radius: 6px; padding: 8px 10px; margin: 6px 0;
+      font-family: ui-monospace, "SF Mono", Consolas, monospace;
+      font-size: 11px; color: #94a3b8; white-space: pre-wrap; overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>SeeSharp 数采 · 5 步实现<br>Analog Input</h1>
+    <div class="sub">JY5510 · MISD DAQ 入门 · 手机版</div>
+    <span class="tag">JY5500AITask · 中英对照</span>
+  </header>
+
+  <div class="tip-banner">
+    👉 滑动顶部步骤切换 · 每一步都可调参数，代码实时生成
+  </div>
+
+  <!-- Step Tracker -->
+  <div class="step-bar">
+    <div class="step-pill active" data-step="1" onclick="gotoStep(1)">
+      <span class="num">1</span><span>创建任务</span>
+    </div>
+    <div class="step-pill" data-step="2" onclick="gotoStep(2)">
+      <span class="num">2</span><span>添加通道</span>
+    </div>
+    <div class="step-pill" data-step="3" onclick="gotoStep(3)">
+      <span class="num">3</span><span>配置参数</span>
+    </div>
+    <div class="step-pill" data-step="4" onclick="gotoStep(4)">
+      <span class="num">4</span><span>启动采集</span>
+    </div>
+    <div class="step-pill" data-step="5" onclick="gotoStep(5)">
+      <span class="num">5</span><span>读取数据</span>
+    </div>
+  </div>
+
+  <!-- ============ STEP 1 ============ -->
+  <section class="step-section active" data-step="1">
+    <div class="card">
+      <h2><span class="num-large">1</span>创建任务<br><span style="font-size:12px;font-weight:400;color:var(--c-muted)">Create Task · JY5500AITask</span></h2>
+      <p class="lead">采集任务 (Task) 把"硬件 + 通道 + 参数 + 触发"封装成一个对象，相当于在 PXIe 槽位上"租用"一台采集仪。</p>
+
+      <div class="concept">
+        <strong>类比：</strong>你坐在 5510 板卡前，先按下电源、登记座位号 (Slot Number)，于是诞生了一个 <code>aiTask</code>。它知道操作哪张板卡，但还不知道测哪一路、用什么采样率。
+      </div>
+
+      <div class="device-card">
+        <div class="icon">📟</div>
+        <div class="info">
+          <div class="title">JY5510 多功能 I/O</div>
+          <div class="spec">16-ch 差分 / 32-ch 单端<br>18-bit · 最大 2 MS/s<br>±10V ~ ±0.1V · USB / PCIe / PXIe</div>
+        </div>
+      </div>
+
+      <div class="prop-list">
+        <div class="prop-item">
+          <div class="pname">JY5500AITask(slotNumber)</div>
+          <div class="pdesc">构造函数 — 按"槽位号"创建任务<span class="en">Create AI task by Slot Number</span></div>
+        </div>
+        <div class="prop-item">
+          <div class="pname">SlotNumber</div>
+          <div class="pdesc">设备槽位号 (在设备管理器中查看)<span class="en">Slot index seen in JYTEK Device Manager</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:14px">🔧 动手实验 Hands-on Lab</h2>
+      <div class="lab">
+        <div class="ctrl">
+          <div class="ctrl-label">
+            <span>板卡型号 <span class="en">Board</span></span>
+            <span class="readout" id="lab-board-val">5510</span>
+          </div>
+          <select id="lab-board">
+            <option value="5510">JY5510 (2 MS/s)</option>
+            <option value="5511">JY5511 (1.25 MS/s)</option>
+            <option value="5515">JY5515 (16 SE)</option>
+            <option value="5516">JY5516 (16 SE)</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label">
+            <span>槽位号 <span class="en">Slot</span></span>
+            <span class="readout" id="lab-slot-val">0</span>
+          </div>
+          <input type="range" id="lab-slot" min="0" max="7" step="1" value="0" />
+        </div>
+      </div>
+      <pre class="code-panel" id="code-step1"></pre>
+    </div>
+
+    <div class="nav-bar">
+      <span style="flex:1"></span>
+      <button class="btn primary" onclick="gotoStep(2)">下一步 →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2 ============ -->
+  <section class="step-section" data-step="2">
+    <div class="card">
+      <h2><span class="num-large">2</span>添加通道<br><span style="font-size:12px;font-weight:400;color:var(--c-muted)">AddChannel</span></h2>
+      <p class="lead">告诉任务"我要测哪一路、量程多大、用何种接线方式"。</p>
+
+      <div class="concept">
+        <strong>关键概念：</strong><code>AddChannel</code> 把物理引脚映射到任务里。一旦添加，硬件就为这一路分配增益放大器 (PGA) 与缓冲区。
+      </div>
+
+      <div class="prop-list">
+        <div class="prop-item">
+          <div class="pname">chnId · 通道号</div>
+          <div class="pdesc">物理引脚序号；-1 表示全部<span class="en">5510: 0–31 (SE) / 0–7 (Diff)</span></div>
+        </div>
+        <div class="prop-item">
+          <div class="pname">rangeLow / rangeHigh · 量程</div>
+          <div class="pdesc">选择略大于信号峰值 → 精度最高<span class="en">±10 / ±5 / ±2 / ±1 / ±0.5 / ±0.2 / ±0.1 V</span></div>
+        </div>
+        <div class="prop-item">
+          <div class="pname">AITerminal · 终端配置</div>
+          <div class="pdesc">RSE 单端 / NRSE 非参考单端 / Differential 差分<span class="en">Wiring Configuration</span></div>
+        </div>
+      </div>
+
+      <div class="concept warn">
+        <strong>📌 量程口诀：</strong>信号 ≤ 0.2V → 用 ±0.2V 量程，充分利用 18-bit 分辨率；信号超过 ±5V → 必选 ±10V，避免削顶 (clipping)。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:14px">🔧 动手实验</h2>
+      <div class="lab">
+        <div class="ctrl">
+          <div class="ctrl-label">
+            <span>通道号 <span class="en">Channel</span></span>
+            <span class="readout" id="lab-ch-val">AI0</span>
+          </div>
+          <input type="range" id="lab-ch" min="0" max="31" step="1" value="0" />
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label">
+            <span>量程 <span class="en">Range</span></span>
+            <span class="readout" id="lab-range-val">±10 V</span>
+          </div>
+          <select id="lab-range">
+            <option value="10">±10 V</option>
+            <option value="5">±5 V</option>
+            <option value="2">±2 V</option>
+            <option value="1">±1 V</option>
+            <option value="0.5">±0.5 V</option>
+            <option value="0.2">±0.2 V</option>
+            <option value="0.1">±0.1 V</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label">
+            <span>终端配置 <span class="en">Terminal</span></span>
+            <span class="readout" id="lab-term-val">RSE</span>
+          </div>
+          <select id="lab-term">
+            <option value="RSE">RSE · 参考单端</option>
+            <option value="NRSE">NRSE · 非参考单端</option>
+            <option value="Differential">Differential · 差分</option>
+          </select>
+        </div>
+      </div>
+      <pre class="code-panel" id="code-step2"></pre>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn" onclick="gotoStep(1)">← 上一步</button>
+      <button class="btn primary" onclick="gotoStep(3)">下一步 →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3 ============ -->
+  <section class="step-section" data-step="3">
+    <div class="card">
+      <h2><span class="num-large">3</span>配置参数<br><span style="font-size:12px;font-weight:400;color:var(--c-muted)">Configure Parameters</span></h2>
+      <p class="lead">设定"采集模式 + 采样率 + 采集点数"，决定波形以什么速度、采多少点、是否一次完成。</p>
+
+      <div class="concept">
+        <strong>采样率 SampleRate (Sa/s)：</strong>每秒采几个点。<br>
+        <strong>Nyquist 准则：</strong>采样率 ≥ 2 × 信号最高频率。看 10 kHz 正弦波，采样率必须 ≥ 20 kSa/s，工程上常用 5–10 倍。
+      </div>
+
+      <div class="concept">
+        <strong>采集模式 AIMode 四种：</strong>
+        <ul>
+          <li><code>Single</code> 单点 — 类似万用表</li>
+          <li><code>Finite</code> 有限 — 采固定 N 点 (本例)</li>
+          <li><code>Continuous</code> 连续 — 持续采集</li>
+          <li><code>Record</code> 录制 — 流式落盘</li>
+        </ul>
+      </div>
+
+      <div class="prop-list">
+        <div class="prop-item">
+          <div class="pname">Mode · AIMode</div>
+          <div class="pdesc">采集模式枚举<span class="en">Acquisition mode</span></div>
+        </div>
+        <div class="prop-item">
+          <div class="pname">SampleRate · double</div>
+          <div class="pdesc">每通道采样率<span class="en">Sa/s per channel</span></div>
+        </div>
+        <div class="prop-item">
+          <div class="pname">SamplesToAcquire · int</div>
+          <div class="pdesc">Finite 模式总点数<span class="en">Finite-mode samples per channel</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:14px">🔧 动手实验</h2>
+      <div class="lab">
+        <div class="ctrl">
+          <div class="ctrl-label">
+            <span>采集模式 <span class="en">AIMode</span></span>
+            <span class="readout" id="lab-mode-val">Finite</span>
+          </div>
+          <select id="lab-mode">
+            <option value="Finite" selected>Finite · 有限</option>
+            <option value="Single">Single · 单点</option>
+            <option value="Continuous">Continuous · 连续</option>
+            <option value="Record">Record · 录制</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label">
+            <span>采样率 <span class="en">SampleRate</span></span>
+            <span class="readout" id="lab-sr-val">10000 Sa/s</span>
+          </div>
+          <input type="range" id="lab-sr" min="1000" max="2000000" step="1000" value="10000" />
+          <div class="hint">JY5510 上限 2 MS/s · Nyquist 可还原 ≤ <span id="lab-nyq">5000</span> Hz</div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label">
+            <span>采集点数 <span class="en">Samples</span></span>
+            <span class="readout" id="lab-samp-val">1000 pts</span>
+          </div>
+          <input type="range" id="lab-samp" min="100" max="100000" step="100" value="1000" />
+          <div class="hint">采集时长 = 点数 / 采样率 = <span id="lab-dur">0.10</span> s</div>
+        </div>
+      </div>
+      <pre class="code-panel" id="code-step3"></pre>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn" onclick="gotoStep(2)">← 上一步</button>
+      <button class="btn primary" onclick="gotoStep(4)">下一步 →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 4 ============ -->
+  <section class="step-section" data-step="4">
+    <div class="card">
+      <h2><span class="num-large">4</span>启动采集<br><span style="font-size:12px;font-weight:400;color:var(--c-muted)">Start</span></h2>
+      <p class="lead">参数配置完毕，调用 <code>Start()</code>，硬件按设定采样率写入板载缓冲区。</p>
+
+      <div class="concept">
+        <strong>触发 Trigger：</strong>Start 后等触发条件满足才开始采集。
+        <ul>
+          <li><code>Immediate</code> 立即 (默认)</li>
+          <li><code>Digital</code> 数字边沿 (PFI0 上升/下降沿)</li>
+          <li><code>Analog</code> 模拟阈值 (AI0 越过 2.5V)</li>
+          <li><code>Soft</code> 软触发 (调用 SendSoftwareTrigger)</li>
+        </ul>
+      </div>
+
+      <div class="concept warn">
+        <strong>⚠️ 易错点：</strong>Start 后再改 <code>SampleRate</code>/<code>Mode</code> 会抛 <code>TaskHasStartedCannotPerformTheSetOperation</code> — 必须先 Stop 再改参。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:14px">🔧 动手实验</h2>
+      <div class="lab">
+        <div class="ctrl">
+          <div class="ctrl-label">
+            <span>触发类型 <span class="en">Trigger</span></span>
+            <span class="readout" id="lab-trig-val">Immediate</span>
+          </div>
+          <select id="lab-trig">
+            <option value="Immediate" selected>Immediate · 立即</option>
+            <option value="Digital">Digital · 数字</option>
+            <option value="Analog">Analog · 模拟</option>
+            <option value="Soft">Soft · 软触发</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-bar">
+        <button class="btn primary" id="btn-start">▶ Start</button>
+        <button class="btn danger" id="btn-stop">■ Stop</button>
+      </div>
+
+      <div class="status-row">
+        <div class="status-item">
+          <span class="k">状态 State</span>
+          <span class="v" id="stat-state">Stopped</span>
+        </div>
+        <div class="status-item">
+          <span class="k">已采 Acquired</span>
+          <span class="v" id="stat-acq">0</span>
+        </div>
+        <div class="status-item">
+          <span class="k">缓冲 Avail</span>
+          <span class="v" id="stat-avail">0</span>
+        </div>
+      </div>
+
+      <div class="wave-box">
+        <canvas id="wave"></canvas>
+        <div class="wave-legend">
+          <span class="swatch"></span>AI0 仿真信号 · 100 Hz Sine
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn" onclick="gotoStep(3)">← 上一步</button>
+      <button class="btn primary" onclick="gotoStep(5)">下一步 →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 5 ============ -->
+  <section class="step-section" data-step="5">
+    <div class="card">
+      <h2><span class="num-large">5</span>读取数据<br><span style="font-size:12px;font-weight:400;color:var(--c-muted)">ReadData</span></h2>
+      <p class="lead">数据已在板卡 DMA 缓冲区。调用 <code>ReadData</code> 搬到 .NET 数组中绘图或写文件。</p>
+
+      <div class="concept">
+        <strong>缓冲区 Buffer 模型：</strong><br>
+        硬件持续以 SampleRate 写入环形缓冲区 (FIFO)；应用周期性轮询 <code>AvailableSamples</code>，达到 N 点后调 <code>ReadData</code>。<br>
+        读不及时 → <code>BufferDataOverflow</code>，需提高读取频率或降低采样率。
+      </div>
+
+      <div class="prop-list">
+        <div class="prop-item">
+          <div class="pname">AvailableSamples</div>
+          <div class="pdesc">缓冲区可读样本数<span class="en">Samples ready in buffer</span></div>
+        </div>
+        <div class="prop-item">
+          <div class="pname">ReadData(ref buf, n, timeout)</div>
+          <div class="pdesc">读到本地数组；timeout = -1 表示永久等待<span class="en">double[] 单通道 / double[,] 多通道列存储</span></div>
+        </div>
+        <div class="prop-item">
+          <div class="pname">WaitUntilDone(timeout)</div>
+          <div class="pdesc">Finite 模式阻塞等待全部点数完成<span class="en">Block until finite acquisition done</span></div>
+        </div>
+        <div class="prop-item">
+          <div class="pname">Stop() + Channels.Clear()</div>
+          <div class="pdesc">采集完毕务必 Stop 并清通道<span class="en">Avoid leftover channels next time</span></div>
+        </div>
+      </div>
+
+      <div class="concept">
+        <strong>典型 Finite 流程 (Winform_AI_Finite 范例)：</strong>
+<pre style="margin:6px 0 0; font-size:11px; color:var(--c-muted); white-space:pre-wrap;">Timer Tick:
+  if (aiTask.AvailableSamples
+      >= readValue.Length) {
+    aiTask.ReadData(ref readValue,
+      readValue.Length, -1);
+    chart.Plot(readValue);
+    aiTask.Stop();
+    aiTask.Channels.Clear();
+  }</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:14px">📋 完整代码 Full Code</h2>
+      <p class="lead">把所有参数串起来，得到一份可运行的 5510 单通道 Finite 采集 C# 范例。</p>
+      <pre class="code-panel" id="code-full"></pre>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn" onclick="gotoStep(4)">← 上一步</button>
+      <button class="btn primary" onclick="gotoStep(1)">↺ 重新开始</button>
+    </div>
+  </section>
+
+  <!-- ============ APPENDIX · 附录 ============ -->
+  <section class="appendix-section">
+
+    <div class="card appendix-card">
+      <h2 style="font-size:15px"><span class="apx-badge">A</span>附录 A · 终端模式<br><span style="font-size:11px;font-weight:400;color:var(--c-muted)">Terminal Modes · Canvas 实时绘制</span></h2>
+
+      <div class="apx-tabs" id="term-tabs">
+        <button class="apx-tab active" data-term="RSE">RSE 参考单端</button>
+        <button class="apx-tab" data-term="NRSE">NRSE 非参考单端</button>
+        <button class="apx-tab" data-term="DIFF">Differential 差分</button>
+      </div>
+
+      <div class="apx-canvas-wrap">
+        <canvas id="term-canvas"></canvas>
+      </div>
+      <div class="apx-desc" id="term-desc"></div>
+    </div>
+
+    <div class="card appendix-card">
+      <h2 style="font-size:15px"><span class="apx-badge">B</span>附录 B · 触发模式<br><span style="font-size:11px;font-weight:400;color:var(--c-muted)">Trigger Modes · 参考 JY-5500 手册 Figure 17 起</span></h2>
+
+      <div class="apx-tabs" id="trig-tabs">
+        <button class="apx-tab active" data-trig="Imm">Immediate</button>
+        <button class="apx-tab" data-trig="DRise">Digital ↑</button>
+        <button class="apx-tab" data-trig="DFall">Digital ↓</button>
+        <button class="apx-tab" data-trig="ARise">Analog ↑Slope</button>
+        <button class="apx-tab" data-trig="AFall">Analog ↓Slope</button>
+        <button class="apx-tab" data-trig="AWIn">Window-In</button>
+        <button class="apx-tab" data-trig="AWOut">Window-Out</button>
+        <button class="apx-tab" data-trig="AHHyst">High Hyst.</button>
+        <button class="apx-tab" data-trig="ALHyst">Low Hyst.</button>
+        <button class="apx-tab" data-trig="Soft">Soft 软</button>
+      </div>
+
+      <div class="apx-canvas-wrap">
+        <canvas id="trig-canvas"></canvas>
+      </div>
+      <div class="apx-desc" id="trig-desc"></div>
+    </div>
+
+  </section>
+
+  <!-- Footer -->
+  <footer class="cta">
+    <h3>🚀 开始你的第一次采集</h3>
+    <p>登录简仪官网 <a href="https://www.jytek.com" target="_blank">jytek.com</a></p>
+    <p>下载 <strong>JYPEDIA</strong> 文件，文件内附软件下载链接，</p>
+    <p>可免费获取 <strong>SeeSharp Tools</strong> 软件及范例。</p>
+    <p style="color:var(--c-muted);font-size:11px;margin-top:8px">
+      Visit <a href="https://www.jytek.com" target="_blank">jytek.com</a> →
+      download JYPEDIA → free SeeSharp Tools SDK.
+    </p>
+  </footer>
+
+</div>
+
+<script>
+  // ===== Step Nav =====
+  function gotoStep(n) {
+    document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.step-pill').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.step-section[data-step="${n}"]`).classList.add('active');
+    const pill = document.querySelector(`.step-pill[data-step="${n}"]`);
+    pill.classList.add('active');
+    pill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    refreshCode();
+  }
+
+  // ===== Lab State =====
+  const lab = {
+    board: '5510', slot: 0, ch: 0, range: 10, term: 'RSE',
+    mode: 'Finite', sr: 10000, samp: 1000, trig: 'Immediate'
+  };
+
+  function bind(id, key, render) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      lab[key] = (el.type === 'range') ? +el.value : el.value;
+      if (render) render();
+      refreshCode();
+      // Refresh waveform preview when sr/samp/mode/range changes
+      if (key === 'sr' || key === 'samp' || key === 'mode' || key === 'range'){
+        lastAcquired = 0;
+        if (typeof drawWave === 'function') drawWave();
+      }
+    });
+  }
+  function doc(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+  bind('lab-board', 'board', () => doc('lab-board-val', lab.board));
+  bind('lab-slot', 'slot', () => doc('lab-slot-val', lab.slot));
+  bind('lab-ch', 'ch', () => doc('lab-ch-val', 'AI' + lab.ch));
+  bind('lab-range', 'range', () => doc('lab-range-val', '±' + lab.range + ' V'));
+  bind('lab-term', 'term', () => doc('lab-term-val', lab.term));
+  bind('lab-mode', 'mode', () => doc('lab-mode-val', lab.mode));
+  bind('lab-sr', 'sr', () => {
+    doc('lab-sr-val', lab.sr.toLocaleString() + ' Sa/s');
+    doc('lab-nyq', Math.floor(lab.sr / 2).toLocaleString());
+    doc('lab-dur', (lab.samp / lab.sr).toFixed(3));
+  });
+  bind('lab-samp', 'samp', () => {
+    doc('lab-samp-val', lab.samp.toLocaleString() + ' pts');
+    doc('lab-dur', (lab.samp / lab.sr).toFixed(3));
+  });
+  bind('lab-trig', 'trig', () => doc('lab-trig-val', lab.trig));
+
+  // ===== Code Highlighter =====
+  function fmt(s) {
+    // Escape HTML, then use placeholder tokens to prevent regexes from matching
+    // the attribute values of previously inserted span tags.
+    s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const tokens = [];
+    // Wrap the index with letter delimiters 'Z' so subsequent number/keyword
+    // regexes cannot re-match the index digits inside the placeholder.
+    const mark = (cls, text) => {
+      tokens.push({ cls, text });
+      return '\u0001Z' + (tokens.length - 1) + 'Z\u0001';
+    };
+    s = s.replace(/(\/\/[^\n]*)/g, m => mark('cmt', m));
+    s = s.replace(/(@?"[^"]*")/g, m => mark('str', m));
+    s = s.replace(/\b(JY5500AITask|AIMode|AITerminal|AITriggerType|JYDriverException|AIDigitalTriggerSource|AIDigitalTriggerEdge|AIAnalogTriggerSource|AIAnalogTriggerEdge|MessageBox)\b/g, m => mark('type', m));
+    s = s.replace(/\b(using|var|new|int|double|bool|if|else|return|while|for|catch|try|throw|public|private)\b/g, m => mark('kw', m));
+    s = s.replace(/\b(\d+(?:\.\d+)?)\b/g, m => mark('num', m));
+    return s.replace(/\u0001Z(\d+)Z\u0001/g, (_, i) => {
+      const t = tokens[+i];
+      return '<span class="' + t.cls + '">' + t.text + '</span>';
+    });
+  }
+  function setCode(id, txt) { const el = document.getElementById(id); if (el) el.innerHTML = fmt(txt); }
+
+  function refreshCode() {
+    setCode('code-step1',
+      `// 1. 创建任务 Create Task\nJY5500AITask aiTask = new JY5500AITask(${lab.slot});`);
+    setCode('code-step2',
+      `// 2. 添加通道 Add Channel\n// AI${lab.ch} · ±${lab.range}V · ${lab.term}\naiTask.AddChannel(${lab.ch}, ${-lab.range}, ${lab.range}, AITerminal.${lab.term});`);
+
+    let c3 = `// 3. 配置参数 Configure\naiTask.Mode = AIMode.${lab.mode};`;
+    if (lab.mode !== 'Single') {
+      c3 += `\naiTask.SampleRate = ${lab.sr};`;
+    }
+    if (lab.mode === 'Finite') {
+      c3 += `\naiTask.SamplesToAcquire = ${lab.samp};`;
+    }
+    setCode('code-step3', c3);
+
+    setCode('code-full', buildFull());
+  }
+
+  function buildFull() {
+    let trigCode = '';
+    if (lab.trig === 'Digital') {
+      trigCode = '\n    aiTask.Trigger.Type = AITriggerType.Digital;\n    aiTask.Trigger.Digital.Source = AIDigitalTriggerSource.PFI0;\n    aiTask.Trigger.Digital.Edge = AIDigitalTriggerEdge.Rising;';
+    } else if (lab.trig === 'Analog') {
+      trigCode = '\n    aiTask.Trigger.Type = AITriggerType.Analog;\n    aiTask.Trigger.Analog.Edge.Slope = AIAnalogTriggerEdge.Rising;\n    aiTask.Trigger.Analog.Edge.Threshold = 2.5;';
+    } else if (lab.trig === 'Soft') {
+      trigCode = '\n    aiTask.Trigger.Type = AITriggerType.Soft;';
+    }
+    const samp = lab.samp;
+    return `using System;
+using JY5500;
+
+// === 5 步实现 AI (JY${lab.board}) ===
+try {
+    // 1. 创建任务 — Slot ${lab.slot}
+    JY5500AITask aiTask =
+        new JY5500AITask(${lab.slot});
+
+    // 2. 添加通道 — AI${lab.ch} · ±${lab.range}V
+    aiTask.AddChannel(${lab.ch}, ${-lab.range}, ${lab.range},
+        AITerminal.${lab.term});
+
+    // 3. 配置参数
+    aiTask.Mode = AIMode.${lab.mode};${(lab.mode!=='Single')?'\n    aiTask.SampleRate = '+lab.sr+';':''}${(lab.mode==='Finite')?'\n    aiTask.SamplesToAcquire = '+samp+';':''}${trigCode}
+
+    // 4. 启动采集
+    aiTask.Start();${(lab.trig==='Soft')?'\n    aiTask.SendSoftwareTrigger();':''}
+
+    // 5. 读取数据
+    double[] readValue = new double[${samp}];
+    ${(lab.mode==='Finite')?'aiTask.WaitUntilDone(-1);\n    ':''}aiTask.ReadData(ref readValue,
+        readValue.Length, -1);
+
+    // 收尾 Cleanup
+    aiTask.Stop();
+    aiTask.Channels.Clear();
+}
+catch (JYDriverException ex) {
+    MessageBox.Show(ex.Message);
+}`;
+  }
+
+  // ===== Waveform =====
+  const canvas = document.getElementById('wave');
+  let running = false, t0 = 0, animId = 0, lastAcquired = 0;
+  const SIG_FREQ = 100; // simulated 100 Hz sine
+  function drawWave() {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.clientWidth, H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    // grid
+    ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 8; i++) {
+      const x = (W / 8) * i;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let i = 0; i <= 4; i++) {
+      const y = (H / 4) * i;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    ctx.strokeStyle = '#475569'; ctx.beginPath();
+    ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke();
+
+    // Single mode: 1 sample, sample rate / length irrelevant
+    if (lab.mode === 'Single'){
+      if (running){
+        const v = lab.range * 0.6;
+        const yy = H / 2 - (v / lab.range) * (H / 2 - 6);
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath(); ctx.arc(W * 0.5, yy, 4, 0, Math.PI * 2); ctx.fill();
+        doc('stat-acq', '1'); doc('stat-avail', '1');
+        running = false; doc('stat-state', 'Done');
+      }
+      ctx.fillStyle = '#64748b'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('Single · 单点采样（不受 SR/Samples 影响）', W/2, H - 4);
+      return;
+    }
+
+    // Finite / Continuous: X-axis spans full record (samp/sr seconds)
+    const totalSamp = Math.max(1, lab.samp);
+    const totalDur  = totalSamp / lab.sr;
+
+    let acquired;
+    if (running){
+      acquired = Math.min((Date.now() - t0) / 1000 * lab.sr, totalSamp);
+      lastAcquired = acquired;
+    } else {
+      acquired = Math.min(lastAcquired, totalSamp);
+    }
+    doc('stat-acq', Math.floor(acquired));
+    doc('stat-avail', Math.floor(acquired));
+
+    if (running && acquired >= totalSamp && lab.mode === 'Finite') {
+      running = false; doc('stat-state', 'Done');
+    }
+
+    const maxPts = 800;
+    const step   = Math.max(1, Math.floor(totalSamp / maxPts));
+    const acqInt = Math.floor(acquired);
+
+    // ghost outline of the entire record
+    ctx.strokeStyle = 'rgba(56,189,248,0.20)'; ctx.lineWidth = 1;
+    ctx.setLineDash([2,3]); ctx.beginPath();
+    for (let i = 0, started = false; i <= totalSamp; i += step){
+      const tt = i / lab.sr;
+      const v  = lab.range * 0.6 * Math.sin(2 * Math.PI * SIG_FREQ * tt);
+      const x  = (i / totalSamp) * W;
+      const y  = H / 2 - (v / lab.range) * (H / 2 - 6);
+      if (!started){ ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // solid acquired portion
+    ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (let i = 0, started = false; i <= acqInt; i += step){
+      const tt = i / lab.sr;
+      const v  = lab.range * 0.6 * Math.sin(2 * Math.PI * SIG_FREQ * tt);
+      const x  = (i / totalSamp) * W;
+      const y  = H / 2 - (v / lab.range) * (H / 2 - 6);
+      if (!started){ ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // progress cursor
+    if (running && acqInt < totalSamp){
+      const xCursor = (acqInt / totalSamp) * W;
+      ctx.strokeStyle = '#f472b6'; ctx.lineWidth = 1.3; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(xCursor, 0); ctx.lineTo(xCursor, H); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // axis labels
+    ctx.fillStyle = '#64748b'; ctx.font = '9px sans-serif';
+    ctx.textAlign = 'left';  ctx.fillText('0 s', 3, H - 3);
+    ctx.textAlign = 'right';
+    const durLabel = totalDur >= 1 ? totalDur.toFixed(3) + ' s'
+                                   : (totalDur * 1000).toFixed(2) + ' ms';
+    ctx.fillText(durLabel + ' · ' + lab.sr.toLocaleString() + ' Sa/s × ' + totalSamp.toLocaleString() + ' pts', W - 3, H - 3);
+
+    if (running) animId = requestAnimationFrame(drawWave);
+  }
+
+  document.getElementById('btn-start').addEventListener('click', () => {
+    running = true; t0 = Date.now(); lastAcquired = 0;
+    doc('stat-state', 'Running');
+    drawWave();
+  });
+  document.getElementById('btn-stop').addEventListener('click', () => {
+    running = false; cancelAnimationFrame(animId);
+    doc('stat-state', 'Stopped');
+    drawWave();
+  });
+
+  // ===== Appendix · 终端 & 触发原理图 =====
+  (function appendixModule(){
+    function setup(canvas){
+      if (!canvas) return null;
+      const dpr = window.devicePixelRatio || 1;
+      const W = canvas.clientWidth || 360;
+      const H = canvas.clientHeight || 220;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      ctx.font = '11px "PingFang SC","Microsoft YaHei",sans-serif';
+      ctx.textBaseline = 'alphabetic';
+      return { ctx, W, H };
+    }
+    function gridBg(ctx, W, H){
+      ctx.strokeStyle = '#162032'; ctx.lineWidth = 1;
+      for (let i = 1; i < 10; i++){ const x = W*i/10; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let j = 1; j < 5; j++){  const y = H*j/5;  ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    }
+    function drawBox(ctx, x, y, w, h, label){
+      ctx.fillStyle = 'rgba(30,41,59,0.55)';
+      ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.1;
+      ctx.fillRect(x,y,w,h); ctx.strokeRect(x,y,w,h);
+      if (label){
+        ctx.fillStyle = '#94a3b8'; ctx.textAlign = 'left';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText(label, x + 4, y - 4);
+      }
+    }
+    function vSrc(ctx, x, y, label){
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.4; ctx.fillStyle = 'rgba(56,189,248,0.08)';
+      ctx.beginPath(); ctx.arc(x,y,11,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x-5,y-2); ctx.bezierCurveTo(x-2,y-7,x+2,y+3,x+5,y-2); ctx.stroke();
+      if (label){ ctx.fillStyle = '#38bdf8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(label, x, y+22); }
+    }
+    function earth(ctx, x, y, color){
+      color = color || '#94a3b8';
+      ctx.strokeStyle = color; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(x-9,y); ctx.lineTo(x+9,y);
+      ctx.moveTo(x-6, y+3); ctx.lineTo(x+6, y+3);
+      ctx.moveTo(x-3, y+6); ctx.lineTo(x+3, y+6);
+      ctx.stroke();
+    }
+    function arrow(ctx, x1, y1, x2, y2, color, dashed){
+      color = color || '#ef4444';
+      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.3;
+      if (dashed) ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      ctx.setLineDash([]);
+      const a = Math.atan2(y2-y1, x2-x1);
+      ctx.beginPath();
+      ctx.moveTo(x2,y2);
+      ctx.lineTo(x2 - 6*Math.cos(a-0.4), y2 - 6*Math.sin(a-0.4));
+      ctx.lineTo(x2 - 6*Math.cos(a+0.4), y2 - 6*Math.sin(a+0.4));
+      ctx.closePath(); ctx.fill();
+    }
+    function ampSym(ctx, x, y, label){
+      ctx.fillStyle = 'rgba(167,139,250,0.18)'; ctx.strokeStyle = '#a78bfa'; ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(x-16,y-16); ctx.lineTo(x-16,y+16); ctx.lineTo(x+14,y); ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#a78bfa'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = '9px sans-serif';
+      ctx.fillText(label || 'PGA', x-5, y);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('+', x-22, y-7);
+      ctx.fillText('−', x-22, y+10);
+      ctx.textBaseline = 'alphabetic';
+    }
+    function title(ctx, W, txt, color){
+      ctx.fillStyle = color || '#f472b6';
+      ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText(txt, W - 6, 14);
+    }
+
+    // ---------- RSE: Two-Scenario Drawing (mobile) ----------
+    function drawRSEScenario(ctx, baseX, baseY, w, h, grounded){
+      const margin = Math.max(8, w * 0.022);
+      const srcW = Math.min(140, Math.max(90, w * 0.32));
+      const devW = Math.min(180, Math.max(120, w * 0.42));
+      const srcX = baseX + margin;
+      const devX = baseX + w - devW - margin;
+      // Push the boxes down so their external labels (at srcY-6) clear the
+      // status banner (banner spans baseY+2 .. baseY+22).
+      const innerY0 = baseY + 44;
+      const innerH = h - 50;
+      const srcY = innerY0;
+      const srcH = innerH - 50;
+      const devY = innerY0;
+      const devH = innerH - 50;
+      const sigY = innerY0 + 14;
+      const refY = innerY0 + innerH - 50;
+
+      // ----- Status banner -----
+      if (grounded){
+        ctx.fillStyle = 'rgba(239,68,68,0.22)';
+        ctx.fillRect(baseX + 4, baseY + 2, w - 8, 20);
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2.2;
+        ctx.strokeRect(baseX + 4, baseY + 2, w - 8, 20);
+        ctx.fillStyle = '#fecaca'; ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText('⛔ 错误·接地源+RSE→地回路·VG 串入', baseX + 10, baseY + 12);
+        ctx.textBaseline = 'alphabetic';
+      } else {
+        ctx.fillStyle = 'rgba(74,222,128,0.18)';
+        ctx.fillRect(baseX + 4, baseY + 2, w - 8, 20);
+        ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 1.5;
+        ctx.strokeRect(baseX + 4, baseY + 2, w - 8, 20);
+        ctx.fillStyle = '#bbf7d0'; ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText('✅ 正确·浮地源+RSE→单点接地，无地回路', baseX + 10, baseY + 12);
+        ctx.textBaseline = 'alphabetic';
+      }
+
+      // ----- Source -----
+      drawBox(ctx, srcX, srcY, srcW, srcH, '信号源');
+      const srcCx = srcX + srcW / 2;
+      const srcCy = srcY + srcH / 2;
+      vSrc(ctx, srcCx, srcCy, 'Vs');
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(srcCx, srcCy - 11); ctx.lineTo(srcCx, sigY); ctx.lineTo(srcX + srcW, sigY);
+      ctx.stroke();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.beginPath();
+      ctx.moveTo(srcCx, srcCy + 11); ctx.lineTo(srcCx, refY); ctx.lineTo(srcX + srcW, refY);
+      ctx.stroke();
+
+      // ----- Device -----
+      drawBox(ctx, devX, devY, devW, devH, 'JY5500');
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(srcX + srcW, sigY); ctx.lineTo(devX, sigY); ctx.stroke();
+      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(srcX + srcW, refY); ctx.lineTo(devX, refY); ctx.stroke();
+      ctx.fillStyle = '#38bdf8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('AI0', devX + 4, sigY - 3);
+      ctx.fillStyle = '#94a3b8'; ctx.fillText('AIGND', devX + 4, refY - 3);
+      const pgaX = devX + Math.min(50, devW * 0.34);
+      ampSym(ctx, pgaX, sigY + 18, 'PGA');
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(devX + 22, sigY); ctx.lineTo(pgaX - 16, sigY + 11); ctx.stroke();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.beginPath(); ctx.moveTo(devX + 22, refY); ctx.lineTo(pgaX - 16, sigY + 28); ctx.stroke();
+
+      // Device-side AIGND → chassis earth
+      ctx.strokeStyle = '#94a3b8';
+      ctx.beginPath(); ctx.moveTo(devX + 22, refY); ctx.lineTo(devX + 22, refY + 12); ctx.stroke();
+      earth(ctx, devX + 22, refY + 14);
+
+      if (grounded){
+        ctx.strokeStyle = '#94a3b8';
+        ctx.beginPath(); ctx.moveTo(srcCx, refY); ctx.lineTo(srcCx, refY + 12); ctx.stroke();
+        earth(ctx, srcCx, refY + 14);
+        ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('源端接地', srcCx, refY + 32);
+
+        // Prominent ground-loop visuals
+        ctx.fillStyle = 'rgba(239,68,68,0.12)';
+        ctx.fillRect(srcCx - 10, refY - 4, devX + 22 - srcCx + 20, 48);
+
+        const loopY = refY + 28;
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2.5;
+        ctx.setLineDash([6, 3]);
+        ctx.beginPath();
+        ctx.moveTo(srcCx + 12, loopY); ctx.lineTo(devX + 22 - 12, loopY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        arrow(ctx, srcCx + 20, loopY, srcCx + 10, loopY, '#ef4444', false);
+        arrow(ctx, devX + 22 - 20, loopY, devX + 22 - 10, loopY, '#ef4444', false);
+
+        const cxLoop = (srcCx + devX + 22) / 2;
+        const labW = Math.min(160, devX + 22 - srcCx - 20), labH = 22;
+        ctx.fillStyle = '#7f1d1d';
+        ctx.fillRect(cxLoop - labW/2, loopY - 8 - labH, labW, labH);
+        ctx.strokeStyle = '#fca5a5'; ctx.lineWidth = 1.6;
+        ctx.strokeRect(cxLoop - labW/2, loopY - 8 - labH, labW, labH);
+        ctx.fillStyle = '#fee2e2'; ctx.font = 'bold 10.5px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('⚠️ VG · 地电位差', cxLoop, loopY - 8 - labH/2);
+        ctx.textBaseline = 'alphabetic';
+      } else {
+        ctx.fillStyle = '#4ade80'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('浮地源', srcCx, refY + 14);
+        ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(srcCx - 6, refY + 20); ctx.lineTo(srcCx + 6, refY + 30);
+        ctx.moveTo(srcCx + 6, refY + 20); ctx.lineTo(srcCx - 6, refY + 30);
+        ctx.stroke();
+        ctx.fillStyle = '#4ade80'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('（无源端接地）', srcCx, refY + 42);
+        ctx.fillText('唯一接地点', devX + 22, refY + 32);
+      }
+    }
+
+    // ---------- Terminal Mode Drawings (mobile compact) ----------
+    function drawTerminal(canvas, mode){
+      // RSE shows two scenarios stacked → taller canvas
+      canvas.style.height = (mode === 'RSE') ? '380px' : '220px';
+      void canvas.offsetHeight;
+      const s = setup(canvas); if (!s) return;
+      const { ctx, W, H } = s;
+      const srcX = 8, srcY = 30, srcW = Math.max(108, W*0.32), srcH = 110;
+      const devW = Math.max(140, W*0.42), devX = W - devW - 6, devY = 30, devH = 110;
+      const sigY = 60, refY = 120;
+
+      drawBox(ctx, srcX, srcY, srcW, srcH, '信号源');
+      vSrc(ctx, srcX + srcW/2, srcY + 50, 'Vs');
+
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(srcX + srcW/2, srcY + 39); ctx.lineTo(srcX + srcW/2, sigY); ctx.lineTo(srcX + srcW, sigY);
+      ctx.stroke();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.beginPath();
+      ctx.moveTo(srcX + srcW/2, srcY + 61); ctx.lineTo(srcX + srcW/2, refY); ctx.lineTo(srcX + srcW, refY);
+      ctx.stroke();
+
+      drawBox(ctx, devX, devY, devW, devH, 'JY5500');
+
+      // Cables
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(srcX + srcW, sigY); ctx.lineTo(devX, sigY); ctx.stroke();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.beginPath(); ctx.moveTo(srcX + srcW, refY); ctx.lineTo(devX, refY); ctx.stroke();
+
+      ctx.fillStyle = '#e2e8f0'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+
+      if (mode === 'RSE'){
+        // RSE shows TWO scenarios stacked vertically:
+        //   ✅ correct (floating source) on top
+        //   ⛔ wrong   (grounded source → ground loop) on bottom
+        ctx.clearRect(0, 0, W, H);
+        const halfH = H / 2;
+        drawRSEScenario(ctx, 0, 0, W, halfH - 4, false);
+        ctx.strokeStyle = '#475569'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(14, halfH); ctx.lineTo(W - 14, halfH); ctx.stroke();
+        ctx.setLineDash([]);
+        drawRSEScenario(ctx, 0, halfH + 4, W, halfH - 4, true);
+        return;
+      }
+      else if (mode === 'NRSE'){
+        ctx.fillStyle = '#38bdf8'; ctx.fillText('AI0', devX + 4, sigY - 3);
+        ctx.fillStyle = '#a78bfa'; ctx.fillText('AISENSE', devX + 4, refY - 3);
+        ampSym(ctx, devX + 60, sigY + 18, 'PGA');
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(devX + 22, sigY); ctx.lineTo(devX + 44, sigY + 11); ctx.stroke();
+        ctx.strokeStyle = '#a78bfa';
+        ctx.beginPath(); ctx.moveTo(devX + 22, refY); ctx.lineTo(devX + 44, sigY + 28); ctx.stroke();
+        // source still grounded
+        ctx.strokeStyle = '#94a3b8';
+        ctx.beginPath(); ctx.moveTo(srcX + srcW/2, refY); ctx.lineTo(srcX + srcW/2, refY + 18); ctx.stroke();
+        earth(ctx, srcX + srcW/2, refY + 20);
+        // AISENSE floating: red X mark
+        ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('浮空', devX + 22, refY + 18);
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(devX + 16, refY + 24); ctx.lineTo(devX + 28, refY + 36);
+        ctx.moveTo(devX + 28, refY + 24); ctx.lineTo(devX + 16, refY + 36);
+        ctx.stroke();
+        ctx.fillStyle = '#4ade80'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('✓ 切断地回路', W/2, H - 6);
+        title(ctx, W, 'NRSE · 浮地参考');
+      }
+      else { // DIFF
+        ctx.fillStyle = '#38bdf8'; ctx.fillText('AI+', devX + 4, sigY - 3);
+        ctx.fillStyle = '#f472b6'; ctx.fillText('AI−', devX + 4, refY - 3);
+        ampSym(ctx, devX + 56, sigY + 30, 'IA');
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(devX + 22, sigY); ctx.lineTo(devX + 40, sigY + 23); ctx.stroke();
+        ctx.strokeStyle = '#f472b6';
+        ctx.beginPath(); ctx.moveTo(devX + 22, refY); ctx.lineTo(devX + 40, sigY + 40); ctx.stroke();
+        // bias resistor
+        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(devX + 30, refY); ctx.lineTo(devX + 30, refY + 16); ctx.stroke();
+        ctx.beginPath();
+        for (let k = 0; k < 4; k++){
+          const yz = refY + 16 + k*3;
+          ctx.moveTo(devX + 30 + (k%2?-3:3), yz);
+          ctx.lineTo(devX + 30 + (k%2?3:-3), yz + 3);
+        }
+        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(devX + 30, refY + 30); ctx.lineTo(devX + 30, refY + 38); ctx.stroke();
+        earth(ctx, devX + 30, refY + 40);
+        ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('Rbias', devX + 36, refY + 22);
+        ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('浮地源', srcX + srcW/2, refY + 14);
+        ctx.fillStyle = '#4ade80'; ctx.font = 'bold 10px sans-serif';
+        ctx.fillText('✓ CMR ≥ 100 dB', W/2, H - 6);
+        title(ctx, W, 'Differential · 差分');
+      }
+    }
+
+    // ---------- Trigger Mode Drawings (mobile compact) ----------
+    function trigBase(canvas){
+      const s = setup(canvas); if (!s) return null;
+      const { ctx, W, H } = s;
+      gridBg(ctx, W, H);
+      const PL = 30, PR = 8, PT = 22, PB = 22;
+      const x0 = PL, y0 = H - PB, xN = W - PR, yT = PT;
+      ctx.strokeStyle = '#475569'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x0, yT); ctx.lineTo(x0, y0); ctx.lineTo(xN, y0);
+      ctx.stroke();
+      ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif';
+      ctx.textAlign = 'right'; ctx.fillText('V', x0 - 4, yT + 7);
+      ctx.textAlign = 'left';  ctx.fillText('t', xN + 1, y0 + 3);
+      return { ctx, W, H, x0, y0, xN, yT };
+    }
+    function hLine(ctx, x0, xN, y, color, dashed, label){
+      ctx.strokeStyle = color; ctx.lineWidth = 1.1;
+      if (dashed) ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(xN, y); ctx.stroke();
+      ctx.setLineDash([]);
+      if (label){
+        ctx.fillStyle = color; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText(label, xN - 76, y - 3);
+      }
+    }
+    function vTrig(ctx, x, yT, y0, label){
+      ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.4;
+      ctx.setLineDash([5,3]);
+      ctx.beginPath(); ctx.moveTo(x, yT); ctx.lineTo(x, y0); ctx.stroke();
+      ctx.setLineDash([]);
+      arrow(ctx, x, yT - 8, x, yT, '#ef4444');
+      ctx.fillStyle = '#ef4444'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(label || '触发', x, yT - 11);
+    }
+    function shadePost(ctx, x, y0, xN, yT){
+      ctx.fillStyle = 'rgba(74,222,128,0.10)';
+      ctx.fillRect(x, yT, xN - x, y0 - yT);
+      ctx.fillStyle = '#4ade80'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('采集', x + 4, y0 - 4);
+    }
+    function shadePre(ctx, x0, xT, y0, yT){
+      ctx.fillStyle = 'rgba(148,163,184,0.06)';
+      ctx.fillRect(x0, yT, xT - x0, y0 - yT);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('等待', x0 + 4, y0 - 4);
+    }
+    function plot(ctx, fn, x0, xN, y0, yT, color){
+      ctx.strokeStyle = color || '#38bdf8'; ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      const N = 200;
+      for (let i = 0; i <= N; i++){
+        const t = i / N;
+        const x = x0 + t * (xN - x0);
+        const v = fn(t);
+        const y = y0 - ((v + 1) / 2) * (y0 - yT);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    function drawTrigger(canvas, mode){
+      const s = trigBase(canvas); if (!s) return;
+      const { ctx, W, H, x0, y0, xN, yT } = s;
+      const yMid = (yT + y0) / 2;
+
+      if (mode === 'Imm'){
+        title(ctx, W, 'Immediate · 立即');
+        const xT = x0;
+        shadePost(ctx, xT, y0, xN, yT);
+        plot(ctx, t => 0.6 * Math.sin(2 * Math.PI * 1.8 * t + 0.5), x0, xN, y0, yT);
+        vTrig(ctx, xT, yT, y0, 'Start()');
+      }
+      else if (mode === 'DRise' || mode === 'DFall'){
+        const rising = (mode === 'DRise');
+        title(ctx, W, rising ? 'Digital Rising · 数字↑' : 'Digital Falling · 数字↓');
+        const square = rising
+          ? (t => (t < 0.4 ? -0.7 : (t < 0.78 ? 0.7 : -0.7)))
+          : (t => (t < 0.4 ?  0.7 : (t < 0.78 ? -0.7 : 0.7)));
+        const xT = x0 + 0.4 * (xN - x0);
+        shadePre(ctx, x0, xT, y0, yT);
+        shadePost(ctx, xT, y0, xN, yT);
+        ctx.strokeStyle = '#a78bfa'; ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        let prevY = null;
+        for (let i = 0; i <= 200; i++){
+          const t = i / 200;
+          const x = x0 + t * (xN - x0);
+          const v = square(t);
+          const y = y0 - ((v + 1) / 2) * (y0 - yT);
+          if (i === 0){ ctx.moveTo(x, y); prevY = y; }
+          else {
+            if (Math.abs(y - prevY) > 1){ ctx.lineTo(x, prevY); }
+            ctx.lineTo(x, y);
+            prevY = y;
+          }
+        }
+        ctx.stroke();
+        vTrig(ctx, xT, yT, y0, rising ? '0→1' : '1→0');
+      }
+      else if (mode === 'ARise' || mode === 'AFall'){
+        const rising = (mode === 'ARise');
+        title(ctx, W, rising ? 'Analog Rising Slope' : 'Analog Falling Slope');
+        const yTh = yMid - 22;
+        hLine(ctx, x0, xN, yTh, '#facc15', true, 'Th=2.5V');
+        const fn = t => 0.7 * Math.sin(2 * Math.PI * 1.2 * t - 0.6);
+        const v_th = ((y0 - yTh) / (y0 - yT)) * 2 - 1;
+        let xT = null, prev = fn(0);
+        for (let i = 1; i <= 200; i++){
+          const t = i/200, v = fn(t);
+          if (rising  && prev < v_th && v >= v_th){ xT = x0 + t*(xN - x0); break; }
+          if (!rising && prev > v_th && v <= v_th){ xT = x0 + t*(xN - x0); break; }
+          prev = v;
+        }
+        if (xT === null) xT = x0 + 0.5*(xN - x0);
+        shadePre(ctx, x0, xT, y0, yT);
+        shadePost(ctx, xT, y0, xN, yT);
+        plot(ctx, fn, x0, xN, y0, yT);
+        vTrig(ctx, xT, yT, y0, rising ? '↑过阈' : '↓过阈');
+      }
+      else if (mode === 'AWIn' || mode === 'AWOut'){
+        const into = (mode === 'AWIn');
+        title(ctx, W, into ? 'Window-In · 进窗' : 'Window-Out · 出窗');
+        const yHi = yMid - 26, yLo = yMid + 26;
+        hLine(ctx, x0, xN, yHi, '#facc15', true, 'High');
+        hLine(ctx, x0, xN, yLo, '#facc15', true, 'Low');
+        ctx.fillStyle = 'rgba(250,204,21,0.07)';
+        ctx.fillRect(x0, yHi, xN - x0, yLo - yHi);
+        const fn = into
+          ? (t => 0.85 * Math.cos(2 * Math.PI * 0.9 * t))
+          : (t => (t < 0.5 ? 0.25 * Math.sin(2 * Math.PI * 4 * t) : 0.25 * Math.sin(2 * Math.PI * 4 * t) + (t - 0.5) * 1.4));
+        const vHi = ((y0 - yHi) / (y0 - yT)) * 2 - 1;
+        const vLo = ((y0 - yLo) / (y0 - yT)) * 2 - 1;
+        const inWin = v => v <= vHi && v >= vLo;
+        let xT = null, prev = fn(0);
+        for (let i = 1; i <= 200; i++){
+          const t = i/200, v = fn(t);
+          if (into && !inWin(prev) && inWin(v)){ xT = x0 + t*(xN - x0); break; }
+          if (!into && inWin(prev) && !inWin(v)){ xT = x0 + t*(xN - x0); break; }
+          prev = v;
+        }
+        if (xT === null) xT = x0 + 0.5*(xN - x0);
+        shadePre(ctx, x0, xT, y0, yT);
+        shadePost(ctx, xT, y0, xN, yT);
+        plot(ctx, fn, x0, xN, y0, yT);
+        vTrig(ctx, xT, yT, y0, into ? '进窗' : '出窗');
+      }
+      else if (mode === 'AHHyst' || mode === 'ALHyst'){
+        const high = (mode === 'AHHyst');
+        title(ctx, W, high ? 'High Hysteresis' : 'Low Hysteresis');
+        const yHi = yMid - 22, yLo = yMid + 18;
+        hLine(ctx, x0, xN, yHi, '#facc15', true, 'High');
+        hLine(ctx, x0, xN, yLo, '#fb923c', true, 'Low');
+        const fn = high
+          ? (t => {
+              if (t < 0.20) return 0.15 + 0.05 * Math.sin(20*t);
+              if (t < 0.42) return 0.15 - (t - 0.20) * 4.0;
+              if (t < 0.62) return -0.7 + (t - 0.42) * 7.0;
+              return 0.7 + 0.05 * Math.sin(30*t);
+            })
+          : (t => {
+              if (t < 0.20) return -0.15 + 0.05 * Math.sin(20*t);
+              if (t < 0.42) return -0.15 + (t - 0.20) * 4.0;
+              if (t < 0.62) return  0.7  - (t - 0.42) * 7.0;
+              return -0.7 + 0.05 * Math.sin(30*t);
+            });
+        const vHi = ((y0 - yHi) / (y0 - yT)) * 2 - 1;
+        const vLo = ((y0 - yLo) / (y0 - yT)) * 2 - 1;
+        let armed = false, xArm = null, xT = null, prev = fn(0);
+        for (let i = 1; i <= 200; i++){
+          const t = i/200, v = fn(t);
+          if (high){
+            if (!armed && prev > vLo && v <= vLo){ armed = true; xArm = x0 + t*(xN - x0); }
+            if (armed && prev < vHi && v >= vHi){ xT = x0 + t*(xN - x0); break; }
+          } else {
+            if (!armed && prev < vHi && v >= vHi){ armed = true; xArm = x0 + t*(xN - x0); }
+            if (armed && prev > vLo && v <= vLo){ xT = x0 + t*(xN - x0); break; }
+          }
+          prev = v;
+        }
+        if (xT === null) xT = x0 + 0.7*(xN - x0);
+        shadePre(ctx, x0, xT, y0, yT);
+        shadePost(ctx, xT, y0, xN, yT);
+        plot(ctx, fn, x0, xN, y0, yT);
+        if (xArm){
+          ctx.strokeStyle = '#fb923c'; ctx.setLineDash([3,2]); ctx.lineWidth = 1.1;
+          ctx.beginPath(); ctx.moveTo(xArm, yT); ctx.lineTo(xArm, y0); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#fb923c'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
+          ctx.fillText('Arm', xArm, yT + 10);
+        }
+        vTrig(ctx, xT, yT, y0, 'Fire');
+      }
+      else if (mode === 'Soft'){
+        title(ctx, W, 'Soft · 软触发');
+        const xStart = x0 + 0.10 * (xN - x0);
+        const xT = x0 + 0.45 * (xN - x0);
+        plot(ctx, t => 0.6 * Math.sin(2 * Math.PI * 1.4 * t), x0, xN, y0, yT);
+        ctx.strokeStyle = '#a78bfa'; ctx.setLineDash([3,2]); ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(xStart, yT); ctx.lineTo(xStart, y0); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#a78bfa'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('Start()', xStart, yT - 3);
+        ctx.fillStyle = 'rgba(167,139,250,0.08)';
+        ctx.fillRect(xStart, yT, xT - xStart, y0 - yT);
+        ctx.fillStyle = '#a78bfa'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('Armed', (xStart + xT)/2, yT + 11);
+        shadePost(ctx, xT, y0, xN, yT);
+        vTrig(ctx, xT, yT, y0, 'SendSoftTrig');
+      }
+    }
+
+    // ---------- Description Library ----------
+    const TERM = {
+      RSE: {
+        h: 'RSE · 参考单端',
+        en: 'Referenced Single-Ended · all channels share AIGND.',
+        body:
+          '<p><strong>定义：</strong>所有 AI 通道共用板卡端 <code>AIGND</code> 为统一参考。信号正端接 AIx，源接地端接 AIGND。</p>' +
+          '<p><strong>适配（图中分两情形对照）：</strong></p><ul>' +
+          '<li>✅ <strong>浮地源 + RSE</strong>：信号源端不接大地（电池 / 隔离输出 / 变压器副边），唯一接地点在 AIGND，<strong>无地回路</strong>。</li>' +
+          '<li>⛔ <strong>接地源 + RSE</strong>：墙插仪器自带"系统地"，与 AIGND 形成双接地，<code>VG</code> 串入测量。</li>' +
+          '<li>通道密度优先（32 SE）</li></ul>' +
+          '<div class="warn-tip danger"><strong>⛔ 危险信号 · 接地源 + RSE：</strong>地回路把 <code>VG</code> 直接叠加到测量，无法事后软件滤除。<br><strong>必须规避：</strong>① 改 <strong>NRSE / 差分</strong>；② 源端浮地；③ 加隔离放大器。</div>'
+      },
+      NRSE: {
+        h: 'NRSE · 非参考单端',
+        en: 'Non-Referenced Single-Ended · all channels share AISENSE (floating).',
+        body:
+          '<p><strong>定义：</strong>所有通道共用<strong>浮地参考</strong> <code>AISENSE</code>。AISENSE 在板卡内部不与机箱大地相连。</p>' +
+          '<p><strong>适配：</strong>接地源但不希望形成地回路；多通道共参考时抗共模能力强。</p>' +
+          '<p><strong>关键：</strong>AISENSE 浮空 → 切断地回路 → 测 (Vsignal − VAISENSE)，VG 不再叠加。</p>'
+      },
+      DIFF: {
+        h: 'Differential · 差分',
+        en: 'Each channel uses AI+ / AI−; IA outputs the difference.',
+        body:
+          '<p><strong>定义：</strong>每通道占两根线 <code>AIx+</code>/<code>AIx−</code>，仪表放大器输出 (AI+) − (AI−)，强抑制共模噪声（CMR ≥ 100 dB）。</p>' +
+          '<p><strong>适配：</strong></p><ul>' +
+          '<li>低电平信号（热电偶 / 应变片，mV 级）</li>' +
+          '<li>长走线、强电磁干扰</li>' +
+          '<li>浮地源需 10 k~100 kΩ 偏置电阻接 AIGND</li>' +
+          '<li>最高精度场合首选</li></ul>' +
+          '<div class="warn-tip">📊 通道数减半：32 SE → 16 Diff。</div>'
+      }
+    };
+
+    const TRIG = {
+      Imm: {
+        h: 'Immediate · 立即触发', en: 'Acquisition starts the moment Start() returns.',
+        body:
+          '<p><strong>原理：</strong>调 <code>Start()</code> 后硬件立即采样，无任何等待。</p>' +
+          '<p><strong>用例：</strong>常规录波、连续监视、调试。</p>' +
+          '<pre>aiTask.Trigger.Type = AITriggerType.Immediate; // 默认</pre>'
+      },
+      DRise: {
+        h: 'Digital Rising · 数字上升沿', en: 'Trigger fires on PFI low→high transition.',
+        body:
+          '<p><strong>原理：</strong>监听 PFI 数字线，捕获 <strong>0 → 1</strong> 跳变。</p>' +
+          '<p><strong>用例：</strong>同步外部脉冲 / 编码器 Index / 其它仪器 TTL 启动脉冲。</p>' +
+          '<pre>Trigger.Type = Digital;\nTrigger.Digital.Source = PFI0;\nTrigger.Digital.Edge = Rising;</pre>'
+      },
+      DFall: {
+        h: 'Digital Falling · 数字下降沿', en: 'PFI high→low transition.',
+        body:
+          '<p><strong>原理：</strong>捕获 PFI <strong>1 → 0</strong> 跳变。</p>' +
+          '<p><strong>用例：</strong>低有效启动信号；继电器断开瞬间。</p>' +
+          '<pre>Trigger.Digital.Edge = Falling;</pre>'
+      },
+      ARise: {
+        h: 'Analog Rising Slope · 模拟上升沿', en: 'Signal crosses Threshold while increasing.',
+        body:
+          '<p><strong>原理：</strong>实时比较 AI0 与 <code>Threshold</code>；信号<strong>上升穿越</strong>阈值时触发。</p>' +
+          '<p><strong>用例：</strong>抓冲击、相位对齐、上升沿同步。</p>' +
+          '<pre>Trigger.Type = Analog;\nTrigger.Analog.Edge.Slope = Rising;\nTrigger.Analog.Edge.Threshold = 2.5;</pre>'
+      },
+      AFall: {
+        h: 'Analog Falling Slope · 模拟下降沿', en: 'Signal crosses Threshold while decreasing.',
+        body:
+          '<p><strong>原理：</strong>信号<strong>下降穿越</strong>阈值时触发。</p>' +
+          '<p><strong>用例：</strong>掉电瞬间记录；信号回零。</p>'
+      },
+      AWIn: {
+        h: 'Window-In · 进窗触发', en: 'Trigger when signal enters [Low, High] band.',
+        body:
+          '<p><strong>原理：</strong>上下两阈值构成窗口，信号<strong>进入</strong>窗口时触发。</p>' +
+          '<p><strong>用例：</strong>异常超限信号回到正常带；捕获特定幅度区间。</p>'
+      },
+      AWOut: {
+        h: 'Window-Out · 出窗触发', en: 'Trigger when signal leaves the window.',
+        body:
+          '<p><strong>原理：</strong>信号从窗口内<strong>跳出</strong>时触发。</p>' +
+          '<p><strong>用例：</strong>异常告警 — 信号偏离正常带立即记录。</p>'
+      },
+      AHHyst: {
+        h: 'High Hysteresis · 高电平迟滞', en: 'Rising fire; arming requires prior dip below Low.',
+        body:
+          '<p><strong>原理：</strong>双门限抗抖动。先下降到<strong>低门限以下</strong>装弹（Arm），再上升超过<strong>高门限</strong>触发（Fire）。中间抖动不会误触发。</p>' +
+          '<p><strong>用例：</strong>含噪方波边沿；抖动较大的传感器。</p>'
+      },
+      ALHyst: {
+        h: 'Low Hysteresis · 低电平迟滞', en: 'Falling fire; arming requires prior rise above High.',
+        body:
+          '<p><strong>原理：</strong>先上升超过高门限装弹，再下降低于低门限触发。</p>' +
+          '<p><strong>用例：</strong>抗噪声的下降沿检测。</p>'
+      },
+      Soft: {
+        h: 'Soft · 软触发', en: 'Fired by SendSoftwareTrigger() in code.',
+        body:
+          '<p><strong>原理：</strong>Start() 后任务"等待软件触发"；应用程序调 <code>SendSoftwareTrigger()</code> 显式触发。</p>' +
+          '<p><strong>用例：</strong>多卡 / 多任务<strong>同步启动</strong>。</p>' +
+          '<pre>Trigger.Type = Soft;\naiTask.Start();\n// ... 全部就绪\naiTask.SendSoftwareTrigger();</pre>'
+      }
+    };
+
+    function renderDesc(elId, src){
+      const el = document.getElementById(elId);
+      if (!el || !src) return;
+      el.innerHTML = '<h4>' + src.h + '</h4><span class="en">' + src.en + '</span>' + src.body;
+    }
+
+    let curTerm = 'RSE', curTrig = 'Imm';
+    const termCanvas = document.getElementById('term-canvas');
+    const trigCanvas = document.getElementById('trig-canvas');
+
+    function refreshTerm(){
+      drawTerminal(termCanvas, curTerm);
+      renderDesc('term-desc', TERM[curTerm]);
+    }
+    function refreshTrig(){
+      drawTrigger(trigCanvas, curTrig);
+      renderDesc('trig-desc', TRIG[curTrig]);
+    }
+
+    document.querySelectorAll('#term-tabs .apx-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#term-tabs .apx-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        curTerm = btn.getAttribute('data-term');
+        refreshTerm();
+      });
+    });
+    document.querySelectorAll('#trig-tabs .apx-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#trig-tabs .apx-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        curTrig = btn.getAttribute('data-trig');
+        refreshTrig();
+      });
+    });
+
+    refreshTerm();
+    refreshTrig();
+    window.addEventListener('resize', () => { refreshTerm(); refreshTrig(); });
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => { refreshTerm(); refreshTrig(); }, 300);
+    });
+  })();
+
+  // ===== Init =====
+  refreshCode();
+  drawWave();
+  window.addEventListener('resize', drawWave);
+</script>
+</body>
+</html>

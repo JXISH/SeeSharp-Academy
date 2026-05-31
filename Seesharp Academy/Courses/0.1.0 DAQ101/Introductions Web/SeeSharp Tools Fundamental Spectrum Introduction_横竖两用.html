@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>基础频谱分析 Fundamental Spectrum Analysis</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #273449;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-2: #f472b6;
+    --good: #4ade80;
+    --warn: #fbbf24;
+    --border: #334155;
+    --code-bg: #0b1220;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; line-height: 1.6; }
+  a { color: var(--accent); text-decoration: none; }
+  code, pre { font-family: "Cascadia Code", "Consolas", monospace; }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); font-size: 0.85em; }
+  h1, h2, h3, h4 { color: #f8fafc; line-height: 1.25; }
+  h1 { font-size: 1.8rem; margin: 0 0 8px; }
+  h2 { font-size: 1.4rem; margin: 0 0 12px; border-left: 4px solid var(--accent); padding-left: 10px; }
+  h3 { font-size: 1.1rem; margin: 18px 0 10px; color: var(--accent); }
+  p  { margin: 8px 0; }
+  .zh { color: #f8fafc; }
+  .en { color: var(--muted); font-size: 0.9em; margin-left: 6px; font-style: italic; }
+  .bi { display: inline-flex; gap: 4px; align-items: baseline; flex-wrap: wrap; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    max-width: 1280px;
+    margin: 0 auto;
+    gap: 24px;
+    padding: 24px;
+  }
+  aside.toc {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+  .toc h4 { margin: 0 0 8px; color: var(--accent); font-size: 0.95rem; }
+  .toc ol { padding-left: 18px; margin: 0; font-size: 0.9rem; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text); }
+  .toc a:hover { color: var(--accent); }
+
+  main { min-width: 0; }
+  section.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 22px;
+    scroll-margin-top: 16px;
+  }
+  .hero { background: linear-gradient(135deg, #0c4a6e 0%, #581c87 100%); border: none; }
+  .hero p { color: #e0f2fe; }
+  .badge { display: inline-block; background: var(--panel-2); color: var(--accent); padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; margin-right: 6px; border: 1px solid var(--border); }
+
+  .tip {
+    background: rgba(56, 189, 248, 0.08);
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin: 12px 0;
+    font-size: 0.92em;
+  }
+  .warn {
+    background: rgba(251, 191, 36, 0.08);
+    border-left: 3px solid var(--warn);
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin: 12px 0;
+    font-size: 0.92em;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.9rem; }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--panel-2); color: var(--accent); font-weight: 600; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  .lab-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .chart-box {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    height: 280px;
+    position: relative;
+  }
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+    background: var(--panel-2);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .controls label { display: flex; flex-direction: column; gap: 4px; font-size: 0.88rem; color: var(--muted); }
+  .controls select, .controls input[type="range"], .controls input[type="number"] {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.92rem;
+  }
+  .readout { font-family: "Cascadia Code", monospace; color: var(--good); font-size: 0.9rem; }
+  .readout span { color: var(--accent); }
+
+  .prompt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .prompt-card {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .prompt-card h4 { margin: 0; color: var(--accent-2); font-size: 0.98rem; }
+  .prompt-card pre { margin: 0; white-space: pre-wrap; font-size: 0.82em; }
+  .copy-btn {
+    align-self: flex-start;
+    background: var(--accent);
+    color: #0c4a6e;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: background 0.15s;
+  }
+  .copy-btn:hover { background: #7dd3fc; }
+  .copy-btn.copied { background: var(--good); }
+
+  .bin-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 14px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 10px 0;
+  }
+  .bin {
+    min-width: 64px;
+    text-align: center;
+    padding: 6px 4px;
+    border-radius: 6px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    font-size: 0.78rem;
+  }
+  .bin .k { color: var(--accent); font-weight: 600; }
+  .bin .f { color: var(--good); font-family: monospace; }
+  .bin.dc { border-color: var(--accent-2); }
+  .bin.nyq { border-color: var(--warn); }
+  .bin.neg { opacity: 0.6; border-style: dashed; }
+
+  .glossary { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .glossary div {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.88rem;
+  }
+  .glossary b { color: var(--accent); }
+
+  /* Mobile portrait */
+  @media (max-width: 820px) {
+    .layout {
+      grid-template-columns: 1fr;
+      padding: 12px;
+      gap: 12px;
+    }
+    aside.toc {
+      position: static;
+      max-height: none;
+    }
+    .toc-toggle { display: block; }
+    .toc.collapsed ol { display: none; }
+    .lab-grid { grid-template-columns: 1fr; }
+    .chart-box { height: 240px; }
+    h1 { font-size: 1.4rem; }
+    h2 { font-size: 1.15rem; }
+    .en { display: block; margin-left: 0; }
+    section.card { padding: 14px; }
+    table { font-size: 0.82rem; }
+    th, td { padding: 6px; }
+  }
+  .toc-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="toc" id="toc">
+    <button class="toc-toggle" onclick="document.getElementById('toc').classList.toggle('collapsed')">目录 / Menu</button>
+    <h4>目录 / Contents</h4>
+    <ol>
+      <li><a href="#hero">概述 Overview</a></li>
+      <li><a href="#api">API 速览 Cheat Sheet</a></li>
+      <li><a href="#lab">交互实验台 Interactive Lab</a></li>
+      <li><a href="#advanced">进阶: 输出点数 Advanced</a></li>
+      <li><a href="#prompts">AI 提示词模板 Prompts</a></li>
+      <li><a href="#glossary">术语表 Glossary</a></li>
+    </ol>
+  </aside>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section id="hero" class="card hero">
+      <h1>基础频谱分析 <span style="color:#bae6fd;">Fundamental Spectrum Analysis</span></h1>
+      <p>
+        本页对照 SeeSharpTools 类库 <code>SeeSharpTools.JY.DSP.Fundamental.Spectrum</code> 静态类，
+        以图文 + 动手实验的形式介绍频谱分析的核心概念，帮助你用中文向 AI 助手准确描述频谱分析需求。
+      </p>
+      <p style="color:#bae6fd; font-size:0.9em;">
+        This guide mirrors the public API of the SeeSharpTools <code>Spectrum</code> static class
+        and shows how window function, sample length, and sample rate shape your spectrum.
+      </p>
+      <div>
+        <span class="badge">实数输入 Real Input</span>
+        <span class="badge">复数输入 Complex Input</span>
+        <span class="badge">功率谱 PowerSpectrum</span>
+        <span class="badge">dBFS 谱</span>
+        <span class="badge">窗函数 Window</span>
+      </div>
+      <div class="tip">
+        <b>面向 AI 编程的提示思路 / Prompting Tips:</b><br>
+        1. 明确<b>输入类型</b>（实数 double[] / 复数 Complex[]）和<b>采样率 Fs</b>。<br>
+        2. 指明所需<b>谱线数 spectralLines</b>（即输出数组长度）和<b>窗类型 WindowType</b>。<br>
+        3. 说明<b>输出单位</b>（V / V² / dBV / dBm / dBFS）和是否需要 <b>PSD 功率谱密度</b>。<br>
+        例: "用 SeeSharpTools 计算一个采样率 10 kHz、长度 1024 点的实数信号功率谱，使用汉宁窗，输出 dBV 单位。"
+      </div>
+    </section>
+
+    <!-- ===== API CHEAT SHEET ===== -->
+    <section id="api" class="card">
+      <h2>API 速览 <span class="en">API Cheat Sheet</span></h2>
+      <p>下表汇总 <code>Spectrum</code> 类对外暴露的四个核心方法，所有方法均为 <code>static</code>。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>方法 Method</th>
+            <th>用途 Purpose</th>
+            <th>输入 Input</th>
+            <th>输出长度 Output Length</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>PowerSpectrum</code></td>
+            <td>功率谱 / 单边幅度谱<br><span class="en">Single-sided power spectrum</span></td>
+            <td><code>double[] waveform</code><br>实数时域波形</td>
+            <td><code>spectrum.Length</code><br>由调用方预分配，等于谱线数 N/2</td>
+          </tr>
+          <tr>
+            <td><code>DBFullScaleSpectrum</code></td>
+            <td>相对满量程的 dBFS 谱<br><span class="en">dBFS spectrum vs reference</span></td>
+            <td><code>double[]</code> + <code>refFullScale</code></td>
+            <td>同上 N/2 谱线</td>
+          </tr>
+          <tr>
+            <td><code>AdvanceRealFFT</code></td>
+            <td>实数 → 实数幅度谱<br><span class="en">Real → real magnitude</span></td>
+            <td><code>double[] waveform</code></td>
+            <td>一般为 N/2 谱线（FFT 内部按 2·spectralLines 计算）</td>
+          </tr>
+          <tr>
+            <td><code>AdvanceComplexFFT</code></td>
+            <td>实数/复数 → 复数频谱<br><span class="en">Real/Complex → Complex</span></td>
+            <td><code>double[]</code> 或 <code>Complex[]</code></td>
+            <td>实数输入: N/2+1 复数；复数输入: N 复数</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="tip">
+        <b>关键参数对照 / Key Parameters:</b>
+        <code>samplingRate</code> 采样率,
+        <code>windowType</code> 窗类型,
+        <code>unit</code> 单位 (<code>SpectrumUnits</code>),
+        <code>PSD</code> 是否输出功率谱密度,
+        <code>refFullScale</code> 满量程参考电压.
+      </div>
+      <p>频率分辨率公式 / Frequency Resolution: <span id="formula-df"></span></p>
+    </section>
+
+    <!-- ===== INTERACTIVE LAB ===== -->
+    <section id="lab" class="card">
+      <h2>交互实验台 <span class="en">Interactive Lab</span></h2>
+      <p>三个实验分别揭示<b>窗函数</b>、<b>采样长度 N</b>、<b>采样率 Fs</b> 对频谱的影响。所有图表实时计算。</p>
+
+      <!-- 3.1 Window comparison -->
+      <h3>实验 1: 窗函数对比 <span class="en">Window Type Comparison</span></h3>
+      <div class="controls">
+        <label>信号 Signal
+          <select id="w-signal">
+            <option value="sine">单频正弦 Single Sine (200 Hz)</option>
+            <option value="twotone">双频 Two-Tone (200+220 Hz)</option>
+            <option value="leak">泄漏频率 Leakage (203.7 Hz)</option>
+            <option value="square">方波 Square (100 Hz)</option>
+          </select>
+        </label>
+        <label>窗函数 Window Type
+          <select id="w-window">
+            <option value="None">None 矩形</option>
+            <option value="Hanning" selected>Hanning 汉宁</option>
+            <option value="Hamming">Hamming 海明</option>
+            <option value="Blackman_Harris">Blackman-Harris</option>
+            <option value="Flat_Top_95">Flat_Top_95 平顶</option>
+            <option value="Four_Term_B_Harris">Four_Term_B_Harris</option>
+          </select>
+        </label>
+        <label>显示 Y 轴 Y-Axis
+          <select id="w-yaxis">
+            <option value="lin">线性 Linear (V)</option>
+            <option value="db" selected>对数 dBV</option>
+          </select>
+        </label>
+      </div>
+      <div class="lab-grid">
+        <div class="chart-box"><canvas id="chart-w-time"></canvas></div>
+        <div class="chart-box"><canvas id="chart-w-spec"></canvas></div>
+      </div>
+      <div class="readout">采样率 Fs = <span>2048 Hz</span>　长度 N = <span>1024</span>　Δf = <span id="w-df">2.000</span> Hz　ENBW = <span id="w-enbw">1.50</span> bins</div>
+      <div class="tip">
+        矩形窗主瓣最窄但旁瓣最高（-13 dB）；汉宁/海明等加窗后旁瓣下降但主瓣展宽；
+        平顶窗主瓣最平坦，适合幅度精确测量。<br>
+        <span class="en">Rectangle: narrowest main lobe, worst leakage. Flat-top: best amplitude accuracy, widest main lobe.</span>
+      </div>
+
+      <!-- 3.2 Sample length -->
+      <h3>实验 2: 采样长度 N <span class="en">Sample Length</span></h3>
+      <div class="controls">
+        <label>采样长度 N
+          <select id="n-N">
+            <option>64</option><option>128</option><option>256</option>
+            <option selected>512</option><option>1024</option><option>2048</option><option>4096</option>
+          </select>
+        </label>
+        <label>信号频率 Signal Frequency (Hz)
+          <input type="number" id="n-freq" value="123" min="1" max="500" />
+        </label>
+        <label>窗函数 Window Type
+          <select id="n-window">
+            <option value="None">None 矩形</option>
+            <option value="Hanning" selected>Hanning 汉宁</option>
+            <option value="Hamming">Hamming 海明</option>
+            <option value="Blackman_Harris">Blackman-Harris</option>
+            <option value="Flat_Top_95">Flat_Top_95 平顶</option>
+          </select>
+        </label>
+      </div>
+      <div class="lab-grid">
+        <div class="chart-box"><canvas id="chart-n-time"></canvas></div>
+        <div class="chart-box"><canvas id="chart-n-spec"></canvas></div>
+      </div>
+      <div class="readout">Fs = <span>1024 Hz</span>　N = <span id="n-readout-N">512</span>　谱线数 = <span id="n-readout-lines">256</span>　Δf = <span id="n-readout-df">2.000</span> Hz</div>
+      <div class="tip">
+        N 越大，频率分辨率 Δf = Fs/N 越细，但计算量越大、时间分辨率越差。
+        SeeSharpTools 中 <code>spectralLines = N/2</code>，FFT 实际点数 = <code>2 × spectralLines</code>。
+      </div>
+
+      <!-- 3.3 Sampling rate -->
+      <h3>实验 3: 采样率 Fs 与混叠 <span class="en">Sampling Rate &amp; Aliasing</span></h3>
+      <div class="controls">
+        <label>采样率 Fs (Hz)
+          <select id="fs-Fs">
+            <option>500</option><option>1000</option><option selected>2000</option>
+            <option>5000</option><option>10000</option>
+          </select>
+        </label>
+        <label>信号频率 Signal Frequency (Hz)
+          <input type="number" id="fs-freq" value="700" min="1" max="4000" />
+        </label>
+      </div>
+      <div class="lab-grid">
+        <div class="chart-box"><canvas id="chart-fs-time"></canvas></div>
+        <div class="chart-box"><canvas id="chart-fs-spec"></canvas></div>
+      </div>
+      <div class="readout">最大可观测频率 Fmax = Fs/2 = <span id="fs-readout-nyq">1000</span> Hz　实际显示 = <span id="fs-readout-shown">700</span> Hz <span id="fs-readout-alias" style="color:var(--warn);"></span></div>
+      <div class="warn">
+        <b>奈奎斯特定理 Nyquist:</b> 当信号频率 f &gt; Fs/2 时会发生<b>混叠</b>，
+        频率折叠显示为 <code>|f − round(f/Fs)·Fs|</code>。请试将信号频率调高至 Fs/2 以上观察折叠现象。
+      </div>
+    </section>
+
+    <!-- ===== ADVANCED ===== -->
+    <section id="advanced" class="card">
+      <h2>进阶: 输出点数与频率映射 <span class="en">Advanced: Output Length &amp; Frequency Mapping</span></h2>
+      <p>
+        SeeSharpTools 在 <code>AdvanceRealFFT</code> 内部按 <code>fftsize = 2 × spectralLines</code> 计算实数 FFT，
+        实数输入仅返回单边谱。复数输入则返回完整双边谱。下表汇总四种 I/O 组合的输出点数与频率位置。
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>输入 Input</th>
+            <th>输出 Output</th>
+            <th>N 偶 Even</th>
+            <th>N 奇 Odd</th>
+            <th>k=0 频率</th>
+            <th>末点 Last</th>
+            <th>中点 Middle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>实数 Real</td>
+            <td>实数幅度谱<br>Real magnitude (single-sided)</td>
+            <td><code>N/2 + 1</code></td>
+            <td><code>(N+1)/2</code></td>
+            <td>0 (DC)</td>
+            <td>偶: Fs/2 (Nyquist)<br>奇: ((N-1)/2)·Fs/N</td>
+            <td>Fs/4</td>
+          </tr>
+          <tr>
+            <td>实数 Real</td>
+            <td>复数谱 (rfft, single-sided)</td>
+            <td><code>N/2 + 1</code></td>
+            <td><code>(N+1)/2</code></td>
+            <td>0 (DC, 仅实部)</td>
+            <td>偶: Fs/2 (Nyquist, 仅实部)<br>奇: ((N-1)/2)·Fs/N</td>
+            <td>Fs/4</td>
+          </tr>
+          <tr>
+            <td>复数 Complex</td>
+            <td>复数谱 (full, two-sided)</td>
+            <td><code>N</code></td>
+            <td><code>N</code></td>
+            <td>0 (DC)</td>
+            <td>(N-1)/N · Fs ≈ Fs (即 −Δf)</td>
+            <td>偶: Fs/2 (折回)<br>奇: ((N-1)/2)·Fs/N</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="tip">
+        <b>关键结论 / Key Takeaways:</b><br>
+        ① 实数输入有<b>共轭对称性</b>，只需返回 0~Fs/2，称为<b>单边谱</b>，长度 ⌊N/2⌋+1。<br>
+        ② 复数输入无对称性，需保留全部 N 个 bin（双边谱），bin k 对应频率 <code>k·Fs/N</code>，
+        其中后半部分 (k &gt; N/2) 代表负频率 <code>(k−N)·Fs/N</code>。<br>
+        ③ N 偶数时存在精确的 Nyquist bin (Fs/2)，N 奇数时不存在。<br>
+        ④ SeeSharpTools 的 <code>AdvanceRealFFT</code> 在 0 频做了 <code>÷√2</code> 校正以恢复 RMS 标度。
+      </div>
+
+      <h3>互动: 索引 → 频率映射 <span class="en">Index → Frequency Mapping</span></h3>
+      <div class="controls">
+        <label>FFT 长度 N
+          <input type="number" id="adv-N" value="8" min="4" max="16" />
+        </label>
+        <label>采样率 Fs (Hz)
+          <input type="number" id="adv-Fs" value="1000" min="100" max="100000" step="100" />
+        </label>
+        <label>输入类型 Input Type
+          <select id="adv-mode">
+            <option value="real">实数 Real (单边)</option>
+            <option value="complex">复数 Complex (双边)</option>
+          </select>
+        </label>
+      </div>
+      <div class="bin-line" id="adv-bins"></div>
+      <div class="readout" id="adv-summary"></div>
+    </section>
+
+    <!-- ===== AI PROMPTS ===== -->
+    <section id="prompts" class="card">
+      <h2>AI 提示词模板 <span class="en">AI Prompt Templates</span></h2>
+      <p>下列模板可直接复制给 AI 助手，让其生成调用 SeeSharpTools 的 C# 代码片段。</p>
+      <div class="prompt-grid" id="prompt-grid"></div>
+    </section>
+
+    <!-- ===== GLOSSARY ===== -->
+    <section id="glossary" class="card">
+      <h2>术语表 <span class="en">Glossary</span></h2>
+      <div class="glossary">
+        <div><b>FFT</b> 快速傅里叶变换 / Fast Fourier Transform</div>
+        <div><b>DFT</b> 离散傅里叶变换 / Discrete Fourier Transform</div>
+        <div><b>Δf</b> 频率分辨率 = Fs/N / Frequency resolution</div>
+        <div><b>Fs</b> 采样率 / Sampling rate (S/s)</div>
+        <div><b>N</b> 采样点数 / Sample length</div>
+        <div><b>谱线 Spectral Lines</b> 单边谱输出 bin 数 ≈ N/2</div>
+        <div><b>ENBW</b> 等效噪声带宽 / Equivalent Noise Bandwidth</div>
+        <div><b>CG</b> 相干增益 / Coherent Gain (窗均值)</div>
+        <div><b>PSD</b> 功率谱密度 V²/Hz / Power Spectral Density</div>
+        <div><b>RMS</b> 均方根 / Root Mean Square</div>
+        <div><b>dBFS</b> 相对满量程的 dB / dB Full Scale</div>
+        <div><b>Spectral Leakage</b> 频谱泄漏（非整周期采样导致）</div>
+        <div><b>Aliasing</b> 频率混叠（Fs &lt; 2f 时折叠）</div>
+        <div><b>Nyquist</b> Fs/2 最大可观测频率</div>
+        <div><b>Single-sided / Two-sided</b> 单边谱 / 双边谱</div>
+        <div><b>Window</b> 窗函数（Hanning/Hamming/Flat-Top…）</div>
+      </div>
+      <p style="margin-top:14px; color:var(--muted); font-size:0.85em;">
+        本页频谱计算使用浏览器内 JS 实现的 radix-2 FFT 与标准余弦和窗函数，
+        语义对应 <code>SeeSharpTools.JY.DSP.Fundamental.Spectrum</code> 但参数不完全等同（如未实现 Kaiser/Gaussian/Dolph-Chebyshev 等需 <code>windowPara</code> 的窗）。
+      </p>
+    </section>
+
+    <!-- ===== FOOTER / DOWNLOAD ===== -->
+    <section class="card" style="background: linear-gradient(135deg, #134e4a 0%, #0c4a6e 100%); border:none;">
+      <h2 style="border-left-color:#5eead4;">获取 SeeSharp Tools <span class="en">Get SeeSharp Tools</span></h2>
+      <p style="color:#e0f2fe;">
+        登录简仪官网 <a href="https://www.jytek.com" target="_blank" rel="noopener" style="color:#5eead4; font-weight:600;">jytek.com</a>，
+        下载 <b>JYPEDIA</b> 文件。文件内附软件下载链接，可免费获取 <b>SeeSharp Tools</b> 软件及范例。
+      </p>
+      <p style="color:#bae6fd; font-size:0.9em;">
+        Visit <a href="https://www.jytek.com" target="_blank" rel="noopener" style="color:#5eead4;">jytek.com</a> and download the
+        <b>JYPEDIA</b> package — it contains the download links to obtain SeeSharp Tools and example projects free of charge.
+      </p>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   DSP module: FFT, windows, signal generation, spectrum helper
+   ============================================================ */
+const DSP = (() => {
+  // In-place radix-2 Cooley-Tukey FFT. n must be power of 2.
+  function fft(re, im) {
+    const n = re.length;
+    // bit reversal
+    for (let i = 1, j = 0; i < n; i++) {
+      let bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) {
+        [re[i], re[j]] = [re[j], re[i]];
+        [im[i], im[j]] = [im[j], im[i]];
+      }
+    }
+    for (let size = 2; size <= n; size <<= 1) {
+      const half = size >> 1;
+      const ang = -2 * Math.PI / size;
+      const wRe = Math.cos(ang), wIm = Math.sin(ang);
+      for (let i = 0; i < n; i += size) {
+        let curRe = 1, curIm = 0;
+        for (let j = 0; j < half; j++) {
+          const a = i + j, b = a + half;
+          const tRe = curRe * re[b] - curIm * im[b];
+          const tIm = curRe * im[b] + curIm * re[b];
+          re[b] = re[a] - tRe;
+          im[b] = im[a] - tIm;
+          re[a] += tRe;
+          im[a] += tIm;
+          const nRe = curRe * wRe - curIm * wIm;
+          curIm = curRe * wIm + curIm * wRe;
+          curRe = nRe;
+        }
+      }
+    }
+  }
+
+  // Window coefficients (cosine-sum). Returns {data, cg, enbw}.
+  // CG = mean(w), ENBW = N * sum(w^2) / (sum(w))^2
+  const WINDOWS = {
+    None:        [1],
+    Hanning:     [0.5, -0.5],
+    Hamming:     [0.54, -0.46],
+    Blackman:    [0.42, -0.5, 0.08],
+    Blackman_Harris: [0.35875, -0.48829, 0.14128, -0.01168],
+    Four_Term_B_Harris: [0.35875, -0.48829, 0.14128, -0.01168],
+    Flat_Top_95: [0.2156, -0.4160, 0.2781, -0.0836, 0.0069],
+  };
+
+  function getWindow(type, N) {
+    const coef = WINDOWS[type] || WINDOWS.Hanning;
+    const w = new Float64Array(N);
+    let sum = 0, sumSq = 0;
+    for (let n = 0; n < N; n++) {
+      let v = 0;
+      for (let k = 0; k < coef.length; k++) {
+        v += coef[k] * Math.cos(2 * Math.PI * k * n / (N - 1));
+      }
+      w[n] = v;
+      sum += v;
+      sumSq += v * v;
+    }
+    const cg = sum / N;
+    const enbw = (N * sumSq) / (sum * sum);
+    return { data: w, cg, enbw };
+  }
+
+  // Real-input single-sided amplitude spectrum (Vrms-like, then converted to peak/dB by caller).
+  // Returns { freqs, mags, magsDb, df, enbw }
+  function realSpectrum(signal, Fs, windowType) {
+    const N = signal.length;
+    const win = getWindow(windowType, N);
+    const re = new Float64Array(N);
+    const im = new Float64Array(N);
+    for (let i = 0; i < N; i++) re[i] = signal[i] * win.data[i] / win.cg;
+    fft(re, im);
+    const lines = (N >> 1);
+    const mags = new Float64Array(lines);
+    const magsDb = new Float64Array(lines);
+    const freqs = new Float64Array(lines);
+    const scale = 2 / N; // single-sided peak amplitude
+    for (let k = 0; k < lines; k++) {
+      const a = Math.sqrt(re[k] * re[k] + im[k] * im[k]) * scale;
+      mags[k] = a;
+      magsDb[k] = 20 * Math.log10(Math.max(a, 1e-12));
+      freqs[k] = k * Fs / N;
+    }
+    mags[0] /= 2; // DC has no mirror
+    return { freqs, mags, magsDb, df: Fs / N, enbw: win.enbw, window: win.data };
+  }
+
+  // Built-in signal generators. Returns Float64Array of length N at sampling rate Fs.
+  function generate(kind, N, Fs, params = {}) {
+    const x = new Float64Array(N);
+    switch (kind) {
+      case 'sine': {
+        const f = params.f ?? 200, A = params.A ?? 1;
+        for (let i = 0; i < N; i++) x[i] = A * Math.sin(2 * Math.PI * f * i / Fs);
+        break;
+      }
+      case 'twotone': {
+        for (let i = 0; i < N; i++) x[i] = 0.7 * Math.sin(2 * Math.PI * 200 * i / Fs) + 0.5 * Math.sin(2 * Math.PI * 220 * i / Fs);
+        break;
+      }
+      case 'leak': {
+        for (let i = 0; i < N; i++) x[i] = Math.sin(2 * Math.PI * 203.7 * i / Fs);
+        break;
+      }
+      case 'square': {
+        const f = params.f ?? 100;
+        for (let i = 0; i < N; i++) x[i] = Math.sign(Math.sin(2 * Math.PI * f * i / Fs)) * 0.8;
+        break;
+      }
+    }
+    return x;
+  }
+
+  return { fft, getWindow, realSpectrum, generate, WINDOWS };
+})();
+
+/* ============================================================
+   Chart helper
+   ============================================================ */
+function makeLine(ctx, label, color) {
+  return new Chart(ctx, {
+    type: 'line',
+    data: { labels: [], datasets: [{
+      label, data: [], borderColor: color, backgroundColor: color + '33',
+      borderWidth: 1.4, pointRadius: 0, tension: 0,
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { labels: { color: '#e2e8f0' } } },
+      scales: {
+        x: { ticks: { color: '#94a3b8', maxTicksLimit: 8 }, grid: { color: '#33415544' }, title: { display: true, color: '#94a3b8' } },
+        y: { ticks: { color: '#94a3b8' }, grid: { color: '#33415544' }, title: { display: true, color: '#94a3b8' } },
+      }
+    }
+  });
+}
+
+// Max-pool downsample to preserve spectral peaks; returns {labels, data}.
+// 等步长抽取会跳过真实峰值 bin；这里在每个像素列内取最大值及其对应频率，避免峰值消失。
+function maxPool(values, freqs, targetLen) {
+  const n = values.length;
+  if (n <= targetLen) {
+    const labels = new Array(n), data = new Array(n);
+    for (let i = 0; i < n; i++) { labels[i] = freqs[i].toFixed(1); data[i] = values[i]; }
+    return { labels, data };
+  }
+  const labels = new Array(targetLen), data = new Array(targetLen);
+  const step = n / targetLen;
+  for (let i = 0; i < targetLen; i++) {
+    const start = Math.floor(i * step);
+    const end = Math.min(n, Math.floor((i + 1) * step));
+    let maxV = -Infinity, maxK = start;
+    for (let k = start; k < end; k++) {
+      if (values[k] > maxV) { maxV = values[k]; maxK = k; }
+    }
+    labels[i] = freqs[maxK].toFixed(1);
+    data[i] = maxV;
+  }
+  return { labels, data };
+}
+
+function setData(chart, labels, data, xTitle, yTitle, yMin, yMax) {
+  chart.data.labels = labels;
+  chart.data.datasets[0].data = data;
+  chart.options.scales.x.title.text = xTitle;
+  chart.options.scales.y.title.text = yTitle;
+  if (yMin !== undefined) chart.options.scales.y.min = yMin; else delete chart.options.scales.y.min;
+  if (yMax !== undefined) chart.options.scales.y.max = yMax; else delete chart.options.scales.y.max;
+  chart.update('none');
+}
+
+/* ============================================================
+   Lab UI wiring
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  // KaTeX render
+  if (window.renderMathInElement) {
+    document.getElementById('formula-df').innerHTML =
+      '\\(\\Delta f = \\dfrac{F_s}{N},\\ \\text{spectralLines} = \\dfrac{N}{2},\\ \\text{fftsize} = 2 \\cdot \\text{spectralLines}\\)';
+    renderMathInElement(document.body, { delimiters: [{left:'\\(', right:'\\)', display:false}] });
+  }
+
+  // ---------- Experiment 1: Window ----------
+  const wTime = makeLine(document.getElementById('chart-w-time'), '加窗后时域 Windowed Time', '#38bdf8');
+  const wSpec = makeLine(document.getElementById('chart-w-spec'), '幅度谱 Amplitude Spectrum', '#f472b6');
+  const wSig = document.getElementById('w-signal');
+  const wWin = document.getElementById('w-window');
+  const wAxis = document.getElementById('w-yaxis');
+
+  function updateW() {
+    const Fs = 2048, N = 1024;
+    const sig = DSP.generate(wSig.value, N, Fs);
+    const winType = wWin.value;
+    const win = DSP.getWindow(winType, N);
+    const wave = new Float64Array(N);
+    for (let i = 0; i < N; i++) wave[i] = sig[i] * win.data[i];
+    const tLabels = [], tData = [];
+    const stride = Math.max(1, N >> 8);
+    for (let i = 0; i < N; i += stride) { tLabels.push((i / Fs * 1000).toFixed(1)); tData.push(wave[i]); }
+    setData(wTime, tLabels, tData, 't (ms)', 'amplitude (V)');
+
+    const spec = DSP.realSpectrum(sig, Fs, winType);
+    const useDb = wAxis.value === 'db';
+    const src = useDb ? spec.magsDb : spec.mags;
+    const dst = maxPool(src, spec.freqs, 256);
+    setData(wSpec, dst.labels, dst.data, 'f (Hz)', useDb ? 'dBV' : 'V (peak)', useDb ? -120 : undefined, useDb ? 10 : undefined);
+
+    document.getElementById('w-df').textContent = (Fs / N).toFixed(3);
+    document.getElementById('w-enbw').textContent = spec.enbw.toFixed(2);
+  }
+  [wSig, wWin, wAxis].forEach(el => el.addEventListener('change', updateW));
+  updateW();
+
+  // ---------- Experiment 2: Sample length N ----------
+  const nTime = makeLine(document.getElementById('chart-n-time'), '时域 Time', '#38bdf8');
+  const nSpec = makeLine(document.getElementById('chart-n-spec'), '幅度谱 Spectrum', '#4ade80');
+  const nN = document.getElementById('n-N');
+  const nFreq = document.getElementById('n-freq');
+  const nWin = document.getElementById('n-window');
+
+  function updateN() {
+    const Fs = 1024, N = parseInt(nN.value);
+    const f = Math.max(1, Math.min(Fs / 2 - 1, parseFloat(nFreq.value) || 100));
+    const sig = DSP.generate('sine', N, Fs, { f });
+    const tLabels = [], tData = [];
+    const stride = Math.max(1, N >> 7);
+    for (let i = 0; i < N; i += stride) { tLabels.push((i / Fs * 1000).toFixed(1)); tData.push(sig[i]); }
+    setData(nTime, tLabels, tData, 't (ms)', 'amplitude (V)');
+    const spec = DSP.realSpectrum(sig, Fs, nWin.value);
+    const dst = maxPool(spec.magsDb, spec.freqs, 256);
+    setData(nSpec, dst.labels, dst.data, 'f (Hz)', 'dBV', -120, 10);
+    document.getElementById('n-readout-N').textContent = N;
+    document.getElementById('n-readout-lines').textContent = N >> 1;
+    document.getElementById('n-readout-df').textContent = (Fs / N).toFixed(3);
+  }
+  [nN, nFreq, nWin].forEach(el => el.addEventListener('input', updateN));
+  updateN();
+
+  // ---------- Experiment 3: Sampling rate Fs ----------
+  const fsTime = makeLine(document.getElementById('chart-fs-time'), '时域 Time', '#38bdf8');
+  const fsSpec = makeLine(document.getElementById('chart-fs-spec'), '幅度谱 Spectrum', '#fbbf24');
+  const fsFs = document.getElementById('fs-Fs');
+  const fsFreq = document.getElementById('fs-freq');
+
+  function updateFs() {
+    const Fs = parseInt(fsFs.value);
+    const N = 1024;
+    const f = Math.max(1, parseFloat(fsFreq.value) || 100);
+    const sig = DSP.generate('sine', N, Fs, { f });
+    const tLabels = [], tData = [];
+    const showSamples = Math.min(N, 256);
+    const stride = Math.max(1, N >> 7);
+    for (let i = 0; i < showSamples; i += stride) { tLabels.push((i / Fs * 1000).toFixed(2)); tData.push(sig[i]); }
+    setData(fsTime, tLabels, tData, 't (ms)', 'amplitude (V)');
+    const spec = DSP.realSpectrum(sig, Fs, 'Hanning');
+    const dst = maxPool(spec.magsDb, spec.freqs, 256);
+    setData(fsSpec, dst.labels, dst.data, 'f (Hz)', 'dBV', -120, 10);
+
+    const nyq = Fs / 2;
+    document.getElementById('fs-readout-nyq').textContent = nyq.toFixed(0);
+    let shown = f;
+    let aliasMsg = '';
+    if (f > nyq) {
+      // fold: shown = |f - round(f/Fs)*Fs|
+      const folded = Math.abs(f - Math.round(f / Fs) * Fs);
+      shown = folded;
+      aliasMsg = '⚠ 已混叠 Aliased!';
+    }
+    document.getElementById('fs-readout-shown').textContent = shown.toFixed(1);
+    document.getElementById('fs-readout-alias').textContent = aliasMsg;
+  }
+  [fsFs, fsFreq].forEach(el => el.addEventListener('input', updateFs));
+  updateFs();
+
+  // ---------- Advanced: Index → frequency mapping ----------
+  const advN = document.getElementById('adv-N');
+  const advFs = document.getElementById('adv-Fs');
+  const advMode = document.getElementById('adv-mode');
+  const advBox = document.getElementById('adv-bins');
+  const advSummary = document.getElementById('adv-summary');
+
+  function updateAdv() {
+    const N = Math.max(2, Math.min(16, parseInt(advN.value) || 8));
+    const Fs = Math.max(1, parseInt(advFs.value) || 1000);
+    const mode = advMode.value;
+    advBox.innerHTML = '';
+    const isEven = (N % 2) === 0;
+    let outLen, summary;
+    if (mode === 'real') {
+      outLen = isEven ? (N / 2 + 1) : ((N + 1) / 2);
+      for (let k = 0; k < outLen; k++) {
+        const f = k * Fs / N;
+        const cls = ['bin'];
+        if (k === 0) cls.push('dc');
+        if (isEven && k === N / 2) cls.push('nyq');
+        const div = document.createElement('div');
+        div.className = cls.join(' ');
+        div.innerHTML = `<div class="k">k=${k}</div><div class="f">${f.toFixed(2)} Hz</div>`;
+        advBox.appendChild(div);
+      }
+      summary = `实数输入 单边谱: 输出长度 = ${outLen}　Δf = ${(Fs / N).toFixed(3)} Hz　最大频率 = ${((outLen - 1) * Fs / N).toFixed(2)} Hz` +
+        (isEven ? '　含 Nyquist (Fs/2)' : '　不含精确 Nyquist');
+    } else {
+      outLen = N;
+      for (let k = 0; k < N; k++) {
+        const isPos = k <= N / 2;
+        const fSigned = (k <= N / 2) ? k * Fs / N : (k - N) * Fs / N;
+        const cls = ['bin'];
+        if (k === 0) cls.push('dc');
+        if (isEven && k === N / 2) cls.push('nyq');
+        if (!isPos) cls.push('neg');
+        const div = document.createElement('div');
+        div.className = cls.join(' ');
+        div.innerHTML = `<div class="k">k=${k}</div><div class="f">${fSigned.toFixed(2)} Hz</div>`;
+        advBox.appendChild(div);
+      }
+      summary = `复数输入 双边谱: 输出长度 = ${N}　Δf = ${(Fs / N).toFixed(3)} Hz　bin k 频率 = k·Fs/N (k>N/2 视为负频)` +
+        (isEven ? '　偶数 N: 含 Nyquist bin' : '　奇数 N: 无 Nyquist bin');
+    }
+    advSummary.textContent = summary;
+  }
+  [advN, advFs, advMode].forEach(el => el.addEventListener('input', updateAdv));
+  updateAdv();
+
+  // ---------- Prompts ----------
+  const PROMPTS = [
+    { title: '① 单通道功率谱', body:
+`使用 SeeSharpTools.JY.DSP.Fundamental.Spectrum 计算实数信号的功率谱：
+- 输入: double[] waveform, 长度 1024
+- 采样率 samplingRate = 10000 (S/s)
+- 谱线数 spectralLines = 512（即 spectrum 数组长度）
+- 窗类型 windowType = WindowType.Hanning
+- 单位 unit = SpectrumUnits.V2，PSD = false
+请给出完整 C# 代码并打印 df。` },
+    { title: '② 切换窗函数对比', body:
+`基于同一段实数信号 (Fs=20kHz, N=2048)，
+分别使用 Hanning、Blackman_Harris、Flat_Top_95 三种窗
+调用 Spectrum.PowerSpectrum，输出 dBV 单位，
+并比较峰值频率附近的主瓣宽度与旁瓣电平。` },
+    { title: '③ 多通道平均', body:
+`使用 PowerSpectrum 的 double[,] 重载，
+输入是 4 通道、每通道 8192 点的实数波形 (Fs=51200)，
+spectrum 维度为 [4, 4096]，窗类型 Hanning，
+输出 PSD = true 的功率谱密度 (V²/Hz)。` },
+    { title: '④ dBFS 输出', body:
+`实数信号采样率 Fs=1MHz，长度 N=4096，满量程 ±5V，
+请用 Spectrum.DBFullScaleSpectrum 计算 dBFS 谱，
+谱线数 2048，结果以数组形式返回并标出峰值频率。` },
+    { title: '⑤ 复数 IQ 信号', body:
+`输入 Complex[] iq (长度 1024，Fs=2MHz)，
+请用 Spectrum.AdvanceComplexFFT(iq, WindowType.Hanning, ref spectrum)
+计算双边复数频谱，并把 bin k 映射到频率
+f[k] = k<N/2 ? k*Fs/N : (k-N)*Fs/N。` },
+  ];
+  const grid = document.getElementById('prompt-grid');
+  PROMPTS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'prompt-card';
+    card.innerHTML = `<h4>${p.title}</h4><pre>${p.body.replace(/</g,'&lt;')}</pre>`;
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '复制 Copy';
+    btn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(p.body);
+        btn.textContent = '已复制 ✓';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '复制 Copy'; btn.classList.remove('copied'); }, 1500);
+      } catch (e) { btn.textContent = '复制失败'; }
+    };
+    card.appendChild(btn);
+    grid.appendChild(card);
+  });
+});
+</script>
+</body>
+</html>

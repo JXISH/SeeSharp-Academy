@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>SeeSharp 数采 · 5 步实现 AO · 手机版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <style>
+    :root {
+      --c-bg: #0f172a;
+      --c-panel: #1e293b;
+      --c-panel-2: #273449;
+      --c-border: #334155;
+      --c-text: #e2e8f0;
+      --c-muted: #94a3b8;
+      --c-accent: #38bdf8;
+      --c-accent-2: #f472b6;
+      --c-step-1: #38bdf8;
+      --c-step-2: #a78bfa;
+      --c-step-3: #f472b6;
+      --c-step-4: #fb923c;
+      --c-step-5: #4ade80;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0;
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      color: var(--c-text);
+      font-family: "PingFang SC", "Microsoft YaHei", -apple-system, system-ui, sans-serif;
+      min-height: 100vh; overflow-x: hidden;
+    }
+    .wrap { padding: 16px 14px 32px; max-width: 480px; margin: 0 auto; }
+
+    /* Hero */
+    header.hero {
+      text-align: center; padding: 8px 0 18px;
+      border-bottom: 1px solid var(--c-border);
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      margin: 0; font-size: 20px; line-height: 1.3;
+      background: linear-gradient(90deg, #38bdf8, #f472b6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero .sub { color: var(--c-muted); font-size: 12px; margin-top: 4px; }
+    .hero .tag {
+      display: inline-block; margin-top: 8px;
+      background: rgba(56,189,248,0.14); color: var(--c-accent);
+      border: 1px solid rgba(56,189,248,0.4);
+      padding: 3px 10px; border-radius: 999px; font-size: 11px;
+    }
+
+    /* Step Tracker (horizontal pills, scroll) */
+    .step-bar {
+      display: flex; gap: 8px; overflow-x: auto;
+      padding: 4px 0 10px; margin: 0 -14px 14px; padding-left: 14px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .step-bar::-webkit-scrollbar { display: none; }
+    .step-pill {
+      flex: 0 0 auto; scroll-snap-align: start;
+      background: var(--c-panel); border: 1px solid var(--c-border);
+      border-radius: 999px; padding: 8px 14px;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .step-pill .num {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      background: var(--c-panel-2);
+    }
+    .step-pill[data-step="1"] .num { background: rgba(56,189,248,0.25); }
+    .step-pill[data-step="2"] .num { background: rgba(167,139,250,0.25); }
+    .step-pill[data-step="3"] .num { background: rgba(244,114,182,0.25); }
+    .step-pill[data-step="4"] .num { background: rgba(251,146,60,0.25); }
+    .step-pill[data-step="5"] .num { background: rgba(74,222,128,0.25); }
+    .step-pill.active { border-color: var(--c-accent); }
+    .step-pill[data-step="1"].active { background: rgba(56,189,248,0.15); border-color: var(--c-step-1); }
+    .step-pill[data-step="2"].active { background: rgba(167,139,250,0.15); border-color: var(--c-step-2); }
+    .step-pill[data-step="3"].active { background: rgba(244,114,182,0.15); border-color: var(--c-step-3); }
+    .step-pill[data-step="4"].active { background: rgba(251,146,60,0.15); border-color: var(--c-step-4); }
+    .step-pill[data-step="5"].active { background: rgba(74,222,128,0.15); border-color: var(--c-step-5); }
+    .step-pill[data-step="1"].active .num { background: var(--c-step-1); color: #0f172a; }
+    .step-pill[data-step="2"].active .num { background: var(--c-step-2); color: #0f172a; }
+    .step-pill[data-step="3"].active .num { background: var(--c-step-3); color: #0f172a; }
+    .step-pill[data-step="4"].active .num { background: var(--c-step-4); color: #0f172a; }
+    .step-pill[data-step="5"].active .num { background: var(--c-step-5); color: #0f172a; }
+
+    /* Card */
+    .card {
+      background: var(--c-panel); border: 1px solid var(--c-border);
+      border-radius: 14px; padding: 16px 14px;
+      margin-bottom: 14px;
+    }
+    .card h2 {
+      margin: 0 0 6px; font-size: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card h2 .badge {
+      background: var(--c-accent); color: #0f172a;
+      font-size: 10px; padding: 2px 8px; border-radius: 999px;
+    }
+    .card .lead { color: var(--c-muted); font-size: 12px; margin: 0 0 12px; line-height: 1.6; }
+    .card h2 .num-large {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 50%;
+      font-size: 15px; font-weight: 700; color: #0f172a;
+    }
+    [data-step="1"] .num-large { background: var(--c-step-1); }
+    [data-step="2"] .num-large { background: var(--c-step-2); }
+    [data-step="3"] .num-large { background: var(--c-step-3); }
+    [data-step="4"] .num-large { background: var(--c-step-4); }
+    [data-step="5"] .num-large { background: var(--c-step-5); }
+
+    .concept-block {
+      background: var(--c-panel-2);
+      border-left: 3px solid var(--c-accent);
+      border-radius: 8px; padding: 10px 12px; margin: 10px 0;
+      font-size: 12px; line-height: 1.7;
+    }
+    .concept-block strong { color: var(--c-accent); }
+
+    /* Property Table */
+    .prop-table {
+      width: 100%; border-collapse: collapse; margin-top: 10px;
+      font-size: 11px;
+    }
+    .prop-table th, .prop-table td {
+      padding: 6px 8px; text-align: left;
+      border-bottom: 1px solid var(--c-border);
+    }
+    .prop-table th {
+      background: var(--c-panel-2); color: var(--c-accent);
+      font-size: 10px; text-transform: uppercase;
+    }
+    .prop-table code {
+      background: rgba(56,189,248,0.1); color: var(--c-accent);
+      padding: 1px 4px; border-radius: 3px; font-size: 10px;
+    }
+
+    /* Lab Controls */
+    .lab-controls { display: grid; gap: 10px; margin-top: 8px; }
+    .ctrl-row {
+      display: grid; grid-template-columns: 1fr 80px;
+      align-items: center; gap: 8px;
+    }
+    .ctrl-row.full { grid-template-columns: 1fr; }
+    .ctrl-row label { font-size: 12px; }
+    .ctrl-row label .en { color: var(--c-muted); font-size: 10px; display: block; }
+    .ctrl-row input[type=range] { width: 100%; }
+    .ctrl-row select {
+      background: var(--c-panel-2); color: var(--c-text);
+      border: 1px solid var(--c-border); border-radius: 6px;
+      padding: 6px 8px; width: 100%; font-size: 12px;
+    }
+    .ctrl-row .readout {
+      color: var(--c-accent); font-family: ui-monospace, monospace;
+      font-size: 12px; text-align: right;
+    }
+    .ctrl-row .hint {
+      grid-column: 1 / -1; color: var(--c-muted); font-size: 10px;
+      margin-top: -4px;
+    }
+
+    /* Code Panel */
+    .code-panel {
+      background: #0b1220; border: 1px solid var(--c-border);
+      border-radius: 8px; padding: 12px; margin-top: 12px;
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 11px; line-height: 1.5;
+      max-height: 280px; overflow: auto;
+      white-space: pre; -webkit-overflow-scrolling: touch;
+    }
+    .code-panel .kw { color: #c084fc; }
+    .code-panel .type { color: #38bdf8; }
+    .code-panel .str { color: #fbbf24; }
+    .code-panel .num { color: #f472b6; }
+    .code-panel .cmt { color: #64748b; font-style: italic; }
+
+    /* Wave Canvas */
+    .wave-box {
+      background: #0b1220; border: 1px solid var(--c-border);
+      border-radius: 8px; padding: 8px; margin-top: 10px;
+    }
+    .wave-box canvas { width: 100%; height: 140px; display: block; }
+    .wave-legend {
+      display: flex; gap: 12px; font-size: 10px; color: var(--c-muted); margin-top: 4px;
+    }
+    .wave-legend .swatch {
+      display: inline-block; width: 10px; height: 10px;
+      border-radius: 2px; margin-right: 4px; vertical-align: middle;
+    }
+
+    /* Buttons */
+    .btn-bar { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .btn {
+      padding: 8px 16px; border-radius: 6px;
+      border: 1px solid var(--c-border); cursor: pointer;
+      background: var(--c-panel-2); color: var(--c-text);
+      font-size: 12px; transition: all 0.15s;
+    }
+    .btn.primary { background: var(--c-accent); color: #0f172a; border-color: var(--c-accent); font-weight: 600; }
+    .btn.danger { background: #ef4444; color: white; border-color: #ef4444; }
+
+    /* Status */
+    .status-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px;
+    }
+    .status-item {
+      background: var(--c-panel-2); border-radius: 8px; padding: 8px 10px;
+    }
+    .status-item .k { color: var(--c-muted); font-size: 9px; display: block; }
+    .status-item .v { color: var(--c-accent); font-size: 13px; font-weight: 600; font-family: ui-monospace, monospace; }
+
+    /* Navigation */
+    .nav-bar { display: flex; justify-content: space-between; margin-top: 14px; }
+
+    /* Footer */
+    footer.cta {
+      margin-top: 20px; padding: 18px 16px;
+      background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(244,114,182,0.12));
+      border: 1px solid rgba(56,189,248,0.3); border-radius: 14px;
+      text-align: center;
+    }
+    footer.cta h3 { margin: 0 0 6px; font-size: 15px; color: var(--c-accent); }
+    footer.cta p { margin: 4px 0; color: var(--c-text); font-size: 12px; line-height: 1.7; }
+    footer.cta a { color: var(--c-accent-2); font-weight: 600; text-decoration: none; }
+
+    .step-section { display: none; }
+    .step-section.active { display: block; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>SeeSharp 数采 · 5 步实现 Analog Output</h1>
+    <div class="sub">JY5510 模拟输出 (AO) · 入门动手教程 · 手机版 Mobile</div>
+    <span class="tag">JY5500AOTask · DAQ 101</span>
+  </header>
+
+  <!-- Step Tracker -->
+  <div class="step-bar">
+    <div class="step-pill active" data-step="1" onclick="gotoStep(1)">
+      <span class="num">1</span><span>创建任务</span>
+    </div>
+    <div class="step-pill" data-step="2" onclick="gotoStep(2)">
+      <span class="num">2</span><span>添加通道</span>
+    </div>
+    <div class="step-pill" data-step="3" onclick="gotoStep(3)">
+      <span class="num">3</span><span>配置参数</span>
+    </div>
+    <div class="step-pill" data-step="4" onclick="gotoStep(4)">
+      <span class="num">4</span><span>写入数据</span>
+    </div>
+    <div class="step-pill" data-step="5" onclick="gotoStep(5)">
+      <span class="num">5</span><span>启动停止</span>
+    </div>
+  </div>
+
+  <!-- ============ STEP 1 ============ -->
+  <section class="step-section active" data-step="1">
+    <div class="card">
+      <h2><span class="num-large">1</span>创建任务 Create Task <span class="badge">AOTask</span></h2>
+      <p class="lead">模拟输出任务 (AO Task) 管理硬件输出 — 把"硬件 + 通道 + 参数 + 触发"封装在一起，将数字信号转换为模拟电压。</p>
+
+      <div class="concept-block">
+        <strong>类比：</strong> 按槽位号 (Slot Number) 创建 <code>aoTask</code> 对象，就像在板卡上"登记座位"。它知道操作哪张卡，但还不知道从哪路输出。
+      </div>
+
+      <table class="prop-table">
+        <thead><tr><th>成员 Member</th><th>说明 Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>JY5500AOTask(slot)</code></td><td>按槽位号创建 AO 任务<br><span style="color:var(--c-muted)">Create AO task by Slot Number</span></td></tr>
+          <tr><td><code>SlotNumber</code></td><td>设备管理器中的槽位号<br><span style="color:var(--c-muted)">Slot index from Device Manager</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>动手实验 Lab</h2>
+      <div class="lab-controls">
+        <div class="ctrl-row">
+          <label><span>板卡型号</span><span class="en">Board</span></label>
+          <span class="readout" id="lab-board-val">5510</span>
+        </div>
+        <div class="ctrl-row full">
+          <select id="lab-board">
+            <option value="5510">JY5510 (4-ch AO)</option>
+            <option value="5511">JY5511 (2-ch AO)</option>
+            <option value="5515">JY5515 (4-ch AO)</option>
+            <option value="5516">JY5516 (2-ch AO)</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <label><span>槽位号 Slot</span></label>
+          <span class="readout" id="lab-slot-val">0</span>
+        </div>
+        <div class="ctrl-row full">
+          <input type="range" id="lab-slot" min="0" max="7" step="1" value="0" />
+        </div>
+      </div>
+      <pre class="code-panel" id="code-step1"></pre>
+      <div class="nav-bar">
+        <span></span>
+        <button class="btn primary" onclick="gotoStep(2)">下一步 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2 ============ -->
+  <section class="step-section" data-step="2">
+    <div class="card">
+      <h2><span class="num-large">2</span>添加通道 AddChannel</h2>
+      <p class="lead">告诉任务"从哪一路输出、量程多大"。<code>AddChannel</code> 将物理引脚 (AO0~AO3) 映射到任务中。</p>
+
+      <div class="concept-block" style="border-color: var(--c-accent-2)">
+        <strong style="color:var(--c-accent-2)">📌 AO 量程：</strong> JY5510 支持 ±10V 和 ±5V。选择 ±5V 量程时 16-bit DAC 分辨率更高 (≈0.15 mV/step)。
+      </div>
+
+      <table class="prop-table">
+        <thead><tr><th>参数</th><th>说明</th><th>取值</th></tr></thead>
+        <tbody>
+          <tr><td><code>chnId</code></td><td>通道号<br><span style="color:var(--c-muted)">Channel ID</span></td><td>0–3 (5510)</td></tr>
+          <tr><td><code>rangeLow/High</code></td><td>量程范围<br><span style="color:var(--c-muted)">Range</span></td><td>±10V / ±5V</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>动手实验 Lab</h2>
+      <div class="lab-controls">
+        <div class="ctrl-row">
+          <label><span>通道号 Channel</span></label>
+          <span class="readout" id="lab-ch-val">AO0</span>
+        </div>
+        <div class="ctrl-row full">
+          <input type="range" id="lab-ch" min="0" max="3" step="1" value="0" />
+        </div>
+        <div class="ctrl-row">
+          <label><span>量程 Range</span></label>
+          <span class="readout" id="lab-range-val">±10 V</span>
+        </div>
+        <div class="ctrl-row full">
+          <select id="lab-range">
+            <option value="10">±10 V</option>
+            <option value="5">±5 V</option>
+          </select>
+        </div>
+      </div>
+      <pre class="code-panel" id="code-step2"></pre>
+      <div class="nav-bar">
+        <button class="btn" onclick="gotoStep(1)">← 上一步</button>
+        <button class="btn primary" onclick="gotoStep(3)">下一步 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3 ============ -->
+  <section class="step-section" data-step="3">
+    <div class="card">
+      <h2><span class="num-large">3</span>配置参数 Configure</h2>
+      <p class="lead">设定输出模式 (AOMode)、更新率 (UpdateRate)、输出点数。</p>
+
+      <div class="concept-block">
+        <strong>AOMode 四种模式：</strong>
+        <ul style="margin:4px 0 0;padding-left:18px;line-height:1.6;font-size:11px;">
+          <li><code>Single</code> 单点 — 直接写 DAC 寄存器</li>
+          <li><code>Finite</code> 有限 — 输出 N 点后停止</li>
+          <li><code>ContinuousWrapping</code> 循环 — 循环输出缓冲区</li>
+          <li><code>ContinuousNoWrapping</code> 非循环 — 可实时追加</li>
+        </ul>
+      </div>
+
+      <table class="prop-table">
+        <thead><tr><th>属性</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>Mode</code></td><td>输出模式 AOMode</td></tr>
+          <tr><td><code>UpdateRate</code></td><td>更新率 Sa/s (max 2.86M)</td></tr>
+          <tr><td><code>SamplesToUpdate</code></td><td>Finite 模式输出点数</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>动手实验 Lab</h2>
+      <div class="lab-controls">
+        <div class="ctrl-row">
+          <label><span>输出模式 AOMode</span></label>
+          <span class="readout" id="lab-mode-val">Wrapping</span>
+        </div>
+        <div class="ctrl-row full">
+          <select id="lab-mode">
+            <option value="ContinuousWrapping" selected>ContinuousWrapping · 循环</option>
+            <option value="Single">Single · 单点</option>
+            <option value="Finite">Finite · 有限</option>
+            <option value="ContinuousNoWrapping">ContinuousNoWrapping · 非循环</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <label><span>更新率 UpdateRate</span></label>
+          <span class="readout" id="lab-ur-val">10000 Sa/s</span>
+        </div>
+        <div class="ctrl-row full">
+          <input type="range" id="lab-ur" min="1000" max="2860000" step="1000" value="10000" />
+        </div>
+        <div class="ctrl-row">
+          <label><span>输出点数 Samples</span></label>
+          <span class="readout" id="lab-samp-val">1000 pts</span>
+        </div>
+        <div class="ctrl-row full">
+          <input type="range" id="lab-samp" min="100" max="100000" step="100" value="1000" />
+          <div class="hint">输出周期 = <span id="lab-period">0.100</span> s</div>
+        </div>
+      </div>
+      <pre class="code-panel" id="code-step3"></pre>
+      <div class="nav-bar">
+        <button class="btn" onclick="gotoStep(2)">← 上一步</button>
+        <button class="btn primary" onclick="gotoStep(4)">下一步 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 4 ============ -->
+  <section class="step-section" data-step="4">
+    <div class="card">
+      <h2><span class="num-large">4</span>写入数据 Write Data</h2>
+      <p class="lead">将波形数据写入缓冲区。ContinuousWrapping 模式<strong>必须先 WriteData 后 Start</strong>。</p>
+
+      <div class="concept-block" style="border-color:#facc15">
+        <strong style="color:#facc15">⚠️ 顺序：</strong> Wrapping 模式先写后启动！否则 → <code>BufferDataDownflow</code> 异常。
+      </div>
+
+      <table class="prop-table">
+        <thead><tr><th>方法</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>WriteData(double[], timeout)</code></td><td>单通道写入波形</td></tr>
+          <tr><td><code>WriteData(double[,], timeout)</code></td><td>多通道写入 (列存储)</td></tr>
+          <tr><td><code>WriteSinglePoint(val, ch)</code></td><td>Single 模式直接输出</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>动手实验 Lab</h2>
+      <div class="lab-controls">
+        <div class="ctrl-row">
+          <label><span>波形 Waveform</span></label>
+          <span class="readout" id="lab-wave-val">Sine</span>
+        </div>
+        <div class="ctrl-row full">
+          <select id="lab-wave">
+            <option value="sine" selected>Sine · 正弦波</option>
+            <option value="square">Square · 方波</option>
+            <option value="triangle">Triangle · 三角波</option>
+            <option value="sawtooth">Sawtooth · 锯齿波</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <label><span>幅值 Amplitude</span></label>
+          <span class="readout" id="lab-amp-val">5.0 V</span>
+        </div>
+        <div class="ctrl-row full">
+          <input type="range" id="lab-amp" min="0.1" max="10" step="0.1" value="5" />
+        </div>
+        <div class="ctrl-row">
+          <label><span>频率 Frequency</span></label>
+          <span class="readout" id="lab-freq-val">100 Hz</span>
+        </div>
+        <div class="ctrl-row full">
+          <input type="range" id="lab-freq" min="1" max="10000" step="1" value="100" />
+        </div>
+      </div>
+
+      <div class="wave-box">
+        <canvas id="wave-out"></canvas>
+        <div class="wave-legend">
+          <div><span class="swatch" style="background:#f472b6"></span>AO 输出预览</div>
+        </div>
+      </div>
+
+      <pre class="code-panel" id="code-step4"></pre>
+      <div class="nav-bar">
+        <button class="btn" onclick="gotoStep(3)">← 上一步</button>
+        <button class="btn primary" onclick="gotoStep(5)">下一步 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 5 ============ -->
+  <section class="step-section" data-step="5">
+    <div class="card">
+      <h2><span class="num-large">5</span>启动与停止 Start &amp; Stop</h2>
+      <p class="lead"><code>Start()</code> 启动输出 → 硬件按更新率转换电压。结束后 <code>Stop()</code> + <code>Channels.Clear()</code>。</p>
+
+      <div class="concept-block">
+        <strong>触发 Trigger：</strong>
+        <ul style="margin:4px 0 0;padding-left:18px;line-height:1.6;font-size:11px;">
+          <li><code>Immediate</code> 立即 (默认)</li>
+          <li><code>Digital</code> 数字 — PFI 边沿</li>
+          <li><code>Soft</code> 软触发 — SendSoftwareTrigger()</li>
+        </ul>
+      </div>
+
+      <div class="concept-block">
+        <strong>时钟同步 Clock：</strong>
+        <ul style="margin:4px 0 0;padding-left:18px;line-height:1.6;font-size:11px;">
+          <li><code>Internal</code> 内部 (默认) — 板卡自身振荡器</li>
+          <li><code>External</code> 外部 — 接收 AI_SampleClock / PFI 实现同步</li>
+        </ul>
+      </div>
+
+      <table class="prop-table">
+        <thead><tr><th>成员</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>Start()</code></td><td>启动输出</td></tr>
+          <tr><td><code>Stop()</code></td><td>停止输出</td></tr>
+          <tr><td><code>WaitUntilDone(timeout)</code></td><td>Finite 模式等待完成</td></tr>
+          <tr><td><code>Channels.Clear()</code></td><td>清除通道释放资源</td></tr>
+          <tr><td><code>Trigger.Type</code></td><td>Immediate/Digital/Soft</td></tr>
+          <tr><td><code>SampleClock.Source</code></td><td>Internal/External</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>动手实验 Lab</h2>
+      <div class="lab-controls">
+        <div class="ctrl-row">
+          <label><span>触发 Trigger</span></label>
+          <span class="readout" id="lab-trig-val">Immediate</span>
+        </div>
+        <div class="ctrl-row full">
+          <select id="lab-trig">
+            <option value="Immediate" selected>Immediate · 立即</option>
+            <option value="Digital">Digital · 数字</option>
+            <option value="Soft">Soft · 软触发</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <label><span>时钟 Clock</span></label>
+          <span class="readout" id="lab-clk-val">Internal</span>
+        </div>
+        <div class="ctrl-row full">
+          <select id="lab-clk">
+            <option value="Internal" selected>Internal · 内部</option>
+            <option value="External">External · 外部</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btn-bar">
+        <button class="btn primary" id="btn-start">▶ Start</button>
+        <button class="btn danger" id="btn-stop">■ Stop</button>
+      </div>
+
+      <div class="status-row">
+        <div class="status-item"><span class="k">状态</span><span class="v" id="stat-state">Stop</span></div>
+        <div class="status-item"><span class="k">已输出</span><span class="v" id="stat-out">0</span></div>
+        <div class="status-item"><span class="k">模式</span><span class="v" id="stat-mode">Wrap</span></div>
+      </div>
+
+      <pre class="code-panel" id="code-full"></pre>
+      <div class="nav-bar">
+        <button class="btn" onclick="gotoStep(4)">← 上一步</button>
+        <button class="btn primary" onclick="showFullCode()">📋 复制代码 Copy</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer CTA -->
+  <footer class="cta">
+    <h3>🚀 开始你的第一次模拟输出</h3>
+    <p>登录简仪官网 <a href="https://www.jytek.com" target="_blank">jytek.com</a>，下载 <strong>JYPEDIA</strong> 文件。</p>
+    <p>文件内附软件下载链接，可免费获取 <strong>SeeSharp Tools</strong> 软件及范例。</p>
+    <p style="color:var(--c-muted);font-size:10px;margin-top:8px">
+      Visit <a href="https://www.jytek.com" target="_blank">jytek.com</a> to download <strong>JYPEDIA</strong> — free SeeSharp Tools SDK &amp; examples.
+    </p>
+  </footer>
+
+</div>
+
+<script>
+  // ===== Step Navigation =====
+  function gotoStep(n) {
+    document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.step-pill').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.step-section[data-step="${n}"]`).classList.add('active');
+    document.querySelector(`.step-pill[data-step="${n}"]`).classList.add('active');
+    refreshCode();
+    if (n === 4) drawOutputWave();
+  }
+  function showFullCode() {
+    gotoStep(5); refreshCode();
+    const code = document.getElementById('code-full');
+    if (code) {
+      const text = code.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('[onclick="showFullCode()"]');
+        if (btn) { const orig = btn.textContent; btn.textContent = '✅ 已复制!'; setTimeout(() => btn.textContent = orig, 2000); }
+      }).catch(() => {
+        const range = document.createRange(); range.selectNodeContents(code);
+        const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      });
+    }
+  }
+
+  // ===== Lab State =====
+  const lab = {
+    board: '5510', slot: 0, ch: 0, range: 10,
+    mode: 'ContinuousWrapping', ur: 10000, samp: 1000,
+    trig: 'Immediate', clk: 'Internal',
+    wave: 'sine', amp: 5, freq: 100
+  };
+
+  // ===== Bind Controls =====
+  function bind(id, key, render) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      lab[key] = el.type === 'range' ? +el.value : el.value;
+      if (render) render();
+      refreshCode();
+    });
+  }
+
+  bind('lab-board', 'board', () => doc('lab-board-val', lab.board));
+  bind('lab-slot', 'slot', () => doc('lab-slot-val', lab.slot));
+  bind('lab-ch', 'ch', () => doc('lab-ch-val', 'AO' + lab.ch));
+  bind('lab-range', 'range', () => doc('lab-range-val', '±' + lab.range + ' V'));
+  bind('lab-mode', 'mode', () => {
+    doc('lab-mode-val', lab.mode.replace('Continuous',''));
+    doc('stat-mode', lab.mode.replace('Continuous','').substring(0,4));
+  });
+  bind('lab-ur', 'ur', () => {
+    doc('lab-ur-val', lab.ur.toLocaleString() + ' Sa/s');
+    doc('lab-period', (lab.samp / lab.ur).toFixed(3));
+  });
+  bind('lab-samp', 'samp', () => {
+    doc('lab-samp-val', lab.samp.toLocaleString() + ' pts');
+    doc('lab-period', (lab.samp / lab.ur).toFixed(3));
+  });
+  bind('lab-trig', 'trig', () => doc('lab-trig-val', lab.trig));
+  bind('lab-clk', 'clk', () => doc('lab-clk-val', lab.clk));
+  bind('lab-wave', 'wave', () => { doc('lab-wave-val', lab.wave); drawOutputWave(); });
+  bind('lab-amp', 'amp', () => { doc('lab-amp-val', lab.amp.toFixed(1) + ' V'); drawOutputWave(); });
+  bind('lab-freq', 'freq', () => { doc('lab-freq-val', lab.freq + ' Hz'); drawOutputWave(); });
+
+  function doc(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+  // ===== Code Generators =====
+  function fmt(s) {
+    s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const tokens = [];
+    const mark = (cls, text) => {
+      tokens.push({ cls, text });
+      return '\u0001Z' + (tokens.length - 1) + 'Z\u0001';
+    };
+    s = s.replace(/(\/\/[^\n]*)/g, m => mark('cmt', m));
+    s = s.replace(/(@?"[^"]*")/g, m => mark('str', m));
+    s = s.replace(/\b(JY5500AOTask|AOMode|AOTriggerType|AOSampleClockSource|AODigitalTriggerSource|AODigitalTriggerEdge|ClockTerminal|JYDriverException|Console|MessageBox|EventArgs|Math)\b/g, m => mark('type', m));
+    s = s.replace(/\b(using|var|new|int|double|bool|if|else|return|while|for|catch|try|throw|public|private|void)\b/g, m => mark('kw', m));
+    s = s.replace(/\b(\d+(?:\.\d+)?)\b/g, m => mark('num', m));
+    return s.replace(/\u0001Z(\d+)Z\u0001/g, (_, i) => {
+      const t = tokens[+i];
+      return '<span class="' + t.cls + '">' + t.text + '</span>';
+    });
+  }
+
+  function refreshCode() {
+    const c1 = `// 1. 创建任务 Create Task\nJY5500AOTask aoTask = new JY5500AOTask(${lab.slot});`;
+    setCode('code-step1', c1);
+
+    const c2 = `// 2. 添加通道 Add Channel\naoTask.AddChannel(${lab.ch}, ${-lab.range}, ${lab.range});`;
+    setCode('code-step2', c2);
+
+    let c3 = `// 3. 配置参数 Configure\naoTask.Mode = AOMode.${lab.mode};`;
+    if (lab.mode !== 'Single') {
+      c3 += `\naoTask.UpdateRate = ${lab.ur};`;
+    }
+    if (lab.mode === 'Finite') {
+      c3 += `\naoTask.SamplesToUpdate = ${lab.samp};`;
+    }
+    setCode('code-step3', c3);
+
+    let c4 = `// 4. 写入数据 Write Data\n`;
+    if (lab.mode === 'Single') {
+      c4 += `aoTask.WriteSinglePoint(${lab.amp.toFixed(1)}, ${lab.ch});`;
+    } else {
+      c4 += `double frequency = ${lab.freq};   // ${lab.freq} Hz\ndouble[] buf = new double[${lab.samp}];\nfor (int i = 0; i < ${lab.samp}; i++)\n{\n    double t = (double)i / ${lab.ur};   // 时间 = i / UpdateRate\n    buf[i] = ${lab.amp.toFixed(1)} * Math.Sin(2 * Math.PI * frequency * t);\n}\naoTask.WriteData(buf, -1);`;
+    }
+    setCode('code-step4', c4);
+
+    setCode('code-full', buildFull());
+  }
+
+  function setCode(id, txt) { const el = document.getElementById(id); if (el) el.innerHTML = fmt(txt); }
+
+  function buildFull() {
+    let trigCode = '';
+    if (lab.trig === 'Digital') {
+      trigCode = `\n    aoTask.Trigger.Type = AOTriggerType.Digital;\n    aoTask.Trigger.Digital.Source = AODigitalTriggerSource.PFI0;\n    aoTask.Trigger.Digital.Edge = AODigitalTriggerEdge.Rising;`;
+    } else if (lab.trig === 'Soft') {
+      trigCode = `\n    aoTask.Trigger.Type = AOTriggerType.Soft;`;
+    }
+    let clkCode = '';
+    if (lab.clk === 'External') {
+      clkCode = `\n    aoTask.SampleClock.Source = AOSampleClockSource.External;\n    aoTask.SampleClock.External.Terminal = ClockTerminal.AI_SampleClock;\n    aoTask.SampleClock.External.ExpectedRate = ${lab.ur};`;
+    }
+    const isSingle = lab.mode === 'Single';
+    let writeCode = '';
+    if (isSingle) {
+      writeCode = `\n    // 4. 写入 Write\n    aoTask.WriteSinglePoint(${lab.amp.toFixed(1)}, ${lab.ch});`;
+    } else {
+      writeCode = `\n    // 4. 写入数据 Write Data (${lab.wave}, ${lab.freq} Hz)\n    double frequency = ${lab.freq};\n    double[] buf = new double[${lab.samp}];\n    for (int i = 0; i < ${lab.samp}; i++)\n    {\n        double t = (double)i / ${lab.ur};\n        buf[i] = ${lab.amp.toFixed(1)} * Math.Sin(2 * Math.PI * frequency * t);\n    }\n    aoTask.WriteData(buf, -1);`;
+    }
+    let startCode = `\n    // 5. 启动 Start\n    aoTask.Start();`;
+    if (lab.trig === 'Soft') startCode += `\n    aoTask.SendSoftwareTrigger();`;
+    let waitCode = '';
+    if (lab.mode === 'Finite') waitCode = `\n    aoTask.WaitUntilDone(-1);`;
+    return `using System;
+using JY5500;
+
+// === 5 步实现 Analog Output (JY${lab.board}) ===
+try {
+    // 1. 创建任务 Create Task
+    JY5500AOTask aoTask = new JY5500AOTask(${lab.slot});
+
+    // 2. 添加通道 Add Channel
+    aoTask.AddChannel(${lab.ch}, ${-lab.range}, ${lab.range});
+
+    // 3. 配置参数 Configure
+    aoTask.Mode = AOMode.${lab.mode};${(!isSingle)?'\n    aoTask.UpdateRate = '+lab.ur+';':''}${(lab.mode==='Finite')?'\n    aoTask.SamplesToUpdate = '+lab.samp+';':''}${trigCode}${clkCode}${writeCode}${startCode}${waitCode}
+
+    // 收尾 Cleanup
+    aoTask.Stop();
+    aoTask.Channels.Clear();
+}
+catch (JYDriverException ex) {
+    MessageBox.Show(ex.Message);
+}`;
+  }
+
+  // ===== Output Waveform Preview =====
+  function drawOutputWave() {
+    const canvas = document.getElementById('wave-out');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.clientWidth, H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 8; i++) { const x = (W/8)*i; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let i = 0; i <= 4; i++) { const y = (H/4)*i; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    ctx.strokeStyle = '#475569'; ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke();
+    ctx.strokeStyle = '#f472b6'; ctx.lineWidth = 1.5; ctx.beginPath();
+    const pts = Math.min(lab.samp, 600);
+    const cycles = lab.freq * lab.samp / lab.ur;
+    for (let i = 0; i < pts; i++) {
+      const t = i / pts;
+      const phase = (cycles * t) % 1;
+      let v = 0;
+      switch (lab.wave) {
+        case 'sine': v = lab.amp * Math.sin(2 * Math.PI * cycles * t); break;
+        case 'square': v = (phase < 0.5) ? lab.amp : -lab.amp; break;
+        case 'triangle': v = lab.amp * (1 - 4 * Math.abs(phase - 0.5)); break;
+        case 'sawtooth': v = lab.amp * (2 * phase - 1); break;
+      }
+      const x = (i / (pts - 1)) * W;
+      const y = H / 2 - (v / lab.range) * (H / 2 - 4);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  // ===== Start/Stop Simulation =====
+  let running = false, t0 = 0, animId = 0;
+  document.getElementById('btn-start').addEventListener('click', () => {
+    running = true; t0 = Date.now();
+    document.getElementById('stat-state').textContent = 'Run';
+    animateOutput();
+  });
+  document.getElementById('btn-stop').addEventListener('click', () => {
+    running = false; cancelAnimationFrame(animId);
+    document.getElementById('stat-state').textContent = 'Stop';
+  });
+  function animateOutput() {
+    if (!running) return;
+    const elapsed = (Date.now() - t0) / 1000;
+    const outputted = Math.floor(elapsed * lab.ur);
+    document.getElementById('stat-out').textContent = outputted > 99999 ? (outputted/1000).toFixed(0)+'k' : outputted;
+    if (lab.mode === 'Finite' && outputted >= lab.samp) {
+      running = false;
+      document.getElementById('stat-state').textContent = 'Done';
+      return;
+    }
+    animId = requestAnimationFrame(animateOutput);
+  }
+
+  // ===== Init =====
+  refreshCode();
+  drawOutputWave();
+  window.addEventListener('resize', drawOutputWave);
+</script>
+</body>
+</html>

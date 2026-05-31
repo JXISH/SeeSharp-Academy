@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>SeeSharp 数采 · 5 步实现 Analog Input · 桌面版</title>
+  <meta name="viewport" content="width=1280" />
+  <style>
+    :root {
+      --c-bg: #0f172a;
+      --c-panel: #1e293b;
+      --c-panel-2: #273449;
+      --c-border: #334155;
+      --c-text: #e2e8f0;
+      --c-muted: #94a3b8;
+      --c-accent: #38bdf8;
+      --c-accent-2: #f472b6;
+      --c-ok: #4ade80;
+      --c-warn: #facc15;
+      --c-step-1: #38bdf8;
+      --c-step-2: #a78bfa;
+      --c-step-3: #f472b6;
+      --c-step-4: #fb923c;
+      --c-step-5: #4ade80;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: var(--c-text);
+      font-family: "Segoe UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1240px; margin: 0 auto; padding: 28px 24px 40px; }
+    header.hero {
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--c-border);
+      padding-bottom: 18px; margin-bottom: 24px;
+    }
+    .hero h1 {
+      margin: 0; font-size: 28px; letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #38bdf8, #f472b6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero .sub { color: var(--c-muted); font-size: 14px; margin-top: 4px; }
+    .hero .tag {
+      background: rgba(56,189,248,0.12); color: var(--c-accent);
+      border: 1px solid rgba(56,189,248,0.4);
+      padding: 4px 10px; border-radius: 999px; font-size: 12px;
+    }
+
+    /* Step Tracker */
+    .step-bar {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+      margin-bottom: 22px;
+    }
+    .step-pill {
+      background: var(--c-panel); border: 1px solid var(--c-border);
+      border-radius: 12px; padding: 14px 16px; cursor: pointer;
+      transition: all 0.2s; position: relative; overflow: hidden;
+    }
+    .step-pill:hover { transform: translateY(-2px); border-color: var(--c-accent); }
+    .step-pill.active { border-color: var(--c-accent); box-shadow: 0 4px 18px rgba(56,189,248,0.18); }
+    .step-pill .num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--c-panel-2); color: var(--c-text);
+      font-weight: 700; font-size: 13px; margin-right: 8px;
+    }
+    .step-pill.active .num { background: var(--c-accent); color: #0f172a; }
+    .step-pill .cn { font-weight: 600; font-size: 15px; display: block; }
+    .step-pill .en { color: var(--c-muted); font-size: 12px; display: block; margin-top: 2px; }
+    .step-pill[data-step="1"] .num.active-bar { background: var(--c-step-1); }
+    .step-pill[data-step="2"] .num.active-bar { background: var(--c-step-2); }
+
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+    .card {
+      background: var(--c-panel); border: 1px solid var(--c-border);
+      border-radius: 14px; padding: 20px 22px;
+    }
+    .card h2 {
+      margin: 0 0 6px; font-size: 18px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .card h2 .badge {
+      background: var(--c-accent); color: #0f172a;
+      font-size: 12px; padding: 2px 9px; border-radius: 999px;
+    }
+    .card .lead { color: var(--c-muted); font-size: 13px; margin: 0 0 16px; }
+
+    .concept-block {
+      background: var(--c-panel-2);
+      border-left: 3px solid var(--c-accent);
+      border-radius: 8px; padding: 12px 14px; margin: 12px 0;
+      font-size: 14px; line-height: 1.7;
+    }
+    .concept-block strong { color: var(--c-accent); }
+
+    /* Property Table */
+    .prop-table {
+      width: 100%; border-collapse: collapse; margin-top: 12px;
+      font-size: 13px;
+    }
+    .prop-table th, .prop-table td {
+      padding: 8px 10px; text-align: left;
+      border-bottom: 1px solid var(--c-border);
+    }
+    .prop-table th {
+      background: var(--c-panel-2); color: var(--c-accent);
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .prop-table code {
+      background: rgba(56,189,248,0.1); color: var(--c-accent);
+      padding: 1px 6px; border-radius: 4px; font-size: 12px;
+    }
+    .prop-table .cn-en {
+      display: flex; flex-direction: column;
+    }
+    .prop-table .cn-en .en { color: var(--c-muted); font-size: 11px; }
+
+    /* Interactive Lab */
+    .lab-controls {
+      display: grid; gap: 10px; margin-top: 8px;
+    }
+    .ctrl-row {
+      display: grid; grid-template-columns: 160px 1fr 100px;
+      align-items: center; gap: 10px;
+    }
+    .ctrl-row label { font-size: 13px; }
+    .ctrl-row label .en { color: var(--c-muted); font-size: 11px; display: block; }
+    .ctrl-row input[type=range] { width: 100%; }
+    .ctrl-row select, .ctrl-row input[type=number] {
+      background: var(--c-panel-2); color: var(--c-text);
+      border: 1px solid var(--c-border); border-radius: 6px;
+      padding: 6px 8px; width: 100%;
+    }
+    .ctrl-row .readout {
+      color: var(--c-accent); font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 13px; text-align: right;
+    }
+    .ctrl-row .hint {
+      grid-column: 1 / -1; color: var(--c-muted); font-size: 11px;
+      margin-top: -4px; padding-left: 4px;
+    }
+
+    /* Code Panel */
+    .code-panel {
+      background: #0b1220; border: 1px solid var(--c-border);
+      border-radius: 8px; padding: 16px; margin-top: 14px;
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 12.5px; line-height: 1.55;
+      max-height: 380px; overflow: auto;
+      white-space: pre;
+    }
+    .code-panel .kw { color: #c084fc; }
+    .code-panel .type { color: #38bdf8; }
+    .code-panel .str { color: #fbbf24; }
+    .code-panel .num { color: #f472b6; }
+    .code-panel .cmt { color: #64748b; font-style: italic; }
+    .code-panel .hl { background: rgba(56,189,248,0.15); display: inline-block; }
+
+    /* Waveform Canvas */
+    .wave-box {
+      background: #0b1220; border: 1px solid var(--c-border);
+      border-radius: 8px; padding: 10px; margin-top: 12px;
+    }
+    .wave-box canvas { width: 100%; height: 200px; display: block; }
+    .wave-legend {
+      display: flex; gap: 16px; font-size: 12px; color: var(--c-muted);
+      margin-top: 6px;
+    }
+    .wave-legend .swatch {
+      display: inline-block; width: 12px; height: 12px;
+      border-radius: 2px; margin-right: 6px; vertical-align: middle;
+    }
+
+    /* Action Buttons */
+    .btn-bar { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    .btn {
+      padding: 8px 18px; border-radius: 6px;
+      border: 1px solid var(--c-border); cursor: pointer;
+      background: var(--c-panel-2); color: var(--c-text);
+      font-size: 13px; transition: all 0.15s;
+    }
+    .btn:hover { border-color: var(--c-accent); }
+    .btn.primary { background: var(--c-accent); color: #0f172a; border-color: var(--c-accent); font-weight: 600; }
+    .btn.primary:hover { background: #7dd3fc; }
+    .btn.danger { background: #ef4444; color: white; border-color: #ef4444; }
+    .btn.danger:hover { background: #f87171; }
+
+    /* Status panel */
+    .status-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+      margin-top: 14px;
+    }
+    .status-item {
+      background: var(--c-panel-2); border-radius: 8px;
+      padding: 10px 14px;
+    }
+    .status-item .k { color: var(--c-muted); font-size: 11px; display: block; }
+    .status-item .v { color: var(--c-accent); font-size: 16px; font-weight: 600; font-family: ui-monospace, monospace; }
+
+    /* Footer */
+    footer.cta {
+      margin-top: 28px; padding: 22px 26px;
+      background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(244,114,182,0.12));
+      border: 1px solid rgba(56,189,248,0.3); border-radius: 14px;
+      text-align: center;
+    }
+    footer.cta h3 { margin: 0 0 8px; font-size: 18px; color: var(--c-accent); }
+    footer.cta p { margin: 4px 0; color: var(--c-text); font-size: 14px; line-height: 1.7; }
+    footer.cta a { color: var(--c-accent-2); font-weight: 600; text-decoration: none; }
+    footer.cta a:hover { text-decoration: underline; }
+
+    .step-section { display: none; }
+    .step-section.active { display: block; }
+    .step-section h2 .num-large {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px; border-radius: 50%;
+      font-size: 18px; font-weight: 700; color: #0f172a;
+      margin-right: 8px;
+    }
+    [data-step="1"] .num-large { background: var(--c-step-1); }
+    [data-step="2"] .num-large { background: var(--c-step-2); }
+    [data-step="3"] .num-large { background: var(--c-step-3); }
+    [data-step="4"] .num-large { background: var(--c-step-4); }
+    [data-step="5"] .num-large { background: var(--c-step-5); }
+
+    .step-pill[data-step="1"] .num { background: rgba(56,189,248,0.25); }
+    .step-pill[data-step="2"] .num { background: rgba(167,139,250,0.25); }
+    .step-pill[data-step="3"] .num { background: rgba(244,114,182,0.25); }
+    .step-pill[data-step="4"] .num { background: rgba(251,146,60,0.25); }
+    .step-pill[data-step="5"] .num { background: rgba(74,222,128,0.25); }
+    .step-pill[data-step="1"].active .num { background: var(--c-step-1); color: #0f172a; }
+    .step-pill[data-step="2"].active .num { background: var(--c-step-2); color: #0f172a; }
+    .step-pill[data-step="3"].active .num { background: var(--c-step-3); color: #0f172a; }
+    .step-pill[data-step="4"].active .num { background: var(--c-step-4); color: #0f172a; }
+    .step-pill[data-step="5"].active .num { background: var(--c-step-5); color: #0f172a; }
+
+    .nav-bar {
+      display: flex; justify-content: space-between; margin-top: 18px;
+    }
+
+    .device-card {
+      background: var(--c-panel-2); padding: 12px 14px;
+      border-radius: 8px; margin: 12px 0;
+      display: flex; gap: 14px; align-items: center;
+    }
+    .device-icon {
+      font-size: 32px; line-height: 1;
+    }
+    .device-card .info { flex: 1; }
+    .device-card .info .title { font-weight: 600; font-size: 14px; }
+    .device-card .info .spec { color: var(--c-muted); font-size: 12px; margin-top: 2px; }
+
+    /* ===== Appendix · 附录 ===== */
+    .appendix-section { margin-top: 28px; }
+    .appendix-card { margin-bottom: 16px; }
+    .appendix-card h2 .apx-badge {
+      background: var(--c-accent-2); color: #0f172a;
+      font-size: 12px; padding: 2px 9px; border-radius: 999px;
+    }
+    .apx-tabs {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin: 12px 0 14px;
+    }
+    .apx-tab {
+      background: var(--c-panel-2); color: var(--c-text);
+      border: 1px solid var(--c-border); border-radius: 6px;
+      padding: 6px 12px; font-size: 12.5px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .apx-tab:hover { border-color: var(--c-accent); }
+    .apx-tab.active {
+      background: var(--c-accent); color: #0f172a;
+      border-color: var(--c-accent); font-weight: 600;
+    }
+    .apx-grid {
+      display: grid; grid-template-columns: 1.25fr 1fr; gap: 16px;
+    }
+    .apx-canvas-wrap {
+      background: #0b1220; border: 1px solid var(--c-border);
+      border-radius: 8px; padding: 10px;
+    }
+    .apx-canvas-wrap canvas { width: 100%; height: 320px; display: block; }
+    .apx-desc {
+      font-size: 13px; line-height: 1.7;
+      background: var(--c-panel-2); border-radius: 8px;
+      padding: 14px 16px; max-height: 320px; overflow-y: auto;
+    }
+    .apx-desc h4 {
+      color: var(--c-accent); margin: 0 0 4px; font-size: 14px;
+    }
+    .apx-desc .en {
+      color: var(--c-muted); font-size: 11px;
+      display: block; margin: 0 0 8px;
+    }
+    .apx-desc p { margin: 6px 0; }
+    .apx-desc ul { margin: 4px 0; padding-left: 22px; line-height: 1.7; }
+    .apx-desc .warn-tip {
+      color: var(--c-warn); border-left: 3px solid var(--c-warn);
+      padding: 6px 10px; margin: 8px 0; background: rgba(250,204,21,0.08);
+      border-radius: 0 6px 6px 0; font-size: 12.5px;
+    }
+    .apx-desc .warn-tip.danger {
+      color: #fecaca;
+      border: 2px solid #ef4444;
+      border-left-width: 6px;
+      background: linear-gradient(90deg, rgba(239,68,68,0.18), rgba(239,68,68,0.06));
+      box-shadow: 0 0 0 1px rgba(239,68,68,0.35), 0 4px 14px rgba(239,68,68,0.18);
+      padding: 10px 12px; margin: 10px 0;
+      font-size: 13px; line-height: 1.6;
+      border-radius: 8px;
+    }
+    .apx-desc .warn-tip.danger strong { color: #fff; }
+    .apx-desc .warn-tip.danger code {
+      background: rgba(239,68,68,0.25); color: #fff5f5;
+    }
+    .apx-desc code {
+      background: rgba(56,189,248,0.12); color: var(--c-accent);
+      padding: 1px 5px; border-radius: 4px; font-size: 12px;
+    }
+    .apx-desc pre {
+      background: #0b1220; border: 1px solid var(--c-border);
+      border-radius: 6px; padding: 8px 10px; margin: 6px 0;
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 11.5px; color: #94a3b8; white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div>
+      <h1>SeeSharp 数采 · 5 步实现 Analog Input</h1>
+      <div class="sub">JY5510 模拟输入 (AI · Analog Input) · 入门动手教程 · 桌面版 Desktop</div>
+    </div>
+    <div>
+      <span class="tag">JY5500AITask · MISD DAQ 101</span>
+    </div>
+  </header>
+
+  <!-- Step Tracker -->
+  <div class="step-bar">
+    <div class="step-pill active" data-step="1" onclick="gotoStep(1)">
+      <span class="num">1</span>
+      <span class="cn">创建任务</span>
+      <span class="en">Create Task</span>
+    </div>
+    <div class="step-pill" data-step="2" onclick="gotoStep(2)">
+      <span class="num">2</span>
+      <span class="cn">添加通道</span>
+      <span class="en">Add Channel</span>
+    </div>
+    <div class="step-pill" data-step="3" onclick="gotoStep(3)">
+      <span class="num">3</span>
+      <span class="cn">配置参数</span>
+      <span class="en">Configure</span>
+    </div>
+    <div class="step-pill" data-step="4" onclick="gotoStep(4)">
+      <span class="num">4</span>
+      <span class="cn">启动采集</span>
+      <span class="en">Start</span>
+    </div>
+    <div class="step-pill" data-step="5" onclick="gotoStep(5)">
+      <span class="num">5</span>
+      <span class="cn">读取数据</span>
+      <span class="en">Read Data</span>
+    </div>
+  </div>
+
+  <!-- ============ STEP 1 ============ -->
+  <section class="step-section active" data-step="1">
+    <div class="main-grid">
+      <div class="card">
+        <h2><span class="num-large">1</span>创建任务 · Create Task <span class="badge">JY5500AITask</span></h2>
+        <p class="lead">采集任务 (Task) 是一个一次性的工作对象 — 它把"硬件 + 通道 + 参数 + 触发"全部封装在一起，仿佛在 PXIe 槽位上"租用"了一台采集仪。</p>
+
+        <div class="concept-block">
+          <strong>类比 Analogy：</strong> 你坐在 5510 板卡前，先按下电源、登记座位号 (Slot Number)，于是诞生了一个 <code>aiTask</code> 对象。它知道自己要操作哪一张板卡，但还不知道具体测哪一路信号、用什么采样率。
+        </div>
+
+        <div class="device-card">
+          <div class="device-icon">📟</div>
+          <div class="info">
+            <div class="title">JY5510 多功能 I/O 板卡</div>
+            <div class="spec">16-ch 差分 / 32-ch 单端 AI · 18-bit · 最大 2 MS/s · ±10V 至 ±0.1V · USB / PCIe / PXIe</div>
+          </div>
+        </div>
+
+        <table class="prop-table">
+          <thead><tr><th>属性 / 方法 Member</th><th>类型 Type</th><th>说明 Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>JY5500AITask(slotNumber)</code></td><td>构造 ctor</td>
+              <td><div class="cn-en"><span>构造函数 — 按"槽位号"创建任务</span><span class="en">Create AI task by Slot Number</span></div></td></tr>
+            <tr><td><code>SlotNumber</code></td><td>int</td>
+              <td><div class="cn-en"><span>设备槽位号 (设备管理器中查看)</span><span class="en">Slot index seen in JYTEK Device Manager</span></div></td></tr>
+          </tbody>
+        </table>
+
+        <div class="nav-bar">
+          <span></span>
+          <button class="btn primary" onclick="gotoStep(2)">下一步 Next →</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>动手实验 · Hands-on Lab</h2>
+        <p class="lead">选择槽位号 (Slot Number)，看代码如何自动生成。</p>
+        <div class="lab-controls">
+          <div class="ctrl-row">
+            <label><span>板卡型号</span><span class="en">Board Model</span></label>
+            <select id="lab-board">
+              <option value="5510">JY5510 (2 MS/s)</option>
+              <option value="5511">JY5511 (1.25 MS/s)</option>
+              <option value="5515">JY5515 (2 MS/s · 16 SE)</option>
+              <option value="5516">JY5516 (1.25 MS/s · 16 SE)</option>
+            </select>
+            <span class="readout" id="lab-board-val">5510</span>
+          </div>
+          <div class="ctrl-row">
+            <label><span>槽位号</span><span class="en">Slot Number</span></label>
+            <input type="range" id="lab-slot" min="0" max="7" step="1" value="0" />
+            <span class="readout" id="lab-slot-val">0</span>
+          </div>
+        </div>
+        <pre class="code-panel" id="code-step1"></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2 ============ -->
+  <section class="step-section" data-step="2">
+    <div class="main-grid">
+      <div class="card">
+        <h2><span class="num-large">2</span>添加通道 · AddChannel</h2>
+        <p class="lead">告诉任务"我要测哪一路信号、量程多大、用何种接线方式"。</p>
+
+        <div class="concept-block">
+          <strong>关键概念 Key Idea：</strong> <code>AddChannel</code> 把物理引脚 (AI0~AI31) 映射到任务里。一旦添加，硬件就开始为这一路信号分配增益放大器 (PGA) 与缓冲区。
+        </div>
+
+        <table class="prop-table">
+          <thead><tr><th>参数 Parameter</th><th>说明 Description</th><th>取值 Range</th></tr></thead>
+          <tbody>
+            <tr><td><code>chnId</code><br><span style="color:var(--c-muted);font-size:11px">通道号 Channel ID</span></td>
+              <td>物理引脚序号；<code>-1</code> 表示全部</td><td>5510: 0–31 (SE) / 0–7 (Diff)</td></tr>
+            <tr><td><code>rangeLow / rangeHigh</code><br><span style="color:var(--c-muted);font-size:11px">量程下/上限 Range</span></td>
+              <td>选择略大于信号峰值的量程 → 精度最高</td>
+              <td>±10/±5/±2/±1/±0.5/±0.2/±0.1 V</td></tr>
+            <tr><td><code>AITerminal</code><br><span style="color:var(--c-muted);font-size:11px">终端配置 Terminal</span></td>
+              <td>接线方式 — RSE 单端、NRSE 非参考单端、Differential 差分</td>
+              <td>RSE / NRSE / Differential</td></tr>
+          </tbody>
+        </table>
+
+        <div class="concept-block" style="border-color: var(--c-warn);">
+          <strong style="color:var(--c-warn)">📌 量程选择口诀 Range Tip：</strong> 信号 ≤ 0.2V 用 ±0.2V 量程 → 充分利用 18-bit 分辨率；信号波动大于 ±5V 必选 ±10V，避免削顶 (clipping)。
+        </div>
+
+        <div class="nav-bar">
+          <button class="btn" onclick="gotoStep(1)">← 上一步</button>
+          <button class="btn primary" onclick="gotoStep(3)">下一步 Next →</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>动手实验 · Hands-on Lab</h2>
+        <div class="lab-controls">
+          <div class="ctrl-row">
+            <label><span>通道号</span><span class="en">Channel</span></label>
+            <input type="range" id="lab-ch" min="0" max="31" step="1" value="0" />
+            <span class="readout" id="lab-ch-val">AI0</span>
+          </div>
+          <div class="ctrl-row">
+            <label><span>量程</span><span class="en">Range</span></label>
+            <select id="lab-range">
+              <option value="10">±10 V</option>
+              <option value="5">±5 V</option>
+              <option value="2">±2 V</option>
+              <option value="1">±1 V</option>
+              <option value="0.5">±0.5 V</option>
+              <option value="0.2">±0.2 V</option>
+              <option value="0.1">±0.1 V</option>
+            </select>
+            <span class="readout" id="lab-range-val">±10 V</span>
+          </div>
+          <div class="ctrl-row">
+            <label><span>终端配置</span><span class="en">Terminal</span></label>
+            <select id="lab-term">
+              <option value="RSE">RSE · 参考单端</option>
+              <option value="NRSE">NRSE · 非参考单端</option>
+              <option value="Differential">Differential · 差分</option>
+            </select>
+            <span class="readout" id="lab-term-val">RSE</span>
+          </div>
+        </div>
+        <pre class="code-panel" id="code-step2"></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3 ============ -->
+  <section class="step-section" data-step="3">
+    <div class="main-grid">
+      <div class="card">
+        <h2><span class="num-large">3</span>配置参数 · Configure</h2>
+        <p class="lead">设定"采集模式 + 采样率 + 采集点数"，决定波形将以什么速度、采多少点、是否一次完成。</p>
+
+        <div class="concept-block">
+          <strong>采样率 SampleRate (Sa/s)：</strong> 每秒钟采几个点。Nyquist 准则：<em>采样率 ≥ 2 × 信号最高频率</em>。例如要看 10 kHz 正弦波，采样率必须 ≥ 20 kSa/s，工程上常用 5–10 倍以保留波形细节。
+        </div>
+
+        <div class="concept-block">
+          <strong>采集模式 AIMode 四种：</strong>
+          <ul style="margin: 6px 0 0; padding-left: 22px; line-height: 1.7;">
+            <li><code>Single</code> 单点 — 软件触发一次读一个值，类似万用表</li>
+            <li><code>Finite</code> 有限 — 采固定 N 点后自动停止 (本示例使用)</li>
+            <li><code>Continuous</code> 连续 — 持续采集，应用程序轮询读取</li>
+            <li><code>Record</code> 录制 — 数据流式落盘，支持预览</li>
+          </ul>
+        </div>
+
+        <table class="prop-table">
+          <thead><tr><th>属性 Property</th><th>类型 Type</th><th>说明 Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>Mode</code></td><td>AIMode</td><td>采集模式 / Acquisition mode</td></tr>
+            <tr><td><code>SampleRate</code></td><td>double</td><td>每通道采样率 / Sa/s per channel</td></tr>
+            <tr><td><code>SamplesToAcquire</code></td><td>int</td><td>Finite 模式总点数 / Finite-mode samples per channel</td></tr>
+          </tbody>
+        </table>
+
+        <div class="nav-bar">
+          <button class="btn" onclick="gotoStep(2)">← 上一步</button>
+          <button class="btn primary" onclick="gotoStep(4)">下一步 Next →</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>动手实验 · Hands-on Lab</h2>
+        <div class="lab-controls">
+          <div class="ctrl-row">
+            <label><span>采集模式</span><span class="en">AIMode</span></label>
+            <select id="lab-mode">
+              <option value="Finite" selected>Finite · 有限</option>
+              <option value="Single">Single · 单点</option>
+              <option value="Continuous">Continuous · 连续</option>
+              <option value="Record">Record · 录制</option>
+            </select>
+            <span class="readout" id="lab-mode-val">Finite</span>
+          </div>
+          <div class="ctrl-row">
+            <label><span>采样率</span><span class="en">SampleRate</span></label>
+            <input type="range" id="lab-sr" min="1000" max="2000000" step="1000" value="10000" />
+            <span class="readout" id="lab-sr-val">10000 Sa/s</span>
+            <div class="hint">JY5510 上限 2 MS/s · Nyquist：可还原最高 ≈ <span id="lab-nyq">5000</span> Hz 信号</div>
+          </div>
+          <div class="ctrl-row">
+            <label><span>采集点数</span><span class="en">SamplesToAcquire</span></label>
+            <input type="range" id="lab-samp" min="100" max="100000" step="100" value="1000" />
+            <span class="readout" id="lab-samp-val">1000 pts</span>
+            <div class="hint">采集时长 = 点数 / 采样率 = <span id="lab-dur">0.10</span> s</div>
+          </div>
+        </div>
+        <pre class="code-panel" id="code-step3"></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 4 ============ -->
+  <section class="step-section" data-step="4">
+    <div class="main-grid">
+      <div class="card">
+        <h2><span class="num-large">4</span>启动采集 · Start</h2>
+        <p class="lead">参数配置完成后，调用 <code>Start()</code> — 硬件开始按设定采样率采样、写入板载缓冲区。</p>
+
+        <div class="concept-block">
+          <strong>触发 Trigger：</strong> Start() 之后并不一定立即采集，要等到"触发条件"满足。
+          <ul style="margin: 6px 0 0; padding-left: 22px; line-height: 1.7;">
+            <li><code>Immediate</code> 立即 (默认)</li>
+            <li><code>Digital</code> 数字边沿 (PFI0 上升/下降沿)</li>
+            <li><code>Analog</code> 模拟阈值 (例如 AI0 越过 2.5V)</li>
+            <li><code>Soft</code> 软触发 (调用 <code>SendSoftwareTrigger()</code>)</li>
+          </ul>
+        </div>
+
+        <div class="concept-block" style="border-color: var(--c-warn)">
+          <strong style="color:var(--c-warn)">⚠️ 常见错误 Common Pitfall：</strong> Start 之后再修改 <code>SampleRate</code> / <code>Mode</code> 会抛出
+          <code>TaskHasStartedCannotPerformTheSetOperation</code> 异常 — 必须先 <code>Stop()</code> 才能改参。
+        </div>
+
+        <table class="prop-table">
+          <thead><tr><th>方法 / 属性 Member</th><th>说明 Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>Start()</code></td><td>启动任务，硬件开始采样 / Start the task</td></tr>
+            <tr><td><code>SendSoftwareTrigger()</code></td><td>软件发送一次触发 / Issue a soft trigger</td></tr>
+            <tr><td><code>Trigger.Type</code></td><td>触发类型枚举 / AITriggerType enum</td></tr>
+          </tbody>
+        </table>
+
+        <div class="nav-bar">
+          <button class="btn" onclick="gotoStep(3)">← 上一步</button>
+          <button class="btn primary" onclick="gotoStep(5)">下一步 Next →</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>动手实验 · Hands-on Lab</h2>
+        <p class="lead">选择触发方式，观察缓冲区填充。</p>
+        <div class="lab-controls">
+          <div class="ctrl-row">
+            <label><span>触发类型</span><span class="en">Trigger Type</span></label>
+            <select id="lab-trig">
+              <option value="Immediate" selected>Immediate · 立即</option>
+              <option value="Digital">Digital · 数字</option>
+              <option value="Analog">Analog · 模拟</option>
+              <option value="Soft">Soft · 软触发</option>
+            </select>
+            <span class="readout" id="lab-trig-val">Immediate</span>
+          </div>
+        </div>
+
+        <div class="btn-bar">
+          <button class="btn primary" id="btn-start">▶ Start 启动</button>
+          <button class="btn danger" id="btn-stop">■ Stop 停止</button>
+        </div>
+
+        <div class="status-row">
+          <div class="status-item"><span class="k">任务状态 State</span><span class="v" id="stat-state">Stopped</span></div>
+          <div class="status-item"><span class="k">已采集 Acquired</span><span class="v" id="stat-acq">0</span></div>
+          <div class="status-item"><span class="k">缓冲区 AvailableSamples</span><span class="v" id="stat-avail">0</span></div>
+        </div>
+
+        <div class="wave-box">
+          <canvas id="wave"></canvas>
+          <div class="wave-legend">
+            <div><span class="swatch" style="background:#38bdf8"></span>AI0 仿真信号 Simulated · 100 Hz Sine</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 5 ============ -->
+  <section class="step-section" data-step="5">
+    <div class="main-grid">
+      <div class="card">
+        <h2><span class="num-large">5</span>读取数据 · ReadData</h2>
+        <p class="lead">数据已经在板卡的 DMA 缓冲区中。调用 <code>ReadData</code> 把它搬到 .NET 数组中，绘图或写文件。</p>
+
+        <div class="concept-block">
+          <strong>缓冲区 (Buffer) 模型：</strong>
+          硬件持续以 <em>SampleRate</em> 写入环形缓冲区 (FIFO)；应用程序周期性轮询 <code>AvailableSamples</code>，达到 N 点后调用 <code>ReadData(ref buf, N, timeout)</code>。
+          <br>读不及时 → <code>BufferDataOverflow</code>；读取速度过慢通常需要：① 提高读取频率，或 ② 降低采样率。
+        </div>
+
+        <table class="prop-table">
+          <thead><tr><th>方法 / 属性</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td><code>AvailableSamples</code></td><td>当前缓冲区可读样本数 / Samples ready in buffer</td></tr>
+            <tr><td><code>ReadData(ref double[] buf, int n, int timeout)</code></td><td>单通道读取，timeout=-1 永久等待</td></tr>
+            <tr><td><code>ReadData(ref double[,] buf, int n, int timeout)</code></td><td>多通道读取，列存储 (rows=samples, cols=channels)</td></tr>
+            <tr><td><code>WaitUntilDone(timeout)</code></td><td>Finite 模式阻塞等待全部点数完成</td></tr>
+            <tr><td><code>Stop() + Channels.Clear()</code></td><td>采集完毕务必 Stop 并清通道，避免下次启动残留</td></tr>
+          </tbody>
+        </table>
+
+        <div class="concept-block">
+          <strong>典型 Finite 流程 Pattern (来自 Winform_AI_Finite 范例)：</strong>
+          <pre style="margin: 6px 0 0; font-size: 11.5px; color: var(--c-muted); white-space: pre;">Timer Tick:
+  if (aiTask.AvailableSamples >= readValue.Length) {
+      aiTask.ReadData(ref readValue, readValue.Length, -1);
+      easyChartX.Plot(readValue);
+      aiTask.Stop();
+      aiTask.Channels.Clear();
+  }</pre>
+        </div>
+
+        <div class="nav-bar">
+          <button class="btn" onclick="gotoStep(4)">← 上一步</button>
+          <button class="btn primary" onclick="showFullCode()">📋 查看完整代码 Full Code</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>完整代码 · Full Reference Code</h2>
+        <p class="lead">把当前所有参数串起来，得到一份可运行的 5510 单通道 Finite 采集 C# 范例。</p>
+        <pre class="code-panel" id="code-full"></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ APPENDIX · 附录 ============ -->
+  <section class="appendix-section">
+
+    <div class="card appendix-card">
+      <h2><span class="apx-badge">A</span>附录 A · 终端模式 · Terminal Modes</h2>
+      <p class="lead">三种 AI 接线方式的原理示意 — 用 Canvas 实时绘制（非位图）。点击切换查看每种终端的接线、应用场景与地回路风险。</p>
+
+      <div class="apx-tabs" id="term-tabs">
+        <button class="apx-tab active" data-term="RSE">RSE · 参考单端</button>
+        <button class="apx-tab" data-term="NRSE">NRSE · 非参考单端</button>
+        <button class="apx-tab" data-term="DIFF">Differential · 差分</button>
+      </div>
+
+      <div class="apx-grid">
+        <div class="apx-canvas-wrap">
+          <canvas id="term-canvas"></canvas>
+        </div>
+        <div class="apx-desc" id="term-desc"></div>
+      </div>
+    </div>
+
+    <div class="card appendix-card">
+      <h2><span class="apx-badge">B</span>附录 B · 触发模式 · Trigger Modes</h2>
+      <p class="lead">JY-5500 支持的全部触发原理图（参考手册 Figure 17 起的 Rising Slope / Falling Slope / Window-In/Out / Hysteresis 等）。Canvas 复刻官方插图风格。</p>
+
+      <div class="apx-tabs" id="trig-tabs">
+        <button class="apx-tab active" data-trig="Imm">Immediate 立即</button>
+        <button class="apx-tab" data-trig="DRise">Digital Rising</button>
+        <button class="apx-tab" data-trig="DFall">Digital Falling</button>
+        <button class="apx-tab" data-trig="ARise">Analog Rising Slope</button>
+        <button class="apx-tab" data-trig="AFall">Analog Falling Slope</button>
+        <button class="apx-tab" data-trig="AWIn">Window-In 进窗</button>
+        <button class="apx-tab" data-trig="AWOut">Window-Out 出窗</button>
+        <button class="apx-tab" data-trig="AHHyst">High Hysteresis</button>
+        <button class="apx-tab" data-trig="ALHyst">Low Hysteresis</button>
+        <button class="apx-tab" data-trig="Soft">Soft 软触发</button>
+      </div>
+
+      <div class="apx-grid">
+        <div class="apx-canvas-wrap">
+          <canvas id="trig-canvas"></canvas>
+        </div>
+        <div class="apx-desc" id="trig-desc"></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Footer CTA -->
+  <footer class="cta">
+    <h3>🚀 开始你的第一次采集 · Start Your First Acquisition</h3>
+    <p>登录简仪官网 <a href="https://www.jytek.com" target="_blank">jytek.com</a>，下载 <strong>JYPEDIA</strong> 文件。</p>
+    <p>文件内附软件下载链接，可免费获取 <strong>SeeSharp Tools</strong> 软件及范例。</p>
+    <p style="color:var(--c-muted);font-size:12px;margin-top:10px">
+      Visit <a href="https://www.jytek.com" target="_blank">jytek.com</a> to download <strong>JYPEDIA</strong> — it includes links to free <strong>SeeSharp Tools</strong> SDK and complete examples.
+    </p>
+  </footer>
+
+</div>
+
+<script>
+  // ===== Step Navigation =====
+  function gotoStep(n) {
+    document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.step-pill').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.step-section[data-step="${n}"]`).classList.add('active');
+    document.querySelector(`.step-pill[data-step="${n}"]`).classList.add('active');
+    refreshCode();
+  }
+  function showFullCode() { gotoStep(5); refreshCode(); }
+
+  // ===== Lab State =====
+  const lab = {
+    board: '5510', slot: 0, ch: 0, range: 10, term: 'RSE',
+    mode: 'Finite', sr: 10000, samp: 1000, trig: 'Immediate'
+  };
+
+  // ===== Bind Controls =====
+  function bind(id, key, render) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      lab[key] = el.type === 'range' ? +el.value : el.value;
+      if (render) render();
+      refreshCode();
+      // Reset acquired progress and refresh waveform preview when sr/samp/mode/range changes
+      if (key === 'sr' || key === 'samp' || key === 'mode' || key === 'range'){
+        lastAcquired = 0;
+        if (typeof drawWave === 'function') drawWave();
+      }
+    });
+  }
+
+  bind('lab-board', 'board', () => doc('lab-board-val', lab.board));
+  bind('lab-slot', 'slot', () => doc('lab-slot-val', lab.slot));
+  bind('lab-ch', 'ch', () => doc('lab-ch-val', 'AI' + lab.ch));
+  bind('lab-range', 'range', () => doc('lab-range-val', '±' + lab.range + ' V'));
+  bind('lab-term', 'term', () => doc('lab-term-val', lab.term));
+  bind('lab-mode', 'mode', () => doc('lab-mode-val', lab.mode));
+  bind('lab-sr', 'sr', () => {
+    doc('lab-sr-val', lab.sr.toLocaleString() + ' Sa/s');
+    doc('lab-nyq', Math.floor(lab.sr / 2).toLocaleString());
+    doc('lab-dur', (lab.samp / lab.sr).toFixed(3));
+  });
+  bind('lab-samp', 'samp', () => {
+    doc('lab-samp-val', lab.samp.toLocaleString() + ' pts');
+    doc('lab-dur', (lab.samp / lab.sr).toFixed(3));
+  });
+  bind('lab-trig', 'trig', () => doc('lab-trig-val', lab.trig));
+
+  function doc(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+  // ===== Code Generators =====
+  function fmt(s) {
+    // Escape HTML first, then tokenize via placeholders to avoid regex collision
+    s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const tokens = [];
+    // Wrap the index with letter delimiters 'Z' so subsequent number/keyword
+    // regexes (\b\d+\b, \b\w+\b) cannot re-match the index digits inside the
+    // placeholder — letters create no word boundary against digits.
+    const mark = (cls, text) => {
+      tokens.push({ cls, text });
+      return '\u0001Z' + (tokens.length - 1) + 'Z\u0001';
+    };
+    // Order matters: comments and strings first (so their content is not re-tokenized)
+    s = s.replace(/(\/\/[^\n]*)/g, m => mark('cmt', m));
+    s = s.replace(/(@?"[^"]*")/g, m => mark('str', m));
+    s = s.replace(/\b(JY5500AITask|AIMode|AITerminal|AITriggerType|JYDriverException|AIDigitalTriggerSource|AIDigitalTriggerEdge|AIAnalogTriggerSource|AIAnalogTriggerEdge|AIAnalogTriggerComparator|Console|MessageBox|EventArgs)\b/g, m => mark('type', m));
+    s = s.replace(/\b(using|var|new|int|double|bool|if|else|return|while|for|catch|try|throw|public|private)\b/g, m => mark('kw', m));
+    s = s.replace(/\b(\d+(?:\.\d+)?)\b/g, m => mark('num', m));
+    // Resolve placeholders to span tags
+    return s.replace(/\u0001Z(\d+)Z\u0001/g, (_, i) => {
+      const t = tokens[+i];
+      return '<span class="' + t.cls + '">' + t.text + '</span>';
+    });
+  }
+
+  function refreshCode() {
+    const c1 = `// 1. 创建任务 Create Task\n// 通过设备槽位号 (Slot Number) 创建 JY${lab.board} AI 任务对象\nJY5500AITask aiTask = new JY5500AITask(${lab.slot});`;
+    setCode('code-step1', c1);
+
+    const c2 = `// 2. 添加通道 Add Channel\n// 通道号: ${lab.ch} · 量程: ±${lab.range}V · 终端: ${lab.term}\naiTask.AddChannel(${lab.ch}, ${-lab.range}, ${lab.range}, AITerminal.${lab.term});`;
+    setCode('code-step2', c2);
+
+    let c3 = `// 3. 配置参数 Configure Parameters\naiTask.Mode = AIMode.${lab.mode};`;
+    if (lab.mode === 'Finite' || lab.mode === 'Continuous' || lab.mode === 'Record') {
+      c3 += `\naiTask.SampleRate = ${lab.sr};   // ${lab.sr.toLocaleString()} Sa/s`;
+    }
+    if (lab.mode === 'Finite') {
+      c3 += `\naiTask.SamplesToAcquire = ${lab.samp};   // 总点数 ${lab.samp.toLocaleString()}`;
+    }
+    setCode('code-step3', c3);
+
+    const cFull = buildFull();
+    setCode('code-full', cFull);
+  }
+
+  function setCode(id, txt) { const el = document.getElementById(id); if (el) el.innerHTML = fmt(txt); }
+
+  function buildFull() {
+    let trigCode = '';
+    if (lab.trig === 'Digital') {
+      trigCode = `\naiTask.Trigger.Type = AITriggerType.Digital;\naiTask.Trigger.Digital.Source = AIDigitalTriggerSource.PFI0;\naiTask.Trigger.Digital.Edge = AIDigitalTriggerEdge.Rising;`;
+    } else if (lab.trig === 'Analog') {
+      trigCode = `\naiTask.Trigger.Type = AITriggerType.Analog;\naiTask.Trigger.Analog.Source = AIAnalogTriggerSource.Channel_0;\naiTask.Trigger.Analog.Edge.Slope = AIAnalogTriggerEdge.Rising;\naiTask.Trigger.Analog.Edge.Threshold = 2.5;`;
+    } else if (lab.trig === 'Soft') {
+      trigCode = `\naiTask.Trigger.Type = AITriggerType.Soft;`;
+    }
+    const samp = lab.samp;
+    return `using System;
+using JY5500;
+
+// === SeeSharp 数采 · 5 步实现 Analog Input (JY${lab.board}) ===
+try {
+    // 1. 创建任务 Create Task — Slot ${lab.slot}
+    JY5500AITask aiTask = new JY5500AITask(${lab.slot});
+
+    // 2. 添加通道 Add Channel — AI${lab.ch}, ±${lab.range}V, ${lab.term}
+    aiTask.AddChannel(${lab.ch}, ${-lab.range}, ${lab.range}, AITerminal.${lab.term});
+
+    // 3. 配置参数 Configure
+    aiTask.Mode = AIMode.${lab.mode};${(lab.mode!=='Single')?'\n    aiTask.SampleRate = '+lab.sr+';':''}${(lab.mode==='Finite')?'\n    aiTask.SamplesToAcquire = '+samp+';':''}${trigCode.replace(/\n/g,'\n    ')}
+
+    // 4. 启动采集 Start
+    aiTask.Start();${(lab.trig==='Soft')?'\n    aiTask.SendSoftwareTrigger();':''}
+
+    // 5. 读取数据 Read Data
+    double[] readValue = new double[${samp}];
+    ${(lab.mode==='Finite')?'aiTask.WaitUntilDone(-1);\n    ':''}aiTask.ReadData(ref readValue, readValue.Length, -1);
+
+    // 收尾 Cleanup
+    aiTask.Stop();
+    aiTask.Channels.Clear();
+}
+catch (JYDriverException ex) {
+    MessageBox.Show(ex.Message);
+}`;
+  }
+
+  // ===== Waveform Simulation =====
+  const canvas = document.getElementById('wave');
+  let running = false, t0 = 0, animId = 0, lastAcquired = 0;
+  const SIG_FREQ = 100; // simulated signal: 100 Hz sine
+  function drawWave() {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.clientWidth, H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    // grid
+    ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 10; i++) {
+      const x = (W / 10) * i;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let i = 0; i <= 4; i++) {
+      const y = (H / 4) * i;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    // axis
+    ctx.strokeStyle = '#475569'; ctx.beginPath();
+    ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke();
+
+    // ----- Single mode: 1 sample, sample rate / length irrelevant -----
+    if (lab.mode === 'Single'){
+      if (running){
+        const v = lab.range * 0.6;
+        const yy = H / 2 - (v / lab.range) * (H / 2 - 6);
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath(); ctx.arc(W * 0.5, yy, 5, 0, Math.PI * 2); ctx.fill();
+        document.getElementById('stat-acq').textContent = '1';
+        document.getElementById('stat-avail').textContent = '1';
+        running = false;
+        document.getElementById('stat-state').textContent = 'Done 已完成';
+      }
+      ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('Single Sample · 单点采样（不受 SampleRate / SamplesToAcquire 影响）', W/2, H - 6);
+      return;
+    }
+
+    // ----- Finite / Continuous: X-axis spans the whole record (samp/sr) -----
+    const totalSamp = Math.max(1, lab.samp);
+    const totalDur  = totalSamp / lab.sr;            // seconds for full record
+
+    // acquired sample index (progressive)
+    let acquired;
+    if (running){
+      acquired = Math.min((Date.now() - t0) / 1000 * lab.sr, totalSamp);
+      lastAcquired = acquired;
+    } else {
+      acquired = Math.min(lastAcquired, totalSamp);
+    }
+    document.getElementById('stat-acq').textContent = Math.floor(acquired);
+    document.getElementById('stat-avail').textContent = Math.floor(acquired);
+
+    if (running && acquired >= totalSamp && lab.mode === 'Finite') {
+      running = false;
+      document.getElementById('stat-state').textContent = 'Done 已完成';
+    }
+
+    // sub-sample for performance
+    const maxPts = 1200;
+    const step   = Math.max(1, Math.floor(totalSamp / maxPts));
+    const acqInt = Math.floor(acquired);
+
+    // ghost preview of the un-acquired portion (entire record outline)
+    ctx.strokeStyle = 'rgba(56,189,248,0.20)'; ctx.lineWidth = 1;
+    ctx.setLineDash([2,3]); ctx.beginPath();
+    for (let i = 0, started = false; i <= totalSamp; i += step){
+      const tt = i / lab.sr;
+      const v  = lab.range * 0.6 * Math.sin(2 * Math.PI * SIG_FREQ * tt);
+      const x  = (i / totalSamp) * W;
+      const y  = H / 2 - (v / lab.range) * (H / 2 - 6);
+      if (!started){ ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // solid acquired portion
+    ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (let i = 0, started = false; i <= acqInt; i += step){
+      const tt = i / lab.sr;
+      const v  = lab.range * 0.6 * Math.sin(2 * Math.PI * SIG_FREQ * tt);
+      const x  = (i / totalSamp) * W;
+      const y  = H / 2 - (v / lab.range) * (H / 2 - 6);
+      if (!started){ ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // progress cursor (only while running and not full)
+    if (running && acqInt < totalSamp){
+      const xCursor = (acqInt / totalSamp) * W;
+      ctx.strokeStyle = '#f472b6'; ctx.lineWidth = 1.4; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(xCursor, 0); ctx.lineTo(xCursor, H); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // axis labels: 0s ... totalDur, plus sr × samp summary
+    ctx.fillStyle = '#64748b'; ctx.font = '10px sans-serif';
+    ctx.textAlign = 'left';  ctx.fillText('0 s', 4, H - 4);
+    ctx.textAlign = 'right';
+    const durLabel = totalDur >= 1 ? totalDur.toFixed(3) + ' s'
+                                   : (totalDur * 1000).toFixed(2) + ' ms';
+    ctx.fillText(durLabel + '  ·  ' + lab.sr.toLocaleString() + ' Sa/s × ' + totalSamp.toLocaleString() + ' pts', W - 4, H - 4);
+
+    if (running) animId = requestAnimationFrame(drawWave);
+  }
+
+  document.getElementById('btn-start').addEventListener('click', () => {
+    running = true; t0 = Date.now(); lastAcquired = 0;
+    document.getElementById('stat-state').textContent = 'Running 运行中';
+    drawWave();
+  });
+  document.getElementById('btn-stop').addEventListener('click', () => {
+    running = false; cancelAnimationFrame(animId);
+    document.getElementById('stat-state').textContent = 'Stopped 已停止';
+    drawWave();
+  });
+
+  // ===== Appendix · 终端 & 触发原理图 =====
+  (function appendixModule(){
+    // ---------- helpers ----------
+    function setup(canvas){
+      if (!canvas) return null;
+      const dpr = window.devicePixelRatio || 1;
+      const W = canvas.clientWidth || 600;
+      const H = canvas.clientHeight || 320;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      ctx.font = '12px "Microsoft YaHei", sans-serif';
+      ctx.textBaseline = 'alphabetic';
+      return { ctx, W, H };
+    }
+    function gridBg(ctx, W, H){
+      ctx.strokeStyle = '#162032'; ctx.lineWidth = 1;
+      for (let i = 1; i < 12; i++){ const x = W*i/12; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let j = 1; j < 6; j++){  const y = H*j/6;  ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    }
+    function drawBox(ctx, x, y, w, h, label){
+      ctx.fillStyle = 'rgba(30,41,59,0.55)';
+      ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.2;
+      ctx.fillRect(x,y,w,h); ctx.strokeRect(x,y,w,h);
+      if (label){
+        ctx.fillStyle = '#94a3b8'; ctx.textAlign = 'left';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText(label, x + 6, y - 6);
+      }
+    }
+    function vSrc(ctx, x, y, label){
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.6; ctx.fillStyle = 'rgba(56,189,248,0.08)';
+      ctx.beginPath(); ctx.arc(x,y,14,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = '#38bdf8';
+      ctx.beginPath(); ctx.moveTo(x-6,y-3); ctx.bezierCurveTo(x-3,y-9,x+3,y+3,x+6,y-3); ctx.stroke();
+      if (label){ ctx.fillStyle = '#38bdf8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(label, x, y+26); }
+    }
+    function earth(ctx, x, y, color){
+      color = color || '#94a3b8';
+      ctx.strokeStyle = color; ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(x-12,y); ctx.lineTo(x+12,y);
+      ctx.moveTo(x-8, y+4); ctx.lineTo(x+8, y+4);
+      ctx.moveTo(x-4, y+8); ctx.lineTo(x+4, y+8);
+      ctx.stroke();
+    }
+    function arrow(ctx, x1, y1, x2, y2, color, dashed){
+      color = color || '#ef4444';
+      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.4;
+      if (dashed) ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      ctx.setLineDash([]);
+      const a = Math.atan2(y2-y1, x2-x1);
+      ctx.beginPath();
+      ctx.moveTo(x2,y2);
+      ctx.lineTo(x2 - 8*Math.cos(a-0.4), y2 - 8*Math.sin(a-0.4));
+      ctx.lineTo(x2 - 8*Math.cos(a+0.4), y2 - 8*Math.sin(a+0.4));
+      ctx.closePath(); ctx.fill();
+    }
+    function ampSym(ctx, x, y, label){
+      ctx.fillStyle = 'rgba(167,139,250,0.18)'; ctx.strokeStyle = '#a78bfa'; ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x-22,y-22); ctx.lineTo(x-22,y+22); ctx.lineTo(x+18,y); ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#a78bfa'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = '10px sans-serif';
+      ctx.fillText(label || 'PGA', x-7, y);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('+', x-30, y-10);
+      ctx.fillText('−', x-30, y+14);
+      ctx.textBaseline = 'alphabetic';
+    }
+    function title(ctx, W, txt, color){
+      ctx.fillStyle = color || '#f472b6';
+      ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText(txt, W - 14, 20);
+    }
+    function legend(ctx, x, y, color, txt){
+      ctx.fillStyle = color; ctx.fillRect(x, y-9, 14, 4);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText(txt, x + 20, y - 4);
+    }
+
+    // ---------- RSE: Two-Scenario Drawing (✅ floating source vs. ⛔ grounded source / ground loop) ----------
+    function drawRSEScenario(ctx, baseX, baseY, w, h, grounded){
+      const margin = Math.max(12, w * 0.025);
+      const srcW = Math.min(160, Math.max(100, w * 0.30));
+      const devW = Math.min(240, Math.max(150, w * 0.42));
+      const srcX = baseX + margin;
+      const devX = baseX + w - devW - margin;
+      // Push the boxes down enough so their external labels (drawn at srcY-6)
+      // sit BELOW the status banner instead of overlapping it.
+      // Banner = baseY+2 .. baseY+26 ; box label baseline = innerY0 - 6 .
+      const innerY0 = baseY + 48;
+      const innerH = h - 56;
+      const srcY = innerY0;
+      const srcH = innerH - 50;
+      const devY = innerY0;
+      const devH = innerH - 50;
+      const sigY = innerY0 + 16;
+      const refY = innerY0 + innerH - 50;
+
+      // ----- Status banner -----
+      if (grounded){
+        ctx.fillStyle = 'rgba(239,68,68,0.22)';
+        ctx.fillRect(baseX + 6, baseY + 2, w - 12, 24);
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2.4;
+        ctx.strokeRect(baseX + 6, baseY + 2, w - 12, 24);
+        ctx.fillStyle = '#fecaca'; ctx.font = 'bold 13px sans-serif';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText('⛔  错误接法 · 接地源 + RSE → 地回路（Ground Loop）→ VG 串入测量', baseX + 14, baseY + 14);
+        ctx.textBaseline = 'alphabetic';
+      } else {
+        ctx.fillStyle = 'rgba(74,222,128,0.18)';
+        ctx.fillRect(baseX + 6, baseY + 2, w - 12, 24);
+        ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 1.6;
+        ctx.strokeRect(baseX + 6, baseY + 2, w - 12, 24);
+        ctx.fillStyle = '#bbf7d0'; ctx.font = 'bold 13px sans-serif';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText('✅  正确接法 · 浮地源 + RSE → 单点接地，无地回路', baseX + 14, baseY + 14);
+        ctx.textBaseline = 'alphabetic';
+      }
+
+      // ----- Source -----
+      drawBox(ctx, srcX, srcY, srcW, srcH, '信号源 Signal Source');
+      const srcCx = srcX + srcW / 2;
+      const srcCy = srcY + srcH / 2;
+      vSrc(ctx, srcCx, srcCy, 'Vs');
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(srcCx, srcCy - 14); ctx.lineTo(srcCx, sigY); ctx.lineTo(srcX + srcW, sigY);
+      ctx.stroke();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.beginPath();
+      ctx.moveTo(srcCx, srcCy + 14); ctx.lineTo(srcCx, refY); ctx.lineTo(srcX + srcW, refY);
+      ctx.stroke();
+
+      // ----- Device -----
+      drawBox(ctx, devX, devY, devW, devH, 'JY5500 采集端 Device');
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(srcX + srcW, sigY); ctx.lineTo(devX, sigY); ctx.stroke();
+      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(srcX + srcW, refY); ctx.lineTo(devX, refY); ctx.stroke();
+      ctx.fillStyle = '#38bdf8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('AI0', devX + 6, sigY - 4);
+      ctx.fillStyle = '#94a3b8'; ctx.fillText('AIGND', devX + 6, refY - 4);
+      const pgaX = devX + Math.min(70, devW * 0.34);
+      ampSym(ctx, pgaX, sigY + 16, 'PGA');
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(devX + 30, sigY); ctx.lineTo(pgaX - 22, sigY + 6); ctx.stroke();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.beginPath(); ctx.moveTo(devX + 30, refY); ctx.lineTo(pgaX - 22, sigY + 26); ctx.stroke();
+      const adcX = devX + devW - 62;
+      ctx.strokeStyle = '#fb923c'; ctx.fillStyle = 'rgba(251,146,60,0.1)';
+      ctx.fillRect(adcX, sigY + 4, 50, 28); ctx.strokeRect(adcX, sigY + 4, 50, 28);
+      ctx.fillStyle = '#fb923c'; ctx.textAlign = 'center'; ctx.fillText('ADC', adcX + 25, sigY + 22);
+      ctx.strokeStyle = '#a78bfa';
+      ctx.beginPath(); ctx.moveTo(pgaX + 18, sigY + 16); ctx.lineTo(adcX, sigY + 18); ctx.stroke();
+
+      // Device-side AIGND → chassis earth (always)
+      ctx.strokeStyle = '#94a3b8';
+      ctx.beginPath(); ctx.moveTo(devX + 30, refY); ctx.lineTo(devX + 30, refY + 14); ctx.stroke();
+      earth(ctx, devX + 30, refY + 16);
+
+      if (grounded){
+        // Source-side earth (the "second" ground point that creates the loop)
+        ctx.strokeStyle = '#94a3b8';
+        ctx.beginPath(); ctx.moveTo(srcCx, refY); ctx.lineTo(srcCx, refY + 14); ctx.stroke();
+        earth(ctx, srcCx, refY + 16);
+        ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('源端接地 Source GND', srcCx, refY + 38);
+
+        // ===== Prominent warning visuals =====
+        // 1) translucent red highlight along the loop path
+        ctx.fillStyle = 'rgba(239,68,68,0.12)';
+        ctx.fillRect(srcCx - 12, refY - 6, devX + 30 - srcCx + 24, 56);
+
+        // 2) thick red double-headed dashed arrow showing loop current
+        const loopY = refY + 32;
+        const loopXL = srcCx;
+        const loopXR = devX + 30;
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3;
+        ctx.setLineDash([8, 4]);
+        ctx.beginPath();
+        ctx.moveTo(loopXL + 16, loopY); ctx.lineTo(loopXR - 16, loopY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        arrow(ctx, loopXL + 26, loopY, loopXL + 14, loopY, '#ef4444', false);
+        arrow(ctx, loopXR - 26, loopY, loopXR - 14, loopY, '#ef4444', false);
+
+        // 3) bright VG warning badge with red background
+        const cxLoop = (loopXL + loopXR) / 2;
+        const labW = 220, labH = 28;
+        ctx.fillStyle = '#7f1d1d';
+        ctx.fillRect(cxLoop - labW/2, loopY - 10 - labH, labW, labH);
+        ctx.strokeStyle = '#fca5a5'; ctx.lineWidth = 2;
+        ctx.strokeRect(cxLoop - labW/2, loopY - 10 - labH, labW, labH);
+        ctx.fillStyle = '#fee2e2'; ctx.font = 'bold 12.5px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('⚠️  VG · 地电位差 → 50/60 Hz 干扰', cxLoop, loopY - 10 - labH/2);
+        ctx.textBaseline = 'alphabetic';
+      } else {
+        // Floating source — no earth at the source side
+        ctx.fillStyle = '#4ade80'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('浮地源 Floating', srcCx, refY + 16);
+        // green "no-connection" X under the source GND node
+        ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(srcCx - 7, refY + 24); ctx.lineTo(srcCx + 7, refY + 34);
+        ctx.moveTo(srcCx + 7, refY + 24); ctx.lineTo(srcCx - 7, refY + 34);
+        ctx.stroke();
+        ctx.fillStyle = '#4ade80'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('（无源端接地）', srcCx, refY + 46);
+        ctx.fillText('唯一接地点 Single GND', devX + 30, refY + 38);
+      }
+    }
+
+    // ---------- Terminal Mode Drawings ----------
+    function drawTerminal(canvas, mode){
+      // RSE stacks two scenarios → taller canvas
+      canvas.style.height = (mode === 'RSE') ? '380px' : '320px';
+      void canvas.offsetHeight;
+      const s = setup(canvas); if (!s) return;
+      const { ctx, W, H } = s;
+      // Layout: source(left) — cables — device(right)
+      const srcX = 50, srcY = 60, srcW = 160, srcH = 150;
+      const devW = 220, devX = W - devW - 30, devY = 60, devH = 150;
+      const sigY = 95;          // signal wire y
+      const refY = 175;         // reference / ground wire y
+      // Source box
+      drawBox(ctx, srcX, srcY, srcW, srcH, '信号源 Signal Source');
+      vSrc(ctx, srcX + 80, srcY + 70, 'Vs');
+      // source +/- pads
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(srcX + 80, srcY + 56); ctx.lineTo(srcX + 80, sigY); ctx.lineTo(srcX + srcW, sigY);
+      ctx.stroke();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.beginPath();
+      ctx.moveTo(srcX + 80, srcY + 84); ctx.lineTo(srcX + 80, refY); ctx.lineTo(srcX + srcW, refY);
+      ctx.stroke();
+
+      // Device box
+      drawBox(ctx, devX, devY, devW, devH, 'JY5500 采集端 Device');
+      // pin labels
+      ctx.fillStyle = '#e2e8f0'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+
+      // Cables (signal in cyan, return in gray)
+      ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(srcX + srcW, sigY); ctx.lineTo(devX, sigY); ctx.stroke();
+      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(srcX + srcW, refY); ctx.lineTo(devX, refY); ctx.stroke();
+
+      if (mode === 'RSE'){
+        // RSE shows TWO scenarios stacked vertically:
+        //   ✅ correct (floating source) on top
+        //   ⛔ wrong   (grounded source → ground loop) on bottom
+        ctx.clearRect(0, 0, W, H);
+        const halfH = H / 2;
+        drawRSEScenario(ctx, 0, 0, W, halfH - 6, false);
+        ctx.strokeStyle = '#475569'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(20, halfH); ctx.lineTo(W - 20, halfH); ctx.stroke();
+        ctx.setLineDash([]);
+        drawRSEScenario(ctx, 0, halfH + 6, W, halfH - 6, true);
+        return;
+      }
+      else if (mode === 'NRSE'){
+        ctx.fillStyle = '#38bdf8'; ctx.fillText('AI0', devX + 6, sigY - 4);
+        ctx.fillStyle = '#a78bfa'; ctx.fillText('AISENSE', devX + 6, refY - 4);
+        ampSym(ctx, devX + 80, sigY + 16, 'PGA');
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(devX + 30, sigY); ctx.lineTo(devX + 58, sigY + 6); ctx.stroke();
+        ctx.strokeStyle = '#a78bfa';
+        ctx.beginPath(); ctx.moveTo(devX + 30, refY); ctx.lineTo(devX + 58, sigY + 26); ctx.stroke();
+        // ADC
+        ctx.strokeStyle = '#fb923c'; ctx.fillStyle = 'rgba(251,146,60,0.1)';
+        ctx.fillRect(devX + 138, sigY + 4, 50, 28); ctx.strokeRect(devX + 138, sigY + 4, 50, 28);
+        ctx.fillStyle = '#fb923c'; ctx.textAlign = 'center'; ctx.fillText('ADC', devX + 163, sigY + 22);
+        ctx.strokeStyle = '#a78bfa';
+        ctx.beginPath(); ctx.moveTo(devX + 98, sigY + 16); ctx.lineTo(devX + 138, sigY + 18); ctx.stroke();
+        // Source-side earth (still grounded)
+        ctx.strokeStyle = '#94a3b8';
+        ctx.beginPath(); ctx.moveTo(srcX + 80, refY); ctx.lineTo(srcX + 80, refY + 25); ctx.stroke();
+        earth(ctx, srcX + 80, refY + 28);
+        // AISENSE is FLOATING — show "X" cut between AISENSE and chassis
+        ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('AISENSE 浮空', devX + 30, refY + 22);
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(devX + 22, refY + 30); ctx.lineTo(devX + 38, refY + 46);
+        ctx.moveTo(devX + 38, refY + 30); ctx.lineTo(devX + 22, refY + 46);
+        ctx.stroke();
+        // Chassis earth on AIGND only (not connected to AISENSE)
+        ctx.strokeStyle = '#94a3b8';
+        ctx.beginPath(); ctx.moveTo(devX + devW - 30, refY); ctx.lineTo(devX + devW - 30, refY + 25); ctx.stroke();
+        earth(ctx, devX + devW - 30, refY + 28);
+        ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif';
+        ctx.fillText('AIGND→机箱地', devX + devW - 30, refY + 50);
+        // No ground loop indicator (green check)
+        ctx.fillStyle = '#4ade80'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('✓ 切断地回路 No Ground Loop', W/2, H - 14);
+        title(ctx, W, 'NRSE · 共用 AISENSE（浮地参考，无地回路）');
+      }
+      else { // DIFF
+        ctx.fillStyle = '#38bdf8'; ctx.fillText('AI0+', devX + 6, sigY - 4);
+        ctx.fillStyle = '#f472b6'; ctx.fillText('AI0−', devX + 6, refY - 4);
+        ampSym(ctx, devX + 80, sigY + 40, 'IA');
+        // Differential inputs: AI+ to + input, AI− to − input
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(devX + 30, sigY); ctx.lineTo(devX + 58, sigY + 30); ctx.stroke();
+        ctx.strokeStyle = '#f472b6';
+        ctx.beginPath(); ctx.moveTo(devX + 30, refY); ctx.lineTo(devX + 58, sigY + 50); ctx.stroke();
+        // Bias resistor to AIGND
+        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(devX + 40, refY); ctx.lineTo(devX + 40, refY + 30); ctx.stroke();
+        // resistor zigzag
+        ctx.beginPath();
+        let zx = devX + 40, zy = refY + 30;
+        for (let k = 0; k < 4; k++){
+          ctx.moveTo(zx + (k%2?-4:4), zy + k*4);
+          ctx.lineTo(zx + (k%2?4:-4), zy + (k+1)*4);
+        }
+        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(devX + 40, refY + 50); ctx.lineTo(devX + 40, refY + 60); ctx.stroke();
+        earth(ctx, devX + 40, refY + 62);
+        ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('Rbias 偏置', devX + 50, refY + 36);
+        // ADC
+        ctx.strokeStyle = '#fb923c'; ctx.fillStyle = 'rgba(251,146,60,0.1)';
+        ctx.fillRect(devX + 138, sigY + 28, 50, 28); ctx.strokeRect(devX + 138, sigY + 28, 50, 28);
+        ctx.fillStyle = '#fb923c'; ctx.textAlign = 'center'; ctx.fillText('ADC', devX + 163, sigY + 46);
+        ctx.strokeStyle = '#a78bfa';
+        ctx.beginPath(); ctx.moveTo(devX + 98, sigY + 40); ctx.lineTo(devX + 138, sigY + 42); ctx.stroke();
+        // Source: floating (no source earth)
+        ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('浮地源 / Floating', srcX + 80, refY + 18);
+        // CMR badge
+        ctx.fillStyle = '#4ade80'; ctx.font = 'bold 12px sans-serif';
+        ctx.fillText('✓ 共模抑制 CMR ≥ 100 dB', W/2, H - 14);
+        title(ctx, W, 'Differential · 差分（双线一对，仅放大差模）');
+      }
+
+      // Common legend
+      legend(ctx, 30, H - 14, '#38bdf8', '信号 Signal');
+      legend(ctx, 130, H - 14, '#94a3b8', '参考 / 返回 Return');
+    }
+
+    // ---------- Trigger Mode Drawings ----------
+    function trigBase(canvas){
+      const s = setup(canvas); if (!s) return null;
+      const { ctx, W, H } = s;
+      gridBg(ctx, W, H);
+      // axes
+      const PL = 44, PR = 16, PT = 30, PB = 30;
+      const x0 = PL, y0 = H - PB, xN = W - PR, yT = PT;
+      ctx.strokeStyle = '#475569'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x0, yT); ctx.lineTo(x0, y0); ctx.lineTo(xN, y0);
+      ctx.stroke();
+      // axis labels
+      ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif';
+      ctx.textAlign = 'right'; ctx.fillText('V', x0 - 6, yT + 8);
+      ctx.textAlign = 'left';  ctx.fillText('t', xN + 4, y0 + 4);
+      return { ctx, W, H, x0, y0, xN, yT };
+    }
+    function hLine(ctx, x0, xN, y, color, dashed, label){
+      ctx.strokeStyle = color; ctx.lineWidth = 1.2;
+      if (dashed) ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(xN, y); ctx.stroke();
+      ctx.setLineDash([]);
+      if (label){
+        ctx.fillStyle = color; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText(label, xN - 110, y - 4);
+      }
+    }
+    function vTrig(ctx, x, yT, y0, label){
+      ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.6;
+      ctx.setLineDash([6,4]);
+      ctx.beginPath(); ctx.moveTo(x, yT); ctx.lineTo(x, y0); ctx.stroke();
+      ctx.setLineDash([]);
+      // arrow head + label
+      arrow(ctx, x, yT - 10, x, yT, '#ef4444');
+      ctx.fillStyle = '#ef4444'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(label || '触发点 Trigger', x, yT - 14);
+    }
+    function shadePost(ctx, x, y0, xN, yT){
+      ctx.fillStyle = 'rgba(74,222,128,0.10)';
+      ctx.fillRect(x, yT, xN - x, y0 - yT);
+      ctx.fillStyle = '#4ade80'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('采集 Acquire', x + 6, y0 - 6);
+    }
+    function shadePre(ctx, x0, xT, y0, yT){
+      ctx.fillStyle = 'rgba(148,163,184,0.06)';
+      ctx.fillRect(x0, yT, xT - x0, y0 - yT);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('等待 Waiting', x0 + 6, y0 - 6);
+    }
+    function plot(ctx, fn, x0, xN, y0, yT, color){
+      ctx.strokeStyle = color || '#38bdf8'; ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      const N = 240;
+      for (let i = 0; i <= N; i++){
+        const t = i / N;
+        const x = x0 + t * (xN - x0);
+        const v = fn(t); // v in [-1, 1]
+        const y = y0 - ((v + 1) / 2) * (y0 - yT);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    function drawTrigger(canvas, mode){
+      const s = trigBase(canvas); if (!s) return;
+      const { ctx, W, H, x0, y0, xN, yT } = s;
+      const yMid = (yT + y0) / 2;
+
+      if (mode === 'Imm'){
+        title(ctx, W, 'Immediate · 立即触发');
+        const xT = x0;
+        shadePost(ctx, xT, y0, xN, yT);
+        plot(ctx, t => 0.6 * Math.sin(2 * Math.PI * 1.8 * t + 0.5), x0, xN, y0, yT);
+        vTrig(ctx, xT, yT, y0, 'Start() ⇒ 立即采集');
+        ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('调用 Start() 后硬件立即采样，无等待条件', x0 + 80, yT + 18);
+      }
+      else if (mode === 'DRise' || mode === 'DFall'){
+        const rising = (mode === 'DRise');
+        title(ctx, W, rising ? 'Digital Rising Edge · 数字上升沿' : 'Digital Falling Edge · 数字下降沿');
+        // square wave: low for first 0.4, high until 0.7, low rest (rising version)
+        const square = rising
+          ? (t => (t < 0.4 ? -0.7 : (t < 0.78 ? 0.7 : -0.7)))
+          : (t => (t < 0.4 ?  0.7 : (t < 0.78 ? -0.7 : 0.7)));
+        const xT = x0 + 0.4 * (xN - x0);
+        shadePre(ctx, x0, xT, y0, yT);
+        shadePost(ctx, xT, y0, xN, yT);
+        // PFI label
+        ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('PFI 0 数字线', x0 + 8, yT + 14);
+        // Plot square wave
+        ctx.strokeStyle = '#a78bfa'; ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        let prevY = null;
+        for (let i = 0; i <= 240; i++){
+          const t = i / 240;
+          const x = x0 + t * (xN - x0);
+          const v = square(t);
+          const y = y0 - ((v + 1) / 2) * (y0 - yT);
+          if (i === 0){ ctx.moveTo(x, y); prevY = y; }
+          else {
+            if (Math.abs(y - prevY) > 1){ ctx.lineTo(x, prevY); }
+            ctx.lineTo(x, y);
+            prevY = y;
+          }
+        }
+        ctx.stroke();
+        vTrig(ctx, xT, yT, y0, rising ? '0 → 1 跳变' : '1 → 0 跳变');
+      }
+      else if (mode === 'ARise' || mode === 'AFall'){
+        const rising = (mode === 'ARise');
+        title(ctx, W, rising ? 'Analog Rising Slope · 模拟上升沿' : 'Analog Falling Slope · 模拟下降沿');
+        const yTh = yMid - 30;
+        hLine(ctx, x0, xN, yTh, '#facc15', true, 'Threshold = 2.5 V');
+        // sine wave that crosses threshold rising near x=0.35 (or falling near 0.6)
+        const fn = t => 0.7 * Math.sin(2 * Math.PI * 1.2 * t - 0.6);
+        // Find first rising/falling crossing of v_th
+        const v_th = ((y0 - yTh) / (y0 - yT)) * 2 - 1;
+        let xT = null, prev = fn(0);
+        for (let i = 1; i <= 240; i++){
+          const t = i/240, v = fn(t);
+          if (rising  && prev < v_th && v >= v_th){ xT = x0 + t*(xN - x0); break; }
+          if (!rising && prev > v_th && v <= v_th){ xT = x0 + t*(xN - x0); break; }
+          prev = v;
+        }
+        if (xT === null) xT = x0 + 0.5*(xN - x0);
+        shadePre(ctx, x0, xT, y0, yT);
+        shadePost(ctx, xT, y0, xN, yT);
+        plot(ctx, fn, x0, xN, y0, yT);
+        vTrig(ctx, xT, yT, y0, rising ? '↑ 穿越阈值' : '↓ 穿越阈值');
+      }
+      else if (mode === 'AWIn' || mode === 'AWOut'){
+        const into = (mode === 'AWIn');
+        title(ctx, W, into ? 'Window-In · 进窗触发' : 'Window-Out · 出窗触发');
+        const yHi = yMid - 38, yLo = yMid + 38;
+        hLine(ctx, x0, xN, yHi, '#facc15', true, 'High Threshold');
+        hLine(ctx, x0, xN, yLo, '#facc15', true, 'Low Threshold');
+        // shaded window band
+        ctx.fillStyle = 'rgba(250,204,21,0.07)';
+        ctx.fillRect(x0, yHi, xN - x0, yLo - yHi);
+        // signal: starts above high, drops into window (Window-In) or stays in window then jumps out (Window-Out)
+        const fn = into
+          ? (t => 0.85 * Math.cos(2 * Math.PI * 0.9 * t))
+          : (t => (t < 0.5 ? 0.25 * Math.sin(2 * Math.PI * 4 * t) : 0.25 * Math.sin(2 * Math.PI * 4 * t) + (t - 0.5) * 1.4));
+        // detect crossing
+        const vHi = ((y0 - yHi) / (y0 - yT)) * 2 - 1;
+        const vLo = ((y0 - yLo) / (y0 - yT)) * 2 - 1;
+        let xT = null, prev = fn(0);
+        const inWin = v => v <= vHi && v >= vLo;
+        for (let i = 1; i <= 240; i++){
+          const t = i/240, v = fn(t);
+          if (into && !inWin(prev) && inWin(v)){ xT = x0 + t*(xN - x0); break; }
+          if (!into && inWin(prev) && !inWin(v)){ xT = x0 + t*(xN - x0); break; }
+          prev = v;
+        }
+        if (xT === null) xT = x0 + 0.5*(xN - x0);
+        shadePre(ctx, x0, xT, y0, yT);
+        shadePost(ctx, xT, y0, xN, yT);
+        plot(ctx, fn, x0, xN, y0, yT);
+        vTrig(ctx, xT, yT, y0, into ? '进入窗口' : '跳出窗口');
+      }
+      else if (mode === 'AHHyst' || mode === 'ALHyst'){
+        const high = (mode === 'AHHyst');
+        title(ctx, W, high ? 'High Hysteresis · 高电平迟滞' : 'Low Hysteresis · 低电平迟滞');
+        const yHi = yMid - 32, yLo = yMid + 28;
+        hLine(ctx, x0, xN, yHi, '#facc15', true, 'High Threshold');
+        hLine(ctx, x0, xN, yLo, '#fb923c', true, 'Low Threshold');
+        // signal: piecewise — high ⇒ first dip below Low (arm), then rise crossing High (fire)
+        // low ⇒ first rise above High (arm), then fall crossing Low (fire)
+        const fn = high
+          ? (t => {
+              if (t < 0.20) return 0.15 + 0.05 * Math.sin(20*t);
+              if (t < 0.42) return 0.15 - (t - 0.20) * 4.0;        // dip below low
+              if (t < 0.62) return -0.7 + (t - 0.42) * 7.0;        // rise to high
+              return 0.7 + 0.05 * Math.sin(30*t);
+            })
+          : (t => {
+              if (t < 0.20) return -0.15 + 0.05 * Math.sin(20*t);
+              if (t < 0.42) return -0.15 + (t - 0.20) * 4.0;       // rise above high
+              if (t < 0.62) return  0.7  - (t - 0.42) * 7.0;       // fall to low
+              return -0.7 + 0.05 * Math.sin(30*t);
+            });
+        // detect ARM and FIRE
+        const vHi = ((y0 - yHi) / (y0 - yT)) * 2 - 1;
+        const vLo = ((y0 - yLo) / (y0 - yT)) * 2 - 1;
+        let armed = false, xArm = null, xT = null, prev = fn(0);
+        for (let i = 1; i <= 240; i++){
+          const t = i/240, v = fn(t);
+          if (high){
+            if (!armed && prev > vLo && v <= vLo){ armed = true; xArm = x0 + t*(xN - x0); }
+            if (armed && prev < vHi && v >= vHi){ xT = x0 + t*(xN - x0); break; }
+          } else {
+            if (!armed && prev < vHi && v >= vHi){ armed = true; xArm = x0 + t*(xN - x0); }
+            if (armed && prev > vLo && v <= vLo){ xT = x0 + t*(xN - x0); break; }
+          }
+          prev = v;
+        }
+        if (xT === null) xT = x0 + 0.7*(xN - x0);
+        shadePre(ctx, x0, xT, y0, yT);
+        shadePost(ctx, xT, y0, xN, yT);
+        plot(ctx, fn, x0, xN, y0, yT);
+        if (xArm){
+          ctx.strokeStyle = '#fb923c'; ctx.setLineDash([3,3]); ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.moveTo(xArm, yT); ctx.lineTo(xArm, y0); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#fb923c'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+          ctx.fillText('Arm 装弹', xArm, yT + 12);
+        }
+        vTrig(ctx, xT, yT, y0, high ? 'Fire ↑High' : 'Fire ↓Low');
+      }
+      else if (mode === 'Soft'){
+        title(ctx, W, 'Soft Trigger · 软触发');
+        const xStart = x0 + 0.10 * (xN - x0);
+        const xT = x0 + 0.45 * (xN - x0);
+        // plot continuous waveform
+        plot(ctx, t => 0.6 * Math.sin(2 * Math.PI * 1.4 * t), x0, xN, y0, yT);
+        // Start marker
+        ctx.strokeStyle = '#a78bfa'; ctx.setLineDash([4,3]); ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(xStart, yT); ctx.lineTo(xStart, y0); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#a78bfa'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('Start()', xStart, yT - 4);
+        // Waiting region [xStart, xT]
+        ctx.fillStyle = 'rgba(167,139,250,0.08)';
+        ctx.fillRect(xStart, yT, xT - xStart, y0 - yT);
+        ctx.fillStyle = '#a78bfa'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('Armed · 等待软件触发', (xStart + xT)/2, yT + 14);
+        shadePost(ctx, xT, y0, xN, yT);
+        vTrig(ctx, xT, yT, y0, 'SendSoftwareTrigger()');
+      }
+    }
+
+    // ---------- Description Library ----------
+    const TERM = {
+      RSE: {
+        h: 'RSE · 参考单端 (Referenced Single-Ended)',
+        en: 'All AI channels share device-side AIGND as the common reference.',
+        body:
+          '<p><strong>定义：</strong>所有 AI 通道共用一个统一参考点 — 板卡端 <code>AIGND</code>。被测信号正端接 AIx，信号源接地端接 AIGND。</p>' +
+          '<p><strong>适配信号源（图中分两种情形对照）：</strong></p><ul>' +
+          '<li>✅ <strong>正确：浮地源（Floating Source）+ RSE</strong> — 信号源端不接大地（电池供电传感器、变压器副边、隔离输出等）；唯一接地点在采集端 AIGND，<strong>无地回路</strong>，测量干净。</li>' +
+          '<li>⛔ <strong>错误：接地源（Ground-Referenced Source）+ RSE</strong> — 墙插仪器/发生器自带"系统地"，与采集端 AIGND 形成 <strong>双接地点</strong>，两点之间的 <code>VG</code>（mV ~ 数百 mV）作为 50/60 Hz 工频干扰直接叠加进测量。</li>' +
+          '<li>通道密度优先：JY5510 在 RSE 下可达 32 个单端通道（差分仅 16）。</li>' +
+          '</ul>' +
+          '<div class="warn-tip danger"><strong>⛔ 危险信号 · 接地源 + RSE：</strong>这是工程现场最常见的"看不见的"误差来源。两端接地形成的地回路会让 <code>VG</code> 串入测量，且无法事后软件滤除。<br><strong>必须规避：</strong>① 改用 <strong>NRSE / 差分</strong>；② 信号源端浮地（断开源端 EARTH）；③ 加隔离放大器/隔离变送器。</div>'
+      },
+      NRSE: {
+        h: 'NRSE · 非参考单端 (Non-Referenced Single-Ended)',
+        en: 'All AI channels share AISENSE — an internal floating reference NOT bonded to chassis ground.',
+        body:
+          '<p><strong>定义：</strong>所有 AI 通道共用一个<strong>浮地参考</strong> <code>AISENSE</code>。AISENSE 在板卡内部不与机箱大地相连。信号源接地端连到 AISENSE。</p>' +
+          '<p><strong>适配信号源：</strong></p><ul>' +
+          '<li><strong>接地源但不希望形成地回路：</strong>信号源已自接系统地，但只测"信号 − 源端参考"，避免与采集端 AIGND 串联出 VG。</li>' +
+          '<li>多通道共用同一返回参考时，比 RSE 抗共模能力更强。</li>' +
+          '</ul>' +
+          '<p><strong>关键点：</strong>AISENSE 浮空 → 切断地回路 → 实际测量 (Vsignal − VAISENSE)，VG 不再叠加。</p>'
+      },
+      DIFF: {
+        h: 'Differential · 差分',
+        en: 'Each channel uses a pair of inputs (AI+, AI−); the instrumentation amplifier outputs (AI+) − (AI−).',
+        body:
+          '<p><strong>定义：</strong>每个通道占用两根输入线 <code>AIx+</code> / <code>AIx−</code>；仪表放大器（IA）输出 (AIx+) − (AIx−)，仅放大差模信号，强烈抑制共模噪声（CMR ≥ 100 dB）。</p>' +
+          '<p><strong>适配信号源：</strong></p><ul>' +
+          '<li><strong>低电平信号</strong>：热电偶、应变片、电桥（mV 级）。</li>' +
+          '<li>长走线、强电磁干扰环境。</li>' +
+          '<li><strong>浮地源</strong>（Floating Source）：电池供电传感器、变压器副边等。需在 AI− 与 AIGND 之间加 <code>10 kΩ ~ 100 kΩ</code> 偏置电阻，否则 IA 共模输入饱和漂移。</li>' +
+          '<li>需要最高精度时优先选差分。</li>' +
+          '</ul>' +
+          '<div class="warn-tip">📊 <strong>通道数减半：</strong>JY5510 单端 32 通道 → 差分 16 通道。</div>'
+      }
+    };
+
+    const TRIG = {
+      Imm: {
+        h: 'Immediate · 立即触发', en: 'Acquisition starts the moment Start() returns.',
+        body:
+          '<p><strong>原理：</strong>调用 <code>Start()</code> 后硬件立刻开始采样，无任何等待条件。</p>' +
+          '<p><strong>用例：</strong>不关心起点对齐的常规录波；连续监视；调试。</p>' +
+          '<pre>aiTask.Trigger.Type = AITriggerType.Immediate; // 默认</pre>'
+      },
+      DRise: {
+        h: 'Digital Rising Edge · 数字上升沿', en: 'Trigger fires on a low→high transition of the PFI line.',
+        body:
+          '<p><strong>原理：</strong>监听 PFI 数字线，捕获 <strong>0 → 1</strong> 跳变。</p>' +
+          '<p><strong>用例：</strong>同步外部脉冲、编码器索引脉冲、其它仪器发出的 TTL 启动脉冲。</p>' +
+          '<pre>Trigger.Type = AITriggerType.Digital;\nTrigger.Digital.Source = AIDigitalTriggerSource.PFI0;\nTrigger.Digital.Edge = AIDigitalTriggerEdge.Rising;</pre>'
+      },
+      DFall: {
+        h: 'Digital Falling Edge · 数字下降沿', en: 'Trigger fires on a high→low transition of the PFI line.',
+        body:
+          '<p><strong>原理：</strong>捕获 PFI 上 <strong>1 → 0</strong> 跳变。</p>' +
+          '<p><strong>用例：</strong>低有效（Active-Low）启动信号；外部继电器断开瞬间。</p>' +
+          '<pre>Trigger.Digital.Edge = AIDigitalTriggerEdge.Falling;</pre>'
+      },
+      ARise: {
+        h: 'Analog Rising Slope · 模拟上升沿', en: 'Trigger fires when the analog signal crosses Threshold while increasing.',
+        body:
+          '<p><strong>原理：</strong>实时比较 AI0（或选定通道）与阈值 <code>Threshold</code>；当信号从低于阈值<strong>上升穿越</strong>阈值时触发。</p>' +
+          '<p><strong>用例：</strong>抓取冲击事件；周期信号同一相位对齐；上升沿同步。</p>' +
+          '<pre>Trigger.Type = AITriggerType.Analog;\nTrigger.Analog.Edge.Slope = AIAnalogTriggerEdge.Rising;\nTrigger.Analog.Edge.Threshold = 2.5;</pre>'
+      },
+      AFall: {
+        h: 'Analog Falling Slope · 模拟下降沿', en: 'Trigger fires when the signal crosses Threshold while decreasing.',
+        body:
+          '<p><strong>原理：</strong>信号从高于阈值<strong>下降穿越</strong>阈值时触发。</p>' +
+          '<p><strong>用例：</strong>掉电瞬间记录；信号回零检测。</p>' +
+          '<pre>Trigger.Analog.Edge.Slope = AIAnalogTriggerEdge.Falling;</pre>'
+      },
+      AWIn: {
+        h: 'Analog Window-In · 进窗触发', en: 'Trigger when the signal enters the [LowThreshold, HighThreshold] band.',
+        body:
+          '<p><strong>原理：</strong>设上下两阈值构成"窗口"。当信号<strong>进入</strong>窗口区间时触发。</p>' +
+          '<p><strong>用例：</strong>异常超限信号回到正常带；捕捉特定幅度区间事件。</p>' +
+          '<pre>Trigger.Analog.Window.Mode = WindowIn;\nTrigger.Analog.Window.High = 2.0;\nTrigger.Analog.Window.Low  = -2.0;</pre>'
+      },
+      AWOut: {
+        h: 'Analog Window-Out · 出窗触发', en: 'Trigger when the signal leaves the window.',
+        body:
+          '<p><strong>原理：</strong>信号从窗口内<strong>跳出</strong>到上方或下方时触发。</p>' +
+          '<p><strong>用例：</strong>异常告警 — 信号偏离正常带立即记录。</p>' +
+          '<pre>Trigger.Analog.Window.Mode = WindowOut;</pre>'
+      },
+      AHHyst: {
+        h: 'High Hysteresis · 高电平迟滞', en: 'Rising-edge trigger; arming requires a prior dip below LowThreshold.',
+        body:
+          '<p><strong>原理：</strong>双门限抗抖动。信号必须先下降到<strong>低门限以下</strong>"装弹（Arm）"，再上升超过<strong>高门限</strong>才触发（Fire）。中间反复抖动不会误触发。</p>' +
+          '<p><strong>用例：</strong>含噪声方波边沿；抖动较大的传感器。</p>'
+      },
+      ALHyst: {
+        h: 'Low Hysteresis · 低电平迟滞', en: 'Falling-edge trigger; arming requires prior rise above HighThreshold.',
+        body:
+          '<p><strong>原理：</strong>信号先上升超过高门限"装弹（Arm）"，再下降低于低门限触发（Fire）。</p>' +
+          '<p><strong>用例：</strong>抗噪声的下降沿检测。</p>'
+      },
+      Soft: {
+        h: 'Soft Trigger · 软触发', en: 'Trigger fires when SendSoftwareTrigger() is invoked from code.',
+        body:
+          '<p><strong>原理：</strong>Start() 后任务进入"等待软件触发"状态；应用程序调用 <code>SendSoftwareTrigger()</code> 显式发出一次触发。</p>' +
+          '<p><strong>用例：</strong>多卡 / 多任务<strong>同步启动</strong> — 主程序统一发软触发，规避不同 Start() 之间的微小时延。</p>' +
+          '<pre>aiTask.Trigger.Type = AITriggerType.Soft;\naiTask.Start();\n// ...等所有任务就绪\naiTask.SendSoftwareTrigger();</pre>'
+      }
+    };
+
+    function renderDesc(elId, src){
+      const el = document.getElementById(elId);
+      if (!el || !src) return;
+      el.innerHTML = '<h4>' + src.h + '</h4><span class="en">' + src.en + '</span>' + src.body;
+    }
+
+    // ---------- Wire up tabs ----------
+    let curTerm = 'RSE', curTrig = 'Imm';
+    const termCanvas = document.getElementById('term-canvas');
+    const trigCanvas = document.getElementById('trig-canvas');
+
+    function refreshTerm(){
+      drawTerminal(termCanvas, curTerm);
+      renderDesc('term-desc', TERM[curTerm]);
+    }
+    function refreshTrig(){
+      drawTrigger(trigCanvas, curTrig);
+      renderDesc('trig-desc', TRIG[curTrig]);
+    }
+
+    document.querySelectorAll('#term-tabs .apx-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#term-tabs .apx-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        curTerm = btn.getAttribute('data-term');
+        refreshTerm();
+      });
+    });
+    document.querySelectorAll('#trig-tabs .apx-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#trig-tabs .apx-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        curTrig = btn.getAttribute('data-trig');
+        refreshTrig();
+      });
+    });
+
+    // initial render
+    refreshTerm();
+    refreshTrig();
+    window.addEventListener('resize', () => { refreshTerm(); refreshTrig(); });
+  })();
+
+  // ===== Init =====
+  refreshCode();
+  drawWave();
+  window.addEventListener('resize', drawWave);
+</script>
+</body>
+</html>
