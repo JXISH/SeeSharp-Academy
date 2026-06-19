@@ -691,6 +691,19 @@
         <h2>完整代码 · Full Reference Code</h2>
         <p class="lead">把当前所有参数串起来，得到一份可运行的 5510 单通道 Finite 采集 C# 范例。</p>
         <pre class="code-panel" id="code-full"></pre>
+
+        <div style="margin-top:14px;padding:12px 14px;background:var(--c-panel-2);border-left:3px solid var(--c-accent-2);border-radius:8px;">
+          <div style="font-weight:600;font-size:13px;color:var(--c-accent-2);margin-bottom:6px;">🗣️ 大白话总结 AI 配置 · AI Config in Plain Words</div>
+          <div style="color:var(--c-muted);font-size:11px;margin-bottom:8px;">六个问题搞定一次 AI 采集——这就是上面 5 步的本质。</div>
+          <ul style="line-height:1.7;font-size:12px;margin:0;padding-left:18px;">
+            <li><strong>多高？</strong> → <code>量程 Range</code>（信号振幅落在哪一档）</li>
+            <li><strong>多长？</strong> → <code>采集模式</code>：单点 Single / 有限长 Finite（点数）/ 连续 Continuous</li>
+            <li><strong>多快？</strong> → <code>采样率 SampleRate</code>（每秒采多少点）</li>
+            <li><strong>咋接地？</strong> → <code>终端模式 Terminal</code>：RSE / NRSE / Differential（见附录 A）</li>
+            <li><strong>咋耦合？</strong> → <code>Coupling</code>：AC / DC（<strong>JY-5510 只有 DC 耦合</strong>）</li>
+            <li><strong>咋开始？</strong> → <code>触发 Trigger</code>（<strong>不配置 = Immediate 立即开始</strong>，见附录 B）</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -1321,43 +1334,41 @@ catch (JYDriverException ex) {
         ctx.fillText('✓ 切断地回路 No Ground Loop', W/2, H - 14);
         title(ctx, W, 'NRSE · 共用 AISENSE（浮地参考，无地回路）');
       }
-      else { // DIFF
-        ctx.fillStyle = '#38bdf8'; ctx.fillText('AI0+', devX + 6, sigY - 4);
-        ctx.fillStyle = '#f472b6'; ctx.fillText('AI0−', devX + 6, refY - 4);
+      else { // DIFF — Figure 7: Differential Mode for Grounding Signals
+        ctx.fillStyle = '#38bdf8'; ctx.fillText('AI+', devX + 6, sigY - 4);
+        ctx.fillStyle = '#f472b6'; ctx.fillText('AI−', devX + 6, refY - 4);
         ampSym(ctx, devX + 80, sigY + 40, 'IA');
         // Differential inputs: AI+ to + input, AI− to − input
         ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.4;
         ctx.beginPath(); ctx.moveTo(devX + 30, sigY); ctx.lineTo(devX + 58, sigY + 30); ctx.stroke();
         ctx.strokeStyle = '#f472b6';
         ctx.beginPath(); ctx.moveTo(devX + 30, refY); ctx.lineTo(devX + 58, sigY + 50); ctx.stroke();
-        // Bias resistor to AIGND
-        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.4;
-        ctx.beginPath(); ctx.moveTo(devX + 40, refY); ctx.lineTo(devX + 40, refY + 30); ctx.stroke();
-        // resistor zigzag
-        ctx.beginPath();
-        let zx = devX + 40, zy = refY + 30;
-        for (let k = 0; k < 4; k++){
-          ctx.moveTo(zx + (k%2?-4:4), zy + k*4);
-          ctx.lineTo(zx + (k%2?4:-4), zy + (k+1)*4);
-        }
-        ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(devX + 40, refY + 50); ctx.lineTo(devX + 40, refY + 60); ctx.stroke();
-        earth(ctx, devX + 40, refY + 62);
-        ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
-        ctx.fillText('Rbias 偏置', devX + 50, refY + 36);
         // ADC
         ctx.strokeStyle = '#fb923c'; ctx.fillStyle = 'rgba(251,146,60,0.1)';
         ctx.fillRect(devX + 138, sigY + 28, 50, 28); ctx.strokeRect(devX + 138, sigY + 28, 50, 28);
         ctx.fillStyle = '#fb923c'; ctx.textAlign = 'center'; ctx.fillText('ADC', devX + 163, sigY + 46);
         ctx.strokeStyle = '#a78bfa';
         ctx.beginPath(); ctx.moveTo(devX + 98, sigY + 40); ctx.lineTo(devX + 138, sigY + 42); ctx.stroke();
-        // Source: floating (no source earth)
+        // Device-side AI_GND — shown but NOT connected to AI− (isolated reference)
+        const gndX = devX + devW - 56;
+        const gndY = refY + 30;
+        ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('AI_GND', gndX, gndY - 4);
+        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(gndX + 20, gndY); ctx.lineTo(gndX + 20, gndY + 6); ctx.stroke();
+        earth(ctx, gndX + 20, gndY + 8);
+        // Source: GROUNDED at the source-side negative terminal (per Figure 7)
+        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(srcX + 80, refY); ctx.lineTo(srcX + 80, refY + 26);
+        ctx.stroke();
+        earth(ctx, srcX + 80, refY + 28);
         ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText('浮地源 / Floating', srcX + 80, refY + 18);
+        ctx.fillText('接地源 / Grounded Source', srcX + 80, refY + 52);
         // CMR badge
-        ctx.fillStyle = '#4ade80'; ctx.font = 'bold 12px sans-serif';
-        ctx.fillText('✓ 共模抑制 CMR ≥ 100 dB', W/2, H - 14);
-        title(ctx, W, 'Differential · 差分（双线一对，仅放大差模）');
+        ctx.fillStyle = '#4ade80'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('✓ AI_GND 与 AI− 隔离 · IA 抑制源端 GND 与板端 GND 之差 · CMR ≥ 100 dB', W/2, H - 14);
+        title(ctx, W, 'Differential · 差分（接地源 / Figure 7）');
       }
 
       // Common legend
@@ -1628,10 +1639,12 @@ catch (JYDriverException ex) {
         en: 'Each channel uses a pair of inputs (AI+, AI−); the instrumentation amplifier outputs (AI+) − (AI−).',
         body:
           '<p><strong>定义：</strong>每个通道占用两根输入线 <code>AIx+</code> / <code>AIx−</code>；仪表放大器（IA）输出 (AIx+) − (AIx−)，仅放大差模信号，强烈抑制共模噪声（CMR ≥ 100 dB）。</p>' +
+          '<p><strong>图示对应 JY-5500 手册（接地源差分接法）：</strong>信号源负端在源端接地；采集端 <code>AI_GND</code> 仅作板内参考，<strong>不与 AI− 相连</strong>。源端 GND 与板端 AI_GND 之间的电位差作为共模信号，由 IA 抑制。</p>' +
           '<p><strong>适配信号源：</strong></p><ul>' +
+          '<li><strong>接地源</strong>（Grounded Source，本图）：墙插仪器、信号发生器、已接系统地的传感器 — 直接两线接 AI+ / AI−。</li>' +
           '<li><strong>低电平信号</strong>：热电偶、应变片、电桥（mV 级）。</li>' +
           '<li>长走线、强电磁干扰环境。</li>' +
-          '<li><strong>浮地源</strong>（Floating Source）：电池供电传感器、变压器副边等。需在 AI− 与 AIGND 之间加 <code>10 kΩ ~ 100 kΩ</code> 偏置电阻，否则 IA 共模输入饱和漂移。</li>' +
+          '<li><strong>浮地源</strong>（Floating Source）：电池供电传感器、变压器副边等 — 需在 AI− 与 AIGND 之间加 <code>10 kΩ ~ 100 kΩ</code> 偏置电阻，否则 IA 共模输入失去直流通路而饱和漂移。</li>' +
           '<li>需要最高精度时优先选差分。</li>' +
           '</ul>' +
           '<div class="warn-tip">📊 <strong>通道数减半：</strong>JY5510 单端 32 通道 → 差分 16 通道。</div>'

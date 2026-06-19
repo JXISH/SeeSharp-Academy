@@ -366,3 +366,4 @@ MigrationBackup/
 /test/Cpp/JY.DSP.Fundamental_Cpp.UnitTest/TestReport_FirmDriveCore.xml
 /SeeSharpTools_Test.sln
 *.7z
+*.zip

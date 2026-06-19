@@ -729,6 +729,19 @@
       <pre class="code-panel" id="code-full"></pre>
     </div>
 
+    <div class="card">
+      <h2 style="font-size:14px">🗣️ 大白话总结 AI 配置</h2>
+      <p class="lead">六个问题搞定一次 AI 采集——这就是上面 5 步的本质。</p>
+      <ul style="line-height:1.85;font-size:13px;margin:0;padding-left:18px;">
+        <li><strong>多高？</strong> <code>量程</code></li>
+        <li><strong>多长？</strong> 单点 / 有限长（点数）/ 连续</li>
+        <li><strong>多快？</strong> <code>采样率</code></li>
+        <li><strong>咋接地？</strong> 终端模式（附录 A）</li>
+        <li><strong>咋耦合？</strong> AC / DC（<strong>5510 只有 DC</strong>）</li>
+        <li><strong>咋开始？</strong> 触发（<strong>不配置就立即开始</strong>，附录 B）</li>
+      </ul>
+    </div>
+
     <div class="nav-bar">
       <button class="btn" onclick="gotoStep(4)">← 上一步</button>
       <button class="btn primary" onclick="gotoStep(1)">↺ 重新开始</button>
@@ -1311,7 +1324,7 @@ catch (JYDriverException ex) {
         ctx.fillText('✓ 切断地回路', W/2, H - 6);
         title(ctx, W, 'NRSE · 浮地参考');
       }
-      else { // DIFF
+      else { // DIFF — Figure 7: Differential Mode for Grounding Signals
         ctx.fillStyle = '#38bdf8'; ctx.fillText('AI+', devX + 4, sigY - 3);
         ctx.fillStyle = '#f472b6'; ctx.fillText('AI−', devX + 4, refY - 3);
         ampSym(ctx, devX + 56, sigY + 30, 'IA');
@@ -1319,25 +1332,24 @@ catch (JYDriverException ex) {
         ctx.beginPath(); ctx.moveTo(devX + 22, sigY); ctx.lineTo(devX + 40, sigY + 23); ctx.stroke();
         ctx.strokeStyle = '#f472b6';
         ctx.beginPath(); ctx.moveTo(devX + 22, refY); ctx.lineTo(devX + 40, sigY + 40); ctx.stroke();
-        // bias resistor
+        // Device-side AI_GND — shown but NOT connected to AI− (isolated reference)
+        const gndX = devX + devW - 50, gndY = refY + 22;
+        ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('AI_GND', gndX, gndY - 3);
         ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.2;
-        ctx.beginPath(); ctx.moveTo(devX + 30, refY); ctx.lineTo(devX + 30, refY + 16); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(gndX + 16, gndY); ctx.lineTo(gndX + 16, gndY + 5); ctx.stroke();
+        earth(ctx, gndX + 16, gndY + 7);
+        // Source: GROUNDED at the source-side negative terminal (per Figure 7)
+        ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.2;
         ctx.beginPath();
-        for (let k = 0; k < 4; k++){
-          const yz = refY + 16 + k*3;
-          ctx.moveTo(devX + 30 + (k%2?-3:3), yz);
-          ctx.lineTo(devX + 30 + (k%2?3:-3), yz + 3);
-        }
+        ctx.moveTo(srcX + srcW/2, refY); ctx.lineTo(srcX + srcW/2, refY + 22);
         ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(devX + 30, refY + 30); ctx.lineTo(devX + 30, refY + 38); ctx.stroke();
-        earth(ctx, devX + 30, refY + 40);
-        ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'left';
-        ctx.fillText('Rbias', devX + 36, refY + 22);
+        earth(ctx, srcX + srcW/2, refY + 24);
         ctx.fillStyle = '#94a3b8'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText('浮地源', srcX + srcW/2, refY + 14);
-        ctx.fillStyle = '#4ade80'; ctx.font = 'bold 10px sans-serif';
-        ctx.fillText('✓ CMR ≥ 100 dB', W/2, H - 6);
-        title(ctx, W, 'Differential · 差分');
+        ctx.fillText('接地源 / Grounded', srcX + srcW/2, refY + 42);
+        ctx.fillStyle = '#4ade80'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('✓ AI_GND 与 AI− 隔离 · CMR ≥ 100 dB', W/2, H - 6);
+        title(ctx, W, 'Differential · 差分（接地源）');
       }
     }
 
@@ -1579,8 +1591,9 @@ catch (JYDriverException ex) {
         en: 'Each channel uses AI+ / AI−; IA outputs the difference.',
         body:
           '<p><strong>定义：</strong>每通道占两根线 <code>AIx+</code>/<code>AIx−</code>，仪表放大器输出 (AI+) − (AI−)，强抑制共模噪声（CMR ≥ 100 dB）。</p>' +
+          '<p><strong>对应 Figure 7（接地源差分）：</strong>源负端在源端接地；采集端 <code>AI_GND</code> 仅作板内参考，<strong>不与 AI− 相连</strong>。</p>' +
           '<p><strong>适配：</strong></p><ul>' +
-          '<li>低电平信号（热电偶 / 应变片，mV 级）</li>' +
+          '<li>接地源（本图）·低电平信号（热电偶 / 应变片，mV 级）</li>' +
           '<li>长走线、强电磁干扰</li>' +
           '<li>浮地源需 10 k~100 kΩ 偏置电阻接 AIGND</li>' +
           '<li>最高精度场合首选</li></ul>' +
