@@ -179,6 +179,30 @@ aiTask.Record.Mode       = RecordMode.Finite;        // Finite / Infinite
 aiTask.Record.Length     = 10.0;                     // 录制时长（秒），Finite 有效
 ```
 
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `FilePath` | `string` | 录制文件路径 |
+| `FileFormat` | `FileFormat` | 文件格式（Bin） |
+| `Mode` | `RecordMode` | 录制模式（Finite/Infinite） |
+| `Length` | `double` | 录制时长（秒），Finite 模式有效 |
+
+---
+
+## RecordMode 枚举
+
+| 值 | 说明 |
+|----|------|
+| `Finite` | 有限录制，录制指定时长后自动停止 |
+| `Infinite` | 无限录制，需手动调用 Stop 停止 |
+
+---
+
+## FileFormat 枚举
+
+| 值 | 说明 |
+|----|------|
+| `Bin` | 二进制格式（double 类型） |
+
 ---
 
 ## AISignalExport — 信号导出

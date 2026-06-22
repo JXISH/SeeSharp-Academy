@@ -22,7 +22,7 @@
 | `PFISetting` / `PFIFilter` | class | PFI 端子与滤波 |
 | `DeviceInformation` | class | 板卡标识 |
 | `Utility.Thermocouple` | static | 热电偶 EMF↔温度换算 |
-| 枚举：`AIMode` / `AIRange` / `MeasurementType` / `ThermocoupleType` / `AITriggerType` / `AITriggerMode` / `AIDigitalTriggerEdge` / `AIDigitalTriggerSource` / `AISignalExportSource` / `SignalExportDestination` / `AISampleClockSource` / `ClockTerminal` / `PFITerminal` / `CJSensorConnectionStatus` / `ThermocoupleConnectionStatus` / `PowerLineFrequency` / `ErrorCode` | enum | 见 §8 |
+| 枚举 | enum | `AIMode` / `AIRange` / `MeasurementType` / `ThermocoupleType` / `AITriggerType` / `AITriggerMode` / `AIDigitalTriggerEdge` / `AIDigitalTriggerSource` / `AISignalExportSource` / `SignalExportDestination` / `AISampleClockSource` / `ClockTerminal` / `PFITerminal` / `CJSensorConnectionStatus` / `ThermocoupleConnectionStatus` / `PowerLineFrequency` / `ErrorCode` |
 
 ---
 
@@ -34,7 +34,7 @@ AI 任务主类。**所有模拟输入相关功能唯一入口**。
 
 ```csharp
 JY6312AITask();                             // 默认 boardNum = 0
-JY6312AITask(int boardNum);                 // 按板卡号
+JY6312AITask(int boardNum);                 // 按板卡号（槽位号）
 JY6312AITask(string boardName);             // 按板卡名（如 "JY6312/0"）
 ```
 
@@ -45,48 +45,75 @@ JY6312AITask(string boardName);             // 按板卡名（如 "JY6312/0"）
 | `Channels` | `AIChannelCollection` | R | 已添加通道集合（顺序与 `AddChannel` 一致） |
 | `Mode` | `AIMode` | R/W | `Single` / `Finite` / `Continuous` |
 | `SampleRate` | `double` | R/W | 每通道采样率，**0.25 ~ 160 Sa/s**。写后再读为实际生效值 |
+| `ConversionTime` | `double` | R/W | ADC 转换时间（与 SampleRate 互算） |
 | `SamplesToAcquire` | `int` | R/W | Finite 模式每通道采样点数 |
 | `AvailableSamples` | `ulong` | R | 当前缓冲区可读取的每通道样本数 |
+| `TransferedSamples` | `ulong` | R | 已传输点数（非 Single 模式有效） |
 | `SampleClock` | `AISampleClock` | R | 时钟配置入口 |
 | `Trigger` | `AITrigger` | R | 触发配置入口 |
 | `BuildInCJC` | `BuildInCJC` | R | 内置冷端补偿配置 |
 | `PowerLineRejection` | `PowerLineRejection` | R | 工频抑制配置（≤ 8 Sa/s 生效） |
 | `SignalExport` | `SignalExportList` | R | 信号导出列表 |
 | `AITaskIsDone` | `bool` | R | Finite 模式任务是否完成 |
+| `Device` | `JY6312Device` | R | 设备对象 |
+| `DisableCalibration` | `bool` | R/W | 禁用校准（调试用，正常请置 false） |
 
 ### 方法
 
-```csharp
-// 通道添加
-void AddChannel(int channelID, double rangeLow, double rangeHigh);        // 电压模式
-void AddChannel(int channelID, ThermocoupleType type);                    // 热电偶模式
-void AddChannel(int[] channelIDs, double rangeLow, double rangeHigh);     // 批量电压
-void AddChannel(int[] channelIDs, ThermocoupleType type);                 // 批量热电偶
-void RemoveChannel(int channelID);
-void ClearChannels();
+#### 通道添加
 
-// 启停
+```csharp
+// 热电偶模式
+void AddChannel(int channelID, ThermocoupleType type);                    // 单通道
+void AddChannel(int[] channelIDs, ThermocoupleType type);                 // 批量统一类型
+void AddChannel(int[] channelIDs, ThermocoupleType[] types);              // 批量各自类型
+
+// 电压模式
+void AddChannel(int channelID, double rangeLow, double rangeHigh);        // 单通道
+void AddChannel(int[] channelIDs, double rangeLow, double rangeHigh);     // 批量统一量程
+void AddChannel(int[] channelIDs, double[] rangeLow, double[] rangeHigh); // 批量各自量程
+
+void RemoveChannel(int channelID);
+void RemoveChannel(int[] channelIDs);
+void ClearChannels();
+```
+
+#### 启停与控制
+
+```csharp
 void Start();
 void Stop();
+void SendSoftwareTrigger();                            // 软触发
+void CheckTerminalBlockConnectionStatusBeforeStart();  // 启动前检查 TB-68CJ 连接
+```
 
-// 读取（Thermocouple 模式返回温度 ℃，GeneralVoltage 返回电压 V）
+#### 读取数据（Thermocouple 模式返回温度 ℃，GeneralVoltage 返回电压 V）
+
+```csharp
+// Single 模式
+void ReadSinglePoint(ref double[] data);                                  // 按通道顺序
+void ReadRawSinglePoint(ref double[] voltages, ref double[] temperatures);
+
+// 缓冲模式（Finite / Continuous）
 void ReadData(ref double[] data, int timeout = -1);                       // 1D 单通道
-void ReadData(ref double[,] data, int timeout = -1);                      // 2D 多通道 [samples, channels]
 void ReadData(ref double[] data, int samplesToRead, int timeout = -1);
-void ReadSinglePoint(ref double[] data);                                  // Single 模式
+void ReadData(ref double[,] data, int timeout = -1);                      // 2D 多通道 [samples, channels]
+void ReadData(ref double[,] data, int samplesToRead, int timeout = -1);
 
 // 原始数据（EMF + 冷端温度）
+void ReadRawData(ref double[] voltages, ref double[] temperatures, int samplesPerChannel);
+void ReadRawData(ref double[] voltages, ref double[] temperatures, int samplesPerChannel, int timeout);
 void ReadRawData(ref double[,] hjVoltage, ref double[,] cjTemperature, int timeout = -1);
+void ReadRawData(ref double[,] hjVoltage, ref double[,] cjTemperature, int samplesPerChannel, int timeout);
+```
 
-// 软件触发
-void SendSoftwareTrigger();
+#### 冷端温度与开路检测
 
-// 自定义冷端温度（必须先 BuildInCJC.Enabled = false）
+```csharp
 void SetCJTemperature(int channelID, double temperature);
 void SetCJTemperature(double[] temperatures);                             // 与 Channels 顺序对齐
-
-// 开路热电偶检测
-Dictionary<int, ThermocoupleConnectionStatus> DetectOpenThermocouple();
+void ReportBuildInCJException();                                          // 主动上报冷端异常
+ThermocoupleConnectionStatus[] DetectOpenThermocouple();                   // 所有通道开路检测
 ```
 
 ---
@@ -128,10 +155,11 @@ static JY6312Device GetInstance(int boardNum); // 按板卡号获取
 | 成员 | 类型 | 说明 |
 |------|------|------|
 | `ID` | `int` | 通道号 0..15 |
-| `MeasurementType` | `MeasurementType` | `Thermocouple` / `GeneralVoltage` |
+| `MeasurementType` | `MeasurementType` | `Thermocouple` / `GeneralVoltage`（只读） |
 | `ThermocoupleType` | `ThermocoupleType` | 热电偶类型（`Thermocouple` 模式有效） |
-| `Range` | `AIRange` | 电压量程档位 |
-| `RangeHigh` / `RangeLow` | `double` | 实际量程上下限（只读，反映 Range 设置） |
+| `Range` | `AIRange` | 电压量程档位（只读，由 AddChannel 决定） |
+| `RangeHigh` / `RangeLow` | `double` | 实际量程上下限（只读） |
+| `Gain` | `double` | 对应增益（只读） |
 | `CustomCJTemperature` | `double` | 自定义冷端温度（℃） |
 | `Advanced` | `AIChannelAdvanced` | 高级参数 |
 
@@ -184,13 +212,16 @@ BuildInCJC
 ├── Enabled          : bool                              // 默认 true；关闭后需 SetCJTemperature
 ├── SensorStatus     : CJSensorConnectionStatus         // Normal / LostConnect / Closed
 ├── SensorConnected  : bool                             // TB68CJ 是否已接
+├── Debouncing       : bool                             // 状态去抖动
 ├── Advanced         : BuildInCJCAdvanced
-│   └── Debouncing   : int                              // 状态去抖动（ms）
+│   ├── Debouncing           : int                     // 去抖动时间（ms）
+│   ├── IgnoreTimeoutException : bool                  // 忽略冷端读取超时异常
+│   └── UpdateTimeout        : int                     // 冷端温度更新超时（ms）
 ```
 
 `CJSensorConnectionStatus` 枚举值：
 - `Normal` —— 传感器连接正常
-- `LostConnect` —— 曾连接但已断开（需 `Debouncing` 时间确认）
+- `LostConnect` —— 曾连接但已断开（需 Debouncing 时间确认）
 - `Closed` —— 已禁用 CJC 或从未连接
 
 ---

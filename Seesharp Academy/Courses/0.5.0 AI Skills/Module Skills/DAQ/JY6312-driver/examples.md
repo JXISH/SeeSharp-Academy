@@ -56,6 +56,8 @@ class Program
             aiTask = new JY6312AITask(boardNum: 0);
             aiTask.Mode = AIMode.Single;
             aiTask.AddChannel(0, ThermocoupleType.TypeK);
+            aiTask.BuildInCJC.Enabled = true;
+            aiTask.PowerLineRejection.Frequency = PowerLineFrequency._50Hz;
             aiTask.SampleRate = 1;          // 稳定窗口 1 s
             aiTask.Start();
             Thread.Sleep((int)(1000.0 / aiTask.SampleRate));
@@ -91,7 +93,28 @@ double tempC = Utility.Thermocouple.ConvertEMFToTemperature(
 
 ---
 
-## 3. 单通道连续采集（内 / 外时钟切换）
+## 3. 单点电压测量
+
+```csharp
+var aiTask = new JY6312AITask(0);
+
+// 电压模式：±1.25V 量程
+aiTask.AddChannel(0, -1.25, 1.25);
+aiTask.Mode = AIMode.Single;
+aiTask.Start();
+Thread.Sleep(500);
+
+double[] voltage = new double[1];
+aiTask.ReadSinglePoint(ref voltage);
+Console.WriteLine($"电压值：{voltage[0]:F6} V");
+
+aiTask.Stop();
+aiTask.Channels.Clear();
+```
+
+---
+
+## 4. 单通道连续采集（内 / 外时钟切换）
 
 **目录**：`Winform AI Continuous\`
 
@@ -125,7 +148,7 @@ if (aiTask.AvailableSamples >= (ulong)buf.Length)
 
 ---
 
-## 4. 多通道连续采集（热电偶）
+## 5. 多通道连续采集（热电偶）
 
 **目录**：`Winform AI Continuous MutiChannel\`
 
@@ -151,7 +174,40 @@ if (aiTask.AvailableSamples >= (ulong)blockSize)
 
 ---
 
-## 5. 多通道连续采集（电压模式）
+## 6. 多通道混合热电偶采集（不同类型）
+
+```csharp
+JY6312AITask aiTask = new JY6312AITask(0);
+
+// 各通道独立配置热电偶类型
+int[] channels = { 0, 1, 2, 3 };
+ThermocoupleType[] types =
+{
+    ThermocoupleType.TypeK,
+    ThermocoupleType.TypeJ,
+    ThermocoupleType.TypeT,
+    ThermocoupleType.TypeE,
+};
+
+aiTask.AddChannel(channels, types);
+aiTask.BuildInCJC.Enabled = true;
+aiTask.PowerLineRejection.Frequency = PowerLineFrequency._50Hz;
+aiTask.Mode = AIMode.Continuous;
+aiTask.SampleRate = 10;
+aiTask.Start();
+
+// 多通道读取：列存储 [采样点, 通道]
+double[,] readValue = new double[100, 4];
+while (aiTask.AvailableSamples < 100) Thread.Sleep(10);
+aiTask.ReadData(ref readValue, 100, -1);
+
+aiTask.Stop();
+aiTask.Channels.Clear();
+```
+
+---
+
+## 7. 多通道连续采集（电压模式）
 
 **目录**：`Winform AI Continuous MutiChannel GeneralVoltage\`
 
@@ -160,14 +216,14 @@ foreach (int ch in selectedChannels)
     aiTask.AddChannel(ch, rangeLow: -1.25, rangeHigh: 1.25);  // ±1.25 V
 aiTask.Mode       = AIMode.Continuous;
 aiTask.SampleRate = 100;
-// 其他读法同 §4
+// 其他读法同 §5
 ```
 
 可选量程：±1.25 / ±0.625 / ±0.3125 / ±0.15625 / **±0.078125** V。
 
 ---
 
-## 6. 连续 + 数字触发
+## 8. 连续 + 数字触发
 
 **目录**：`Winform AI Continuous Digital Trigger\`
 
@@ -183,7 +239,7 @@ aiTask.Start();
 
 ---
 
-## 7. 连续 + 软件触发
+## 9. 连续 + 软件触发
 
 **目录**：`Winform AI Continuous Soft Trigger\`
 
@@ -197,7 +253,7 @@ private void btnTrigger_Click(object s, EventArgs e) => aiTask.SendSoftwareTrigg
 
 ---
 
-## 8. 软件触发 + Retrigger + Reference 模式
+## 10. 软件触发 + Retrigger + Reference 模式
 
 **目录**：`Winform AI MultiRecord Soft Trigger\`
 
@@ -220,7 +276,7 @@ aiTask.ReadData(ref buf, -1);
 
 ---
 
-## 9. 连续 + 自定义冷端温度
+## 11. 连续 + 自定义冷端温度
 
 **目录**：`Winform AI Continuous Custom RJ\`
 
@@ -241,7 +297,7 @@ private void timerCJ_Tick(object s, EventArgs e)
 
 ---
 
-## 10. 连续 + 原始数据（EMF + 冷端 T）
+## 12. 连续 + 原始数据（EMF + 冷端 T）
 
 **目录**：`Winform AI Continuous Raw Data\`
 
@@ -261,13 +317,13 @@ if (aiTask.AvailableSamples >= (ulong)samples)
 
 ---
 
-## 11. 电流测量（外接分流电阻）
+## 13. 电流测量（外接分流电阻）
 
 **目录**：`Winform AI Continuous Current Measure\` 与 `... MutiChannel Current Measure\`
 
 ```csharp
-const double Rshunt = 250.0;     // Ω，典型 4-20 mA 环路
-aiTask.AddChannel(0, -1.25, 1.25);   // 电压模式
+const double Rshunt = 10.0;     // Ω，精密电阻
+aiTask.AddChannel(0, -1.25, 1.25);   // 电压模式 → ±125 mA
 aiTask.Mode       = AIMode.Continuous;
 aiTask.SampleRate = 100;
 aiTask.Start();
@@ -277,9 +333,17 @@ aiTask.ReadData(ref voltage, -1);
 double[] currentA = voltage.Select(v => v / Rshunt).ToArray();
 ```
 
+| 电压量程 | 对应电流（R=10Ω） |
+|---------|------------------|
+| ±1.25 V | ±125 mA |
+| ±625 mV | ±62.5 mA |
+| ±312.5 mV | ±31.25 mA |
+| ±156.2 mV | ±15.62 mA |
+| ±78.125 mV | ±7.8125 mA |
+
 ---
 
-## 12. 开路热电偶检测 (OTD)
+## 14. 开路热电偶检测 (OTD)
 
 **目录**：`Winform Open Thermocouple Detection\`（主 .cs 为 `OpenThermocoupleDetection.cs`）
 
@@ -291,18 +355,18 @@ aiTask.Mode       = AIMode.Continuous;
 aiTask.SampleRate = 1;
 
 // 不需要 Start()，驱动内部自行测试
-Dictionary<int, ThermocoupleConnectionStatus> result = aiTask.DetectOpenThermocouple();
-foreach (var kv in result)
+ThermocoupleConnectionStatus[] result = aiTask.DetectOpenThermocouple();
+for (int i = 0; i < result.Length; i++)
 {
-    // kv.Value : Normal / OpenCircuit
-    labels[kv.Key].BackColor = (kv.Value == ThermocoupleConnectionStatus.Normal)
-        ? Color.LimeGreen : Color.Red;
+    // result[i] : Normal / OpenCircuit
+    string state = result[i] == ThermocoupleConnectionStatus.OpenCircuit ? "开路" : "正常";
+    Console.WriteLine($"Ch{aiTask.Channels[i].ID}: {state}");
 }
 ```
 
 ---
 
-## 13. TB68CJ 端子状态轮询
+## 15. TB68CJ 端子状态轮询
 
 **目录**：`Winform Terminal Block State\`
 
@@ -324,7 +388,7 @@ private void timer1_Tick(object s, EventArgs e)
 
 ---
 
-## 14. 多卡采样时钟同步
+## 16. 多卡采样时钟同步
 
 **目录**：`Winform AI_MultiCard SampleClock Sync\`
 
@@ -358,27 +422,7 @@ slaveTask.ReadData(ref sBuf, 5000);
 
 ---
 
-## 15. 单点多通道（WinForm）
-
-**目录**：`Winform AI Single Point MultiChannel\`
-
-```csharp
-aiTask = new JY6312AITask(0);
-foreach (int ch in selectedChannels)
-    aiTask.AddChannel(ch, ThermocoupleType.TypeK);
-aiTask.Mode       = AIMode.Single;
-aiTask.SampleRate = 1;
-aiTask.Start();
-Thread.Sleep((int)(1000.0 / aiTask.SampleRate));
-
-double[] values = new double[aiTask.Channels.Count];
-aiTask.ReadSinglePoint(ref values);
-aiTask.Stop();
-```
-
----
-
-## 16. 有限采集 + 数字触发
+## 17. 有限采集 + 数字触发
 
 **目录**：`Winform AI Finite Digital Trigger\`
 
@@ -402,7 +446,31 @@ aiTask.ReadData(ref buf, -1);
 
 ---
 
-## 17. 50 / 60 Hz 工频抑制
+## 18. 有限采集（多通道）
+
+```csharp
+JY6312AITask aiTask = new JY6312AITask(0);
+int[] channels = { 0, 1, 2, 3 };
+aiTask.AddChannel(channels, ThermocoupleType.TypeK);
+
+aiTask.BuildInCJC.Enabled = true;
+aiTask.PowerLineRejection.Frequency = PowerLineFrequency._50Hz;
+aiTask.Mode = AIMode.Finite;
+aiTask.SamplesToAcquire = 200;
+aiTask.SampleRate = 10;
+
+aiTask.Start();
+
+double[,] readValue = new double[200, 4];
+aiTask.ReadData(ref readValue, 200, -1);
+
+aiTask.Stop();
+aiTask.Channels.Clear();
+```
+
+---
+
+## 19. 50 / 60 Hz 工频抑制
 
 ```csharp
 aiTask.SampleRate = 2;                                         // 必须 ≤ 8 Sa/s
@@ -417,7 +485,66 @@ bool actuallyRejecting = aiTask.PowerLineRejection.RejectAt50Hz;
 
 ---
 
-## 18. 通用骨架（全流程模板）
+## 20. 连续温度采集完整 WinForm 示例
+
+```csharp
+using System;
+using System.Windows.Forms;
+using JY6312;
+
+public partial class MainForm : Form
+{
+    private JY6312AITask aiTask;
+    private double[,] readValue;
+
+    private void button_start_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            int pointsPerRead = 10;
+            int channelCount = 1;
+            readValue = new double[pointsPerRead, channelCount];
+
+            aiTask = new JY6312AITask(0);
+            aiTask.AddChannel(0, ThermocoupleType.TypeK);
+            aiTask.BuildInCJC.Enabled = true;
+            aiTask.PowerLineRejection.Frequency = PowerLineFrequency._50Hz;
+            aiTask.Mode = AIMode.Continuous;
+            aiTask.SampleRate = 10;
+
+            aiTask.CheckTerminalBlockConnectionStatusBeforeStart();
+            aiTask.Start();
+            timer1.Enabled = true;
+        }
+        catch (JYDriverException ex) { MessageBox.Show(ex.Message); }
+    }
+
+    private void timer1_Tick(object sender, EventArgs e)
+    {
+        timer1.Enabled = false;
+        if (aiTask.AvailableSamples >= (ulong)readValue.GetLength(0))
+        {
+            try
+            {
+                aiTask.ReadData(ref readValue, readValue.GetLength(0), -1);
+                easyChartX_AI.Plot(readValue);
+            }
+            catch (JYDriverException ex) { MessageBox.Show(ex.Message); return; }
+        }
+        timer1.Enabled = true;
+    }
+
+    private void button_stop_Click(object sender, EventArgs e)
+    {
+        timer1.Enabled = false;
+        if (aiTask != null) { aiTask.Stop(); aiTask.Channels.Clear(); }
+    }
+}
+```
+
+---
+
+## 21. 通用骨架（全流程模板）
 
 ```csharp
 JY6312AITask aiTask = null;
@@ -453,6 +580,59 @@ try
 }
 catch (JYDriverException ex) { MessageBox.Show(ex.Message); }
 finally { aiTask?.Stop(); }
+```
+
+---
+
+## 综合技巧
+
+### 多通道数据解析
+
+```csharp
+// ReadData 多通道缓冲区为 [采样点, 通道] 列存储
+double[,] buf = new double[100, 4];
+aiTask.ReadData(ref buf, 100, -1);
+
+// 提取各通道数据
+double[] ch0 = new double[100];
+for (int i = 0; i < 100; i++) ch0[i] = buf[i, 0];
+```
+
+### 同时读取电压和温度（诊断校准用）
+
+```csharp
+double[,] voltages     = new double[100, 4];
+double[,] temperatures = new double[100, 4];
+aiTask.ReadRawData(ref voltages, ref temperatures, 100, -1);
+// voltages：热电偶原始电压（V）；temperatures：经 CJC 补偿后的温度（℃）
+```
+
+### 冷端补偿策略选择
+
+```csharp
+// 1. 推荐：使用 TB-68CJ 内置冷端传感器
+aiTask.BuildInCJC.Enabled = true;
+
+// 2. 无 TB-68CJ：外接高精度 RTD / 温度计手动提供 RJ
+aiTask.BuildInCJC.Enabled = false;
+aiTask.SetCJTemperature(0, readFromExternalRTD());
+
+// 3. 恒温槽环境（RJ 固定已知）：直接写常数
+aiTask.SetCJTemperature(0, 0.0);   // 冰浴
+```
+
+### 窗体关闭时的资源释放模板
+
+```csharp
+private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+{
+    try
+    {
+        if (timer1 != null) timer1.Enabled = false;
+        if (aiTask != null) { aiTask.Stop(); aiTask.Channels.Clear(); }
+    }
+    catch (JYDriverException ex) { MessageBox.Show(ex.Message); }
+}
 ```
 
 ---

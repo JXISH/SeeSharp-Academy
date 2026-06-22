@@ -1,5 +1,236 @@
 ---
 name: jy6312-driver
+description: 为 JYTEK JY-6312 PXIe 16 通道热电偶/低电压模拟输入模块编写 C# (.NET) 驱动代码。涵盖 AI 单点/有限/连续采集、热电偶测量（R/S/B/J/T/E/K/N/C/A/G/D）与内置冷端补偿 (TB68CJ)、低电压测量（±1.25V / ±625mV / ±312.5mV / ±156.2mV / ±78.125mV 五档量程）、数字触发 / 软件触发 / 重复触发、PFI 与 PXI_Trig 信号导出与多卡采样时钟同步、开路热电偶 (OTD) 检测、50/60 Hz 工频抑制、冷端温度自定义与原始数据 (EMF + 冷端温度) 读取。当用户提到 JY6312、JY-6312、6312 板卡、JY6312AITask、JY6312Device、热电偶采集、TB68CJ、冷端补偿 (CJC)、多通道温度采集、OTD、160 Sa/s 采样时自动应用本技能。
+---
+
+# JY6312 驱动开发技能
+
+## 硬件概览
+
+JY-6312 是 JYTEK PXIe 系列 **16 通道同步采样**热电偶/低电压模拟输入模块，每通道独立 ADC（支持通道级同步），专为低频高精度温度与微弱电压测量设计。
+
+| 参数 | JY-6312 |
+|------|---------|
+| AI 通道数 | 16（每 ADC 1 通道） |
+| AI 最大采样率（每通道） | **160 Sa/s** |
+| AI 最小采样率（每通道） | **0.25 Sa/s** |
+| 输入量程（电压模式） | ±1.25 V / ±625 mV / ±312.5 mV / ±156.2 mV / ±78.125 mV（五档） |
+| 热电偶类型 | R / S / B / J / T / E / K / N / C / A / G / D（12 种） |
+| 冷端补偿 (CJC) | 通过 **TB68CJ** 接线端子内置传感器自动补偿，可关闭后手动设 `CustomCJTemperature` |
+| 工频抑制 | 50 Hz / 60 Hz（**仅在 SampleRate ≤ 8 Sa/s 时有效**） |
+| 触发端子 | PFI0 / PFI1，PXI_Trig0..PXI_Trig7，PXI_Star |
+| 信号导出源 | SampleClock / TriggerOut / IsConverting |
+| 模块功能 | **仅 AI**（无独立 DI/DO 任务类） |
+| 接口 | USB / PCIe / PXIe |
+
+### 产品型号
+
+- **USB-6312**：16-ch 24-bit USB 通道间隔离热电偶输入模块
+- **PCIe-6312**：16-ch 24-bit PCIe 通道间隔离热电偶输入模块
+- **PXIe-6312**：16-ch 24-bit PXIe 通道间隔离热电偶输入模块
+
+## 驱动与依赖
+
+| 文件 | 绝对路径 |
+|------|----------|
+| 主驱动 DLL（**必须引用**） | `C:\SeeSharp\JYTEK\Hardware\DAQ\JY6312\Bin\JY6312.dll` |
+| 驱动 XML 注释文档 | `C:\SeeSharp\JYTEK\Hardware\DAQ\JY6312\Bin\JY6312.XML` |
+| 示例工程根目录 | `C:\SeeSharp\JYTEK\Hardware\DAQ\JY6312\JY6312.Examples\` |
+
+**工程引用配置**（.csproj）：
+
+```xml
+<Reference Include="JY6312">
+  <HintPath>C:\SeeSharp\JYTEK\Hardware\DAQ\JY6312\Bin\JY6312.dll</HintPath>
+</Reference>
+```
+
+目标框架 `.NET Framework 4.0+`，平台选择 `x64`（**禁止 AnyCPU**）。
+
+代码顶部统一：
+```csharp
+using JY6312;
+```
+
+## 核心 API 速查
+
+| 类型 | 用途 |
+|------|------|
+| `JY6312AITask` | AI 任务主类（唯一任务类，电压/热电偶复用） |
+| `JY6312Device` | 板卡实例（`Scan()`, `GetInstance(boardNum)`, `MaxSampleRate` 等） |
+| `JYDriverException` | 驱动统一异常，必须 `try/catch` |
+| `AIMode` | `Single` / `Finite` / `Continuous` |
+| `MeasurementType` | `Thermocouple` / `GeneralVoltage` |
+| `ThermocoupleType` | `TypeR/S/B/J/T/E/K/N/C/A/G/D` |
+| `AIRange` | `_1p25V` / `_625mV` / `_312p5mV` / `_156p2mV` / `_78p125mV` |
+| `AITriggerType` | **`Immediately`** / `Digital` / `Software` |
+| `BuildInCJC` | 内置冷端补偿配置 |
+
+## 标准工作流（AI 任务）
+
+```
+1. 构造 task        : new JY6312AITask(boardNum)
+2. 添加通道         : AddChannel(chID, ThermocoupleType) 或 AddChannel(chID, rangeLow, rangeHigh)
+3. 配置模式/采样率  : Mode / SampleRate / SamplesToAcquire
+4. [可选] 触发/时钟/信号导出 : Trigger / SampleClock / SignalExport
+5. 启动             : Start()
+6. 读取 → 停止      : ReadSinglePoint / ReadData / ReadRawData → Stop()
+```
+
+**关键约束**：
+- `AddChannel` **必须在 `Start()` 之前**，否则抛 `aiIsStart` 错误。
+- `Start()` 前若启用内置 CJC (默认)，驱动会检查 TB68CJ 连接状态。
+- `Finite` 模式必须设置 `SamplesToAcquire`。
+- `ReadData` 连续模式下需先判断 `AvailableSamples >= 请求长度`。
+- 多卡同步：**从卡必须先 `Start()`**，主卡后 `Start()`。
+- 推荐启动前调用 `aiTask.CheckTerminalBlockConnectionStatusBeforeStart()`。
+
+## AI 三种模式速查
+
+| 模式 | 典型配置 | 读取方式 |
+|------|----------|----------|
+| `Single` | `Mode=AIMode.Single` | `ReadSinglePoint` |
+| `Finite` | `+SamplesToAcquire=N` | `AITaskIsDone` 后 `ReadData` |
+| `Continuous` | `+SampleRate` | Timer 轮询 `AvailableSamples` → `ReadData` |
+
+## 典型代码模板
+
+### 1. 单点热电偶测量（Single 模式）
+
+```csharp
+aiTask = new JY6312AITask(boardNum: 0);
+aiTask.Mode = AIMode.Single;
+aiTask.AddChannel(chID: 0, ThermocoupleType.TypeK);
+aiTask.SampleRate = 1;
+aiTask.Start();
+Thread.Sleep((int)(1000.0 / aiTask.SampleRate));
+double[] readValue = new double[1];
+aiTask.ReadSinglePoint(ref readValue);
+aiTask.Stop();
+```
+
+### 2. 连续采集（内部时钟 / 外部时钟）
+
+```csharp
+aiTask = new JY6312AITask(0);
+aiTask.AddChannel(channelID, ThermocoupleType.TypeK);
+aiTask.Mode = AIMode.Continuous;
+aiTask.SampleClock.Source = AISampleClockSource.Internal;
+aiTask.SampleRate = 100;   // 0.25 ~ 160 Sa/s
+// 外部时钟：
+// aiTask.SampleClock.Source = AISampleClockSource.External;
+// aiTask.SampleClock.External.Terminal = ClockTerminal.PFI0;
+// aiTask.SampleClock.External.ExpectedRate = 100;
+aiTask.Start();
+```
+
+### 3. 数字触发（PFI/PXI_Trig 上升沿）
+
+```csharp
+aiTask.Trigger.Type           = AITriggerType.Digital;
+aiTask.Trigger.Mode           = AITriggerMode.Start;
+aiTask.Trigger.Digital.Source = AIDigitalTriggerSource.PFI0;
+aiTask.Trigger.Digital.Edge   = AIDigitalTriggerEdge.Rising;
+```
+
+### 4. 软件触发 + Retrigger
+
+```csharp
+aiTask.Trigger.Type              = AITriggerType.Software;
+aiTask.Trigger.Mode              = AITriggerMode.Reference;
+aiTask.Trigger.ReTriggerCount    = 5;    // -1=无限
+aiTask.Trigger.PreTriggerSamples = 1;
+aiTask.Start();
+aiTask.SendSoftwareTrigger();
+```
+
+### 5. 关闭内置 CJC + 自定义冷端温度
+
+```csharp
+aiTask.BuildInCJC.Enabled = false;
+aiTask.AddChannel(0, ThermocoupleType.TypeK);
+aiTask.Start();
+aiTask.SetCJTemperature(chID: 0, temperature: 25.0);
+```
+
+### 6. 读取原始 EMF + 冷端温度
+
+```csharp
+double[,] hjVoltage     = new double[samples, channels];
+double[,] cjTemperature = new double[samples, channels];
+aiTask.ReadRawData(ref hjVoltage, ref cjTemperature, timeout: 1000);
+double tempC = Utility.Thermocouple.ConvertEMFToTemperature(
+    ThermocoupleType.TypeK, hjVoltage[0, 0] * 1e6, cjTemperature[0, 0]);
+```
+
+### 7. 开路热电偶检测 (OTD)
+
+```csharp
+aiTask = new JY6312AITask(0);
+aiTask.AddChannel(new[] {0, 1, 2, 3}, ThermocoupleType.TypeK);
+aiTask.Mode = AIMode.Continuous;
+aiTask.SampleRate = 1;
+ThermocoupleConnectionStatus[] results = aiTask.DetectOpenThermocouple();
+// results[i]: Normal / OpenCircuit
+```
+
+### 8. TB68CJ 端子状态
+
+```csharp
+bool connected = aiTask.BuildInCJC.SensorStatus == CJSensorConnectionStatus.Normal;
+```
+
+### 9. 多卡采样时钟同步
+
+```csharp
+// 主卡：导出 SampleClock
+master.SignalExport.Add(AISignalExportSource.SampleClock, SignalExportDestination.PXI_Trig0);
+// 从卡：接收外部时钟
+slave.SampleClock.Source = AISampleClockSource.External;
+slave.SampleClock.External.Terminal = ClockTerminal.PXI_Trig0;
+slave.SampleClock.External.ExpectedRate = 100;
+slave.Start();    // 从卡先启动
+master.Start();   // 主卡后启动
+```
+
+### 10. 50/60 Hz 工频抑制
+
+```csharp
+aiTask.SampleRate = 2;   // 必须 ≤ 8 Sa/s 才生效
+aiTask.PowerLineRejection.Frequency = PowerLineFrequency._50Hz;
+```
+
+## 异常与错误处理
+
+所有驱动调用**必须**包在 `try { ... } catch (JYDriverException ex) { ... }` 中。
+
+| 场景 | 错误枚举 | 诊断 |
+|------|----------|------|
+| Start 后仍 AddChannel | `aiIsStart` | 在 Start() 之前完成所有通道 |
+| 读数请求超时 | `Timeout` | 增大 `timeout`，或先判断 `AvailableSamples` |
+| Finite 下读取多于 SamplesToAcquire | `BufferDownflow` | 限制请求长度 |
+| 量程参数非法 | `ErrorParam1` | 仅允许 ±1.25/±0.625/±0.3125/±0.1562/±0.078125 V |
+| 开启内置 CJC 但未接 TB68CJ | `InitializeFailed` | 关闭 `BuildInCJC.Enabled` 或检查端子 |
+| 外部时钟 PLL 未锁定 | `PLLLockFailed` | 检查物理接线和 `ExpectedRate` |
+
+**窗口/程序关闭时**：`FormClosing` / `finally` 中调用 `aiTask?.Stop()` 释放板卡资源。
+
+## 代码风格与约定
+
+- **板卡构造**：`new JY6312AITask(int boardNum)` 或 `new JY6312AITask(string boardName)`。
+- **读数数组维度**：一维 `double[samples]` 单通道；二维 `double[samples, channels]` 多通道。
+- **采样率取整**：`SampleRate` 写后再读会得到驱动实际生效值。
+- **UI 线程更新**：Timer.Tick 中短暂禁用 `timer.Enabled`，防止重入。
+- **平台**：`x64` 推荐。AnyCPU 会在 64 位系统上随机失败。
+
+## 进阶参考
+
+| 文档 | 何时查阅 |
+|------|----------|
+| [`reference.md`](reference.md) | 完整 API 定义（类/属性/方法签名）、枚举全表、错误码、PFI/SignalExport/BuildInCJC 细节 |
+| [`examples.md`](examples.md) | 完整可运行示例代码（21 个场景 + 综合技巧） |
+---
+name: jy6312-driver
 description: 提供 JYTEK JY6312 系列 16 通道、24-bit、通道间隔离热电偶温度采集卡（DAQ）的完整 C# 驱动开发指引。涵盖模拟输入（AI）热电偶温度测量（12 种热电偶类型 R/S/B/J/T/E/K/N/C/A/G/D）、电压测量、电流测量（外接 10Ω 采样电阻）三类模式（Single/Finite/Continuous）、内置冷端补偿（BuildInCJC）、外置冷端温度（SetCJTemperature 自定义 RJ）、开路热电偶检测（DetectOpenThermocouple / OTD）、50/60 Hz 工频抑制、数字触发/软触发/外部时钟、多卡采样时钟同步。当用户使用 USB/PCIe/PXIe-6312、JY6312AITask、ThermocoupleType.TypeR/S/B/J/T/E/K/N/C/A/G/D、MeasurementType.Thermocouple/GeneralVoltage、AIRange._1p25V/_625mV/_312p5mV/_156p2mV/_78p125mV、AIMode.Single/Finite/Continuous、AITriggerType.Immediately/Digital/Software、BuildInCJC、SetCJTemperature、DetectOpenThermocouple、PowerLineRejection、TB-68CJ 接线端子开发热电偶测温、工业温度监测、多点温度扫描、冷端补偿、电流变送器采集应用时自动应用。
 ---
 

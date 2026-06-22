@@ -2,10 +2,14 @@
 
 ## 目录
 - [JY6311AITask 类](#jy6311aitask-类)
+- [AIChannel 类](#aichannel-类)
 - [JY6311DITask 类](#jy6311ditask-类)
 - [JY6311DOTask 类](#jy6311dotask-类)
+- [配置类详解](#配置类详解)
 - [枚举定义](#枚举定义)
 - [异常处理](#异常处理)
+- [数据类型与量程](#数据类型与量程)
+- [采样率限制](#采样率限制)
 
 ---
 
@@ -17,8 +21,8 @@
 
 | 构造函数 | 说明 |
 |---------|------|
-| `JY6311AITask(int boardNum)` | 通过板卡号创建任务，boardNum=0表示第一张卡 |
-| `JY6311AITask(string boardName)` | 通过板卡名称创建任务，名称可在设备管理器中设置 |
+| `JY6311AITask(int slotNumber)` | 通过槽位号创建任务（推荐），slotNumber=0表示第一张卡 |
+| `JY6311AITask(string boardType)` | 通过板卡类型字符串创建任务 |
 
 ### 属性
 
@@ -26,7 +30,7 @@
 |------|------|------|
 | `Device` | `JY6311Device` | 获取当前任务使用的设备实例 |
 | `Mode` | `AIMode` | 采集模式：Single/Finite/Continuous |
-| `SampleRate` | `double` | 每通道采样率（Sa/s），范围0.275~800 |
+| `SampleRate` | `double` | 每通道采样率（Sa/s），范围0.275~3000 |
 | `ActualSampleRate` | `double` | 实际生效的采样率（只读） |
 | `SamplesToAcquire` | `int` | 每通道采集点数（仅Finite模式有效） |
 | `AvailableSamples` | `ulong` | 缓冲区中可读取的样本数（每通道） |
@@ -175,6 +179,20 @@ public void ReadRawData(IntPtr buf, int samplesPerChannel, int timeout)
 
 ---
 
+## AIChannel 类 — 通道属性（只读）
+
+| 属性              | 类型                | 说明                              |
+| ----------------- | ------------------- | --------------------------------- |
+| `ChannelID`       | `int`               | 通道号                            |
+| `MeasureDataType` | `MeasureDataType`   | 测量量类型（Resistance/Temperature/Voltage） |
+| `RTDType`         | `RTDType`           | RTD 类型（温度/电阻模式有效）     |
+| `TerminalType`    | `RTDTerminal`       | 接线方式（温度/电阻模式有效）     |
+| `RTDTCRType`      | `RTDTCRType`        | TCR 系数（温度模式有效）          |
+| `RangeLow`        | `double`            | 输入量程下限                      |
+| `RangeHigh`       | `double`            | 输入量程上限                      |
+
+---
+
 ## JY6311DITask 类
 
 数字输入任务类，用于读取PFI端口状态。
@@ -308,7 +326,7 @@ public void WriteSinglePoint(bool[] writeValues)
 | `Mode` | `AITriggerMode` | 触发模式：Start/Reference |
 | `Digital` | `AIDigitalTrigger` | 数字触发配置 |
 | `ReTriggerCount` | `int` | 重触发次数（0或1=单次，-1=无限次） |
-| `PreTriggerSamples` | `uint` | 预触发样本数（仅Reference模式） |
+| `PreTriggerSamples` | `uint` | 预触发样本数（仅Reference模式，必须 ≤ SamplesToAcquire） |
 
 ### AIDigitalTrigger 类
 
@@ -532,8 +550,6 @@ public enum PowerLineFrequency
 
 ### JYDriverExceptionPublic 枚举
 
-常用错误代码定义。
-
 | 错误代码 | 说明 |
 |---------|------|
 | `Unknown` | 未知异常 |
@@ -550,8 +566,19 @@ public enum PowerLineFrequency
 | `TriggerStateNotMatch` | 触发状态不匹配 |
 | `PLLLockFailed` | 锁相环未能成功锁住时钟源 |
 | `NotSupportOperationForCurrentDevice` | 当前设备不支持该操作 |
-| `StartTaskFailed` | 开始任务失败 |
-| `StopTaskFailed` | 停止任务失败 |
+| `OpenDeviceFailed` | 打开设备失败 |
+| `CloseDeviceFailed` | 关闭设备失败 |
+| `NoChannelAdded` | 未添加通道 |
+| `StartTaskFailed` | 启动 Task 失败 |
+| `StopTaskFailed` | 停止 Task 失败 |
+| `TaskHasNotStarted` | Task 未启动即读写 |
+| `TaskHasStartedCannotPerformTheSetOperation` | Task 运行中修改参数 |
+| `BufferDataOverflow` | 采集缓冲区溢出 |
+| `ReadDataTimeout` | 读取超时 |
+| `SampleRateParameterInvalid` | 采样率超限 |
+| `ChannelNumberParameterInvalid` | 无效通道号 |
+| `ChannelInputRangeParameterInvalid` | 无效输入量程 |
+| `TriggerParameterInvalid` | 触发参数无效 |
 | `SignalExportDestinationInvalid` | 信号导出端口无效 |
 | `HardwareResourceIsReserved` | 硬件资源被占用 |
 | `PerformCalibrationFailed` | 执行校准失败 |

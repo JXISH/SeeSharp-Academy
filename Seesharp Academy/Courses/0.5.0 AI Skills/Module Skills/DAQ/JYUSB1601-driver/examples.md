@@ -243,6 +243,164 @@ aiTask.Channels.Clear();
 
 ---
 
+## 示例 7.1：AI Record 有限录制模式（Finite Streaming）
+
+录制固定时长的数据到文件，录制完成后自动停止：
+
+```csharp
+private JYUSB1601AITask aiTask;
+private double[] previewData;
+
+private void button_Start_Click(object sender, EventArgs e)
+{
+    try
+    {
+        aiTask = new JYUSB1601AITask("USBDev0");
+        aiTask.AddChannel(0, -10, 10);
+        
+        aiTask.Mode = AIMode.Record;
+        aiTask.SampleRate = 50000;
+        
+        aiTask.Record.FilePath = @"C:\Data\record.bin";
+        aiTask.Record.FileFormat = FileFormat.Bin;
+        aiTask.Record.Mode = RecordMode.Finite;  // 有限录制模式
+        aiTask.Record.Length = 10.0;              // 录制 10 秒
+        
+        aiTask.Start();
+        previewData = new double[1000];
+        timer_Preview.Enabled = true;
+    }
+    catch (JYDriverException ex) { MessageBox.Show(ex.Message); }
+}
+
+private void timer_Preview_Tick(object sender, EventArgs e)
+{
+    timer_Preview.Enabled = false;
+    
+    double recordedLength;
+    bool recordDone;
+    aiTask.GetRecordStatus(out recordedLength, out recordDone);
+    
+    if (recordDone)
+    {
+        try { if (aiTask != null) aiTask.Stop(); }
+        catch (JYDriverException ex) { MessageBox.Show(ex.Message); return; }
+        
+        aiTask.Channels.Clear();
+        timer_Preview.Enabled = false;
+        MessageBox.Show("录制完成！");
+    }
+    else
+    {
+        if (aiTask.AvailableSamples >= 1000)
+        {
+            aiTask.GetRecordPreviewData(ref previewData, 1000, 1000);
+        }
+    }
+    timer_Preview.Enabled = true;
+}
+```
+
+---
+
+## 示例 7.2：AI Record 无限录制模式（Infinite Streaming）
+
+持续录制数据，需要手动调用Stop停止：
+
+```csharp
+private JYUSB1601AITask aiTask;
+private double[] previewData;
+
+private void button_Start_Click(object sender, EventArgs e)
+{
+    try
+    {
+        aiTask = new JYUSB1601AITask("USBDev0");
+        aiTask.AddChannel(0, -10, 10);
+        
+        aiTask.Mode = AIMode.Record;
+        aiTask.SampleRate = 50000;
+        
+        aiTask.Record.FilePath = @"C:\Data\continuous_record.bin";
+        aiTask.Record.FileFormat = FileFormat.Bin;
+        aiTask.Record.Mode = RecordMode.Infinite;  // 无限录制模式
+        
+        aiTask.Start();
+        previewData = new double[1000];
+        timer_Preview.Enabled = true;
+        
+        button_Start.Enabled = false;
+        button_Stop.Enabled = true;
+    }
+    catch (JYDriverException ex) { MessageBox.Show(ex.Message); }
+}
+
+private void timer_Preview_Tick(object sender, EventArgs e)
+{
+    timer_Preview.Enabled = false;
+    if (aiTask.AvailableSamples >= 1000)
+    {
+        aiTask.GetRecordPreviewData(ref previewData, 1000, 1000);
+    }
+    timer_Preview.Enabled = true;
+}
+
+private void button_Stop_Click(object sender, EventArgs e)
+{
+    timer_Preview.Enabled = false;
+    try { if (aiTask != null) { aiTask.Stop(); aiTask.Channels.Clear(); } }
+    catch (JYDriverException ex) { MessageBox.Show(ex.Message); }
+    button_Start.Enabled = true;
+    button_Stop.Enabled = false;
+}
+```
+
+---
+
+## 示例 7.3：录制数据回放
+
+读取已录制的 bin 文件并回放显示：
+
+```csharp
+private FileStream playbackStream;
+private BinaryReader playbackReader;
+private double[] playbackData;
+
+private void button_OpenFile_Click(object sender, EventArgs e)
+{
+    var fileBrowser = new OpenFileDialog { Filter = "(*.bin)|*.bin" };
+    if (fileBrowser.ShowDialog() != DialogResult.OK) return;
+    if (!File.Exists(fileBrowser.FileName)) { MessageBox.Show("文件不存在"); return; }
+    
+    playbackStream = new FileStream(fileBrowser.FileName, FileMode.Open);
+    playbackReader = new BinaryReader(playbackStream);
+    
+    playbackData = new double[1000];
+    
+    button_OpenFile.Enabled = false;
+    button_Playback.Enabled = true;
+}
+
+private void timer_Playback_Tick(object sender, EventArgs e)
+{
+    try
+    {
+        for (int i = 0; i < playbackData.Length; i++)
+            if (playbackStream.Position < playbackStream.Length)
+                playbackData[i] = playbackReader.ReadDouble();
+    }
+    catch (EndOfStreamException)
+    {
+        timer_Playback.Enabled = false;
+        playbackReader.Close();
+        playbackStream.Close();
+        MessageBox.Show("回放完成");
+    }
+}
+```
+
+---
+
 ## 示例 8：AO 单点输出（Console）
 
 ```csharp
