@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECharts 等高线图 (Contour Chart) 范例</title>
+
+    <!-- ========== 页面样式 ========== -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .chart-box {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 16px;
+        }
+        .chart-box h3 {
+            text-align: center;
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .chart {
+            width: 600px;
+            height: 450px;
+        }
+        .note {
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== 页面标题与说明 ========== -->
+<h1>ECharts 等高线图 (Contour Chart) 范例</h1>
+<p class="note">基于 <code>@echarts-x/custom-contour</code> 自定义系列 — 使用 d3-contour 密度估计绘制</p>
+
+<!-- ========== 四个图表容器 ========== -->
+<div class="chart-container">
+    <div class="chart-box">
+        <h3>示例 1：随机散点密度等高线</h3>
+        <div id="chart1" class="chart"></div>
+    </div>
+    <div class="chart-box">
+        <h3>示例 2：双峰高斯分布等高线</h3>
+        <div id="chart2" class="chart"></div>
+    </div>
+    <div class="chart-box">
+        <h3>示例 3：仅线条模式</h3>
+        <div id="chart3" class="chart"></div>
+    </div>
+    <div class="chart-box">
+        <h3>示例 4：高分辨率热力等高线</h3>
+        <div id="chart4" class="chart"></div>
+    </div>
+</div>
+
+<!--
+    ========== 依赖库加载顺序（重要） ==========
+    1. echarts.js        — ECharts 6.x 核心库，提供图表引擎
+    2. d3.js             — D3 v7，custom-contour 内部依赖 d3-contour 和 d3-geo 进行密度计算
+    3. contour.auto.js   — @echarts-x/custom-contour 自定义系列，
+                           加载后自动调用 echarts.use() 注册 'contour' renderItem
+    注意：必须先加载 echarts 和 d3，再加载 contour.auto.js，否则自动注册会失败。
+-->
+<script src="./node_modules/echarts/dist/echarts.js"></script>
+<script src="./node_modules/d3/dist/d3.js"></script>
+<script src="./node_modules/@echarts-x/custom-contour/dist/contour.auto.js"></script>
+
+<script>
+// ============================================================
+// 工具函数：生成正态分布随机数（Box-Muller 变换）
+// ============================================================
+// Box-Muller 变换：将两个均匀分布 U(0,1) 的随机数转换为标准正态分布 N(0,1)
+// 返回值范围大约在 [-3, 3] 之间（99.7% 概率）
+function randn() {
+    var u = 0, v = 0;
+    while (u === 0) u = Math.random(); // 排除 0，避免 log(0)
+    while (v === 0) v = Math.random(); // 排除 0
+    return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+// ============================================================
+// 工具函数：生成以 (cx, cy) 为中心的高斯簇数据
+// ============================================================
+// 参数说明：
+//   cx, cy — 簇中心坐标
+//   sx, sy — X/Y 方向的标准差（控制簇的扩散范围）
+//   n      — 生成的数据点数量
+// 返回值：二维数组 [[x, y, val], ...]，其中 val 是该点到簇中心的欧几里得距离
+function generateCluster(cx, cy, sx, sy, n) {
+    var data = [];
+    for (var i = 0; i < n; i++) {
+        var x = cx + randn() * sx;  // 在中心附近按正态分布生成 x 坐标
+        var y = cy + randn() * sy;  // 在中心附近按正态分布生成 y 坐标
+        var val = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)); // 距离中心的距离作为值
+        data.push([x, y, val]);     // 数据格式：[x坐标, y坐标, 数值]
+    }
+    return data;
+}
+
+// ============================================================
+// 示例 1：单簇随机散点密度等高线
+// ============================================================
+// 展示最基本的等高线用法：单个高斯簇 + 填充渐变色 + 轮廓线
+(function () {
+    var chart = echarts.init(document.getElementById('chart1'));
+
+    // 生成 300 个点，中心 (50,50)，标准差 15
+    var data = generateCluster(50, 50, 15, 15, 300);
+
+    chart.setOption({
+        tooltip: {},                                    // 启用默认 tooltip
+        xAxis: { type: 'value', min: 0, max: 100 },    // X 轴数值范围 0~100
+        yAxis: { type: 'value', min: 0, max: 100 },    // Y 轴数值范围 0~100
+        series: [
+            {
+                type: 'custom',          // 使用自定义系列
+                renderItem: 'contour',   // 指定已注册的 'contour' 渲染器
+                data: data,              // 数据格式：[[x, y, value], ...]
+                // encode 指定数据维度映射：
+                //   x: 第 0 维映射到 X 轴
+                //   y: 第 1 维映射到 Y 轴
+                //   tooltip: 第 2 维显示在 tooltip 中
+                encode: { x: 0, y: 1, tooltip: 2 },
+                // itemPayload 传递给 contour 渲染器的配置参数：
+                itemPayload: {
+                    thresholds: 10,      // 等高线层数（越大越精细）
+                    bandwidth: 25,       // 核密度估计的带宽（越大越平滑）
+                    itemStyle: {
+                        // 填充色渐变数组：从外层（低密度）到内层（高密度）插值
+                        color: ['#313695', '#4575b4', '#74add1', '#abd9e9',
+                                '#fee090', '#fdae61', '#f46d43', '#d73027'],
+                        // 透明度范围：[外层透明度, 内层透明度]
+                        opacity: [0.1, 0.8]
+                    },
+                    // 等高线轮廓线样式
+                    lineStyle: { color: '#333', width: 0.5, opacity: 0.6 }
+                }
+            }
+        ]
+    });
+
+    // 监听窗口 resize 事件，自适应调整图表大小
+    window.addEventListener('resize', function () { chart.resize(); });
+})();
+
+// ============================================================
+// 示例 2：双峰高斯分布等高线
+// ============================================================
+// 展示多簇数据如何呈现双峰密度分布，使用 Viridis 配色方案
+(function () {
+    var chart = echarts.init(document.getElementById('chart2'));
+
+    // 合并两个不同位置的高斯簇：
+    //   簇 A：中心 (30, 60)，标准差 10，200 个点
+    //   簇 B：中心 (70, 40)，X 标准差 12，Y 标准差 8（椭圆形分布），200 个点
+    var data = []
+        .concat(generateCluster(30, 60, 10, 10, 200))
+        .concat(generateCluster(70, 40, 12, 8, 200));
+
+    chart.setOption({
+        tooltip: {},
+        xAxis: { type: 'value', min: 0, max: 100 },
+        yAxis: { type: 'value', min: 0, max: 100 },
+        series: [
+            {
+                type: 'custom',
+                renderItem: 'contour',
+                data: data,
+                encode: { x: 0, y: 1, tooltip: 2 },
+                itemPayload: {
+                    thresholds: 12,      // 12 层等高线
+                    bandwidth: 20,       // 带宽 20，适中平滑
+                    itemStyle: {
+                        // Viridis 配色：紫 → 蓝 → 绿 → 黄，适合科学可视化
+                        color: ['#440154', '#482878', '#3e4989', '#31688e',
+                                '#26828e', '#1f9e89', '#6cce5a', '#b6de2b', '#fee825'],
+                        opacity: [0.15, 0.85]
+                    },
+                    lineStyle: { color: '#222', width: 0.8, opacity: 0.5 }
+                }
+            }
+        ]
+    });
+
+    window.addEventListener('resize', function () { chart.resize(); });
+})();
+
+// ============================================================
+// 示例 3：仅线条模式（无填充）
+// ============================================================
+// 展示纯等高线轮廓，不填充颜色，类似地形图等高线风格
+(function () {
+    var chart = echarts.init(document.getElementById('chart3'));
+
+    // 生成 500 个点，较多数据让等高线更平滑
+    var data = generateCluster(50, 50, 18, 18, 500);
+
+    chart.setOption({
+        tooltip: {},
+        xAxis: { type: 'value', min: 0, max: 100 },
+        yAxis: { type: 'value', min: 0, max: 100 },
+        series: [
+            {
+                type: 'custom',
+                renderItem: 'contour',
+                data: data,
+                encode: { x: 0, y: 1, tooltip: 2 },
+                itemPayload: {
+                    thresholds: 15,      // 15 层等高线
+                    bandwidth: 18,       // 带宽 18
+                    itemStyle: {
+                        color: 'none'    // 'none' 表示不填充颜色区域
+                    },
+                    lineStyle: {
+                        color: '#1a9850', // 绿色等高线
+                        width: 1.5,       // 线宽 1.5px
+                        opacity: 0.8      // 线条透明度
+                    }
+                }
+            }
+        ]
+    });
+
+    window.addEventListener('resize', function () { chart.resize(); });
+})();
+
+// ============================================================
+// 示例 4：高分辨率热力等高线（三簇 + visualMap）
+// ============================================================
+// 展示多簇数据 + 高 thresholds 实现细腻热力图效果
+// 同时演示 visualMap 组件与 contour 配合使用
+(function () {
+    var chart = echarts.init(document.getElementById('chart4'));
+
+    // 三个高斯簇：左上、中间、右下，形成对角线分布
+    var data = []
+        .concat(generateCluster(25, 75, 8, 8, 150))   // 左上簇
+        .concat(generateCluster(50, 50, 10, 10, 200))  // 中间簇（较大）
+        .concat(generateCluster(75, 25, 8, 8, 150));   // 右下簇
+
+    chart.setOption({
+        tooltip: {},
+        xAxis: { type: 'value', min: 0, max: 100 },
+        yAxis: { type: 'value', min: 0, max: 100 },
+        // visualMap：右侧颜色条，提供数据值到颜色的映射参考
+        // 注意：contour 的填充色由 itemPayload.itemStyle.color 独立控制，
+        //       visualMap 这里主要用于展示图例参考
+        visualMap: {
+            show: true,
+            min: 0,              // 最小值
+            max: 30,             // 最大值
+            inRange: { color: ['#313695', '#d73027'] }, // 颜色映射范围
+            right: 10,           // 定位：右侧
+            top: 'center',       // 定位：垂直居中
+            text: ['高', '低'],   // 图例文字
+            calculable: true     // 允许拖拽筛选
+        },
+        series: [
+            {
+                type: 'custom',
+                renderItem: 'contour',
+                data: data,
+                encode: { x: 0, y: 1, tooltip: 2 },
+                itemPayload: {
+                    thresholds: 20,      // 20 层等高线，非常细腻
+                    bandwidth: 15,       // 带宽 15，较小，保留更多细节
+                    itemStyle: {
+                        // 10 色渐变：蓝 → 白 → 红，模拟热力图
+                        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8',
+                                '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026'],
+                        opacity: [0.2, 0.9] // 外层半透明，内层不透明
+                    },
+                    lineStyle: { color: 'none' } // 不显示轮廓线，纯填充
+                }
+            }
+        ]
+    });
+
+    window.addEventListener('resize', function () { chart.resize(); });
+})();
+</script>
+
+</body>
+</html>
